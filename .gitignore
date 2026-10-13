@@ -40,3 +40,6 @@ workbench/video/hero-a/out-perfis/
 
 # material de trabalho (mocks, capturas, geracoes): nao compoe o site
 /workbench/assets/
+# Figura isométrica: páginas de conferência e capturas (regeneráveis)
+workbench/tools/iso/cerne/out/
+workbench/tools/iso/cerne/shots/
