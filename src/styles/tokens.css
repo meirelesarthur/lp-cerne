@@ -1,0 +1,42 @@
+@import '@fontsource-variable/outfit';
+
+/* Tema claro (acompanha a cena do amanhecer). O GB Mode escuro fica em [data-theme='gbMode'] para as seções seguintes. */
+:root {
+  --canvas: #f5f8f4;
+  --outer: #eef3ee;
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.82);
+  --border: #d3dfd6;
+  --text: #171717;
+  --text-soft: #2b3a31;
+  --muted: #4a5b50;
+  --accent: #059669;
+  --accent-hover: #047857;
+  --accent-bright: #059669;
+  --on-accent: #ffffff;
+  --danger: #b91c1c;
+  --placeholder: #6b7d71;
+  --veil: 247, 250, 246; /* rgb do véu de legibilidade sobre o céu */
+
+  --font: 'Outfit Variable', 'Outfit', system-ui, sans-serif;
+  --gutter: clamp(20px, 4vw, 64px);
+  --radius: 14px;
+}
+
+[data-theme='gbMode'] {
+  --canvas: #051008;
+  --outer: #081a12;
+  --surface: #0e2a1d;
+  --surface-glass: rgba(8, 26, 18, 0.86);
+  --border: #1c3f2c;
+  --text: #e2f0e8;
+  --text-soft: #e2f0e8;
+  --muted: #7da893;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-bright: #4ade80;
+  --on-accent: #03140b;
+  --danger: #f87171;
+  --placeholder: #74967f;
+  --veil: 5, 16, 8;
+}

@@ -1,0 +1,478 @@
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { maskPhone, submitLead, validators, type Status } from '../lib/form'
+import { gsap } from '../lib/scroll'
+import { useAfterFirstScroll } from '../lib/defer'
+
+const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
+
+/* ───────────────────────── 03 · Problema ───────────────────────── */
+export function ProblemSection() {
+  const root = useRef<HTMLElement>(null)
+  const media = useAfterFirstScroll()
+  // planilha, caderno e conversa convergem no painel único conforme o scroll
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ scrollTrigger: { trigger: '.layers', start: 'top 75%', end: 'bottom 40%', scrub: 0.6 } })
+      tl.from('.layer-a', { x: -60, y: -40, rotate: -6 }, 0)
+        .from('.layer-b', { x: 50, y: 10, rotate: 5 }, 0)
+        .from('.layer-c', { x: -30, y: 60, rotate: -3 }, 0)
+        .to('.layer', { opacity: 0, scale: 0.92, duration: 0.5 }, 0.6)
+        .fromTo('.layer-panel', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5 }, 0.65)
+    }, root)
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section ref={root} className="sec sec-light problem" id="problema" aria-labelledby="problema-title">
+      <div className="wrap problem-grid">
+        <div className="problem-copy">
+          <header className="sec-head" data-reveal>
+            <span className="eyebrow">O ponto de partida</span>
+            <h2 id="problema-title">Planilha aqui, caderno ali, WhatsApp no meio.</h2>
+            <p className="sec-lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
+          </header>
+          <ol className="pains">
+            <li data-reveal><b>01</b> Número diferente em cada controle.</li>
+            <li data-reveal><b>02</b> O que o campo anota demora a chegar ao escritório.</li>
+            <li data-reveal><b>03</b> Resultado por lote ou curral só no fechamento, se der.</li>
+          </ol>
+          <p className="problem-answer" data-reveal>O Cerne junta tudo em um lugar.</p>
+        </div>
+
+        <div className="layers" aria-hidden="true">
+          <div className="layer layer-a">
+            <span className="layer-tag">Planilha</span>
+            <div className="sheet">{Array.from({ length: 24 }, (_, i) => <i key={i} />)}</div>
+          </div>
+          <div className="layer layer-b">
+            <span className="layer-tag">Caderno</span>
+            <div className="notebook"><p>Curral 4: trato 6h30</p><p>Lote 12: pesar sexta</p><p>Ração: pedir 8 t</p></div>
+          </div>
+          <div className="layer layer-c">
+            <span className="layer-tag">Conversa</span>
+            <div className="chat"><p className="in">Quantos bois no curral 7?</p><p className="out">Acho que 84, vou confirmar</p></div>
+          </div>
+          <figure className="layer-panel">
+            {media && <img src="/screens/visao-geral.webp" alt="Painel Visão Geral do Cerne com mapa de talhões e indicadores" loading="lazy" />}
+          </figure>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 04 · Trailer ───────────────────────── */
+const CAPITULOS = [
+  { t: 0, n: 'Visão geral', d: 'Indicadores da fazenda num painel só.' },
+  { t: 3.6, n: 'Pecuária de corte', d: 'Rebanho, composição e manejos do período.' },
+  { t: 6.4, n: 'Lotação de currais', d: 'Quem está onde e o que precisa de atenção.' },
+  { t: 9.2, n: 'Custos do confinamento', d: 'Quanto custa cada fase, sem esperar o fechamento.' },
+  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas e orçamento do período.' },
+]
+
+const DESKTOP_PIN = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
+
+export function TrailerSection() {
+  const root = useRef<HTMLElement>(null)
+  const video = useRef<HTMLVideoElement>(null)
+  const capRef = useRef(0)
+  const media = useAfterFirstScroll()
+  const [cap, setCap] = useState(0)
+
+  useEffect(() => {
+    const v = video.current
+    if (!v) return
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; void v.play().catch(() => {}) } else v.pause()
+    }, { threshold: 0.35 })
+    io.observe(v)
+    const onTime = () => {
+      const t = v.currentTime % 15
+      let i = 0
+      CAPITULOS.forEach((c, k) => { if (t >= c.t) i = k })
+      capRef.current = i
+      setCap(i)
+    }
+    v.addEventListener('timeupdate', onTime)
+    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime) }
+  }, [])
+
+  const goTo = (i: number) => {
+    const v = video.current
+    capRef.current = i
+    setCap(i)
+    if (!v) return
+    v.currentTime = CAPITULOS[i].t + 0.05
+    void v.play().catch(() => {})
+  }
+
+  // desktop: a seção fica fixa e cada trecho do scroll abre um capítulo
+  useLayoutEffect(() => {
+    const mm = gsap.matchMedia()
+    mm.add(DESKTOP_PIN, () => {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: root.current, start: 'top top', end: '+=240%', pin: true, scrub: true, refreshPriority: 5,
+          onUpdate: (self) => {
+            const i = Math.min(CAPITULOS.length - 1, Math.floor(self.progress * CAPITULOS.length))
+            if (i !== capRef.current) goTo(i)
+          },
+        },
+      }).fromTo('.trailer .browser', { scale: 0.94 }, { scale: 1, ease: 'none', duration: 0.25 })
+        .fromTo('.trailer .scrub-bar i', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
+    })
+    return () => mm.revert()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title">
+      <div className="wrap">
+        <header className="sec-head center" data-reveal>
+          <span className="eyebrow">O sistema em funcionamento</span>
+          <h2 id="trailer-title">Veja o Cerne por dentro.</h2>
+          <p className="sec-lead">Telas reais do Cerne Web, com dados de demonstração.</p>
+        </header>
+        <div className="trailer-grid">
+          <figure className="browser" data-reveal>
+            <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
+            <video ref={video} muted loop playsInline preload="none" poster={media ? '/video/system-loop-poster.webp' : undefined} aria-label="Demonstração das telas do Cerne Web">
+              <source src="/video/system-loop.webm" type="video/webm" />
+              <source src="/video/system-loop.mp4" type="video/mp4" />
+            </video>
+          </figure>
+          <ol className="chapters">
+            <li className="scrub-bar" aria-hidden="true"><i /></li>
+            {CAPITULOS.map((c, i) => (
+              <li key={c.n} data-reveal>
+                <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
+                  <b>{String(i + 1).padStart(2, '0')}</b>
+                  <span><strong>{c.n}</strong><small>{c.d}</small></span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
+// grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
+const MODULOS = [
+  { k: 'a', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', img: 'lotacao-currais' },
+  { k: 'b', t: 'Agricultura', d: 'Planejamento, romaneios e rastreabilidade.', chips: ['Planejamento de safra', 'Romaneios', 'Rastreabilidade', 'Talhões'] },
+  { k: 'c', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', img: 'suprimentos' },
+  { k: 'd', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', img: 'financeiros' },
+  { k: 'e', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
+  { k: 'f', t: 'Dashboards e relatórios', d: 'Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.', img: 'custos-confinamento' },
+]
+
+export function SystemSection() {
+  const root = useRef<HTMLElement>(null)
+  const media = useAfterFirstScroll()
+  // leve parallax das telas dentro das molduras (transform só, sem layout)
+  useLayoutEffect(() => {
+    if (!media || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>('.shot img').forEach((img) => {
+        gsap.fromTo(img, { yPercent: 0 }, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } })
+      })
+    }, root)
+    return () => ctx.revert()
+  }, [media])
+
+  return (
+    <section ref={root} className="sec sec-light system" id="sistema" aria-labelledby="sistema-title">
+      <div className="wrap">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">O sistema</span>
+          <h2 id="sistema-title">Seis frentes. Um só cadastro.</h2>
+          <p className="sec-lead">Os módulos que já estão no menu do Cerne Web.</p>
+        </header>
+        <div className="bento">
+          {MODULOS.map((m) => (
+            <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
+              <div className="cell-text">
+                <h3>{m.t}</h3>
+                <p>{m.d}</p>
+              </div>
+              {m.img ? (
+                <div className="shot">{media && <img src={`/screens/${m.img}.webp`} alt="" loading="lazy" decoding="async" />}</div>
+              ) : (
+                <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 06 · Edições ───────────────────────── */
+export function EditionsSection() {
+  const media = useAfterFirstScroll()
+  return (
+    <section className="sec sec-light editions" id="edicoes" aria-labelledby="edicoes-title">
+      <div className="wrap">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Como usar</span>
+          <h2 id="edicoes-title">Um sistema. Três formas de usar.</h2>
+        </header>
+        <div className="editions-grid">
+          <article className="edition web" data-reveal>
+            <span className="badge on">Disponível · navegador</span>
+            <h3>Cerne Web</h3>
+            <p>O ERP completo: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p>
+            {media && <img src="/screens/visao-geral.webp" alt="Cerne Web: painel Visão Geral" loading="lazy" />}
+            <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
+          </article>
+          <article className="edition app" data-reveal>
+            <span className="badge">Em construção · em teste</span>
+            <h3>Cerne Administração</h3>
+            <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
+            <div className="phone" aria-hidden="true"><span>Tela do app</span></div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Quero testar</a>
+          </article>
+          <article className="edition app" data-reveal>
+            <span className="badge">Em construção · em teste</span>
+            <h3>Cerne Operação</h3>
+            <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
+            <div className="phone" aria-hidden="true"><span>Tela do app</span></div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Quero testar</a>
+          </article>
+        </div>
+        <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 07 · Perfis ───────────────────────── */
+const PASSOS = [
+  { t: 'Escritório', d: 'Cria a ordem de serviço.' },
+  { t: 'Campo', d: 'Recebe e executa.' },
+  { t: 'Apontamento', d: 'Registrado em etapas.' },
+  { t: 'Gestor', d: 'Avalia e vê o resultado.' },
+]
+
+export function ProfilesSection() {
+  const root = useRef<HTMLElement>(null)
+  const [step, setStep] = useState(-1)
+  useLayoutEffect(() => {
+    const mm = gsap.matchMedia()
+    mm.add(DESKTOP_PIN, () => {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: root.current, start: 'top top', end: '+=160%', pin: true, scrub: true, refreshPriority: 4,
+          onUpdate: (self) => setStep(Math.min(PASSOS.length - 1, Math.floor(self.progress * (PASSOS.length + 0.6)) - 0)),
+        },
+      }).fromTo('.flow-fill', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 })
+    })
+    return () => mm.revert()
+  }, [])
+  return (
+    <section ref={root} className="sec sec-mint profiles" id="perfis" aria-labelledby="perfis-title">
+      <div className="wrap">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Escritório e campo</span>
+          <h2 id="perfis-title">Quem decide e quem executa, no mesmo fluxo.</h2>
+        </header>
+        <div className="profiles-grid">
+          <article className="profile" data-reveal>
+            <h3>Gestor</h3>
+            <ul><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos</li></ul>
+          </article>
+          <article className="profile" data-reveal>
+            <h3>Campo</h3>
+            <ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul>
+            <p className="note">Pelos apps em construção.</p>
+          </article>
+        </div>
+        <ol className="flow">
+          <li className="flow-track" aria-hidden="true"><i className="flow-fill" /></li>
+          {PASSOS.map((p, i) => (
+            <li key={p.t} className={i <= step ? 'on' : ''} data-reveal><b>{i + 1}</b><h3>{p.t}</h3><p>{p.d}</p></li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 08 · Confiança ───────────────────────── */
+export function TrustSection() {
+  return (
+    <section className="sec sec-light trust" aria-labelledby="confianca-title">
+      <div className="wrap trust-inner" data-reveal>
+        <span className="eyebrow">Quem constrói</span>
+        <h2 id="confianca-title">Feito por quem conhece o campo.</h2>
+        <p className="sec-lead">Desenvolvido pela GB Agritech. <Tbd>redação e prova a validar</Tbd></p>
+        <p className="fineprint">Depoimentos, parcerias e selos só entram com material real validado para o Cerne.</p>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 09 · Form completo ───────────────────────── */
+type CErr = Partial<Record<'name' | 'email' | 'whatsapp' | 'consent', string>>
+
+export function ContactSection() {
+  const uid = useId()
+  const [v, setV] = useState({ name: '', email: '', whatsapp: '', size: '', interest: '', consent: false })
+  const [errors, setErrors] = useState<CErr>({})
+  const [status, setStatus] = useState<Status>('idle')
+
+  // os CTAs "Agendar demonstração" / "Quero testar" pré-selecionam o interesse
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement).closest('[data-interest]') as HTMLElement | null
+      if (a) setV((s) => ({ ...s, interest: a.dataset.interest ?? '' }))
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [])
+
+  const check = (k: keyof CErr) => {
+    const msg = k === 'consent' ? validators.consent(v.consent) : validators[k](v[k])
+    setErrors((e) => ({ ...e, [k]: msg }))
+    return !msg
+  }
+  const set = (k: keyof typeof v, val: string | boolean) => setV((s) => ({ ...s, [k]: val }))
+
+  const onSubmit = async (ev: FormEvent, intent: 'lista' | 'demonstracao') => {
+    ev.preventDefault()
+    if (![check('name'), check('email'), check('whatsapp'), check('consent')].every(Boolean)) return
+    setStatus('loading')
+    try {
+      await submitLead({ origem: 'form-completo', intencao: intent, nome: v.name.trim(), email: v.email.trim(), whatsapp: v.whatsapp, tamanho: v.size, interesse: v.interest, consent: v.consent })
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  const field = (k: 'name' | 'email' | 'whatsapp', label: string, props: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <div className="field" data-invalid={Boolean(errors[k])}>
+      <label htmlFor={`${uid}-${k}`}>{label}</label>
+      <input id={`${uid}-${k}`} {...props} value={v[k]} onBlur={() => check(k)}
+        onChange={(e) => set(k, k === 'whatsapp' ? maskPhone(e.target.value) : e.target.value)}
+        aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `${uid}-${k}-e` : undefined} />
+      {errors[k] && <span className="err" id={`${uid}-${k}-e`}>{errors[k]}</span>}
+    </div>
+  )
+
+  return (
+    <section className="sec sec-light contact" id="contato" aria-labelledby="contato-title">
+      <div className="wrap contact-grid">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Lista de espera</span>
+          <h2 id="contato-title">Entre na lista e fale com a gente.</h2>
+          <p className="sec-lead">Receba o acesso ao Cerne Web, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
+          <a className="btn btn-ghost whats" aria-disabled="true" href="#contato" onClick={(e) => e.preventDefault()}>Falar agora no WhatsApp <Tbd>número a definir</Tbd></a>
+        </header>
+
+        {status === 'success' ? (
+          <div className="form big" role="status" data-reveal>
+            <h3>Pronto, você está na lista.</h3>
+            <p className="sub" style={{ display: 'block' }}>Nossa equipe vai falar com você pelo e-mail ou WhatsApp informado.</p>
+          </div>
+        ) : (
+          <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
+            {field('name', 'Nome', { autoComplete: 'name', placeholder: 'Seu nome' })}
+            <div className="row2">
+              {field('email', 'E-mail', { type: 'email', autoComplete: 'email', inputMode: 'email', placeholder: 'voce@suafazenda.com.br' })}
+              {field('whatsapp', 'WhatsApp', { type: 'tel', autoComplete: 'tel-national', inputMode: 'tel', placeholder: '(00) 00000-0000' })}
+            </div>
+            <div className="row2">
+              <div className="field">
+                <label htmlFor={`${uid}-size`}>Tamanho da operação</label>
+                <select id={`${uid}-size`} value={v.size} onChange={(e) => set('size', e.target.value)}>
+                  <option value="">Selecione</option>
+                  <option value="ate-1000">Até 1.000 cabeças</option>
+                  <option value="1000-5000">1.000 a 5.000 cabeças</option>
+                  <option value="acima-5000">Acima de 5.000 cabeças</option>
+                  <option value="agricultura-outro">Agricultura / outro</option>
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor={`${uid}-interest`}>Interesse</label>
+                <select id={`${uid}-interest`} value={v.interest} onChange={(e) => set('interest', e.target.value)}>
+                  <option value="">Selecione</option>
+                  <option value="web">Cerne Web</option>
+                  <option value="app-administracao">App Administração</option>
+                  <option value="app-operacao">App Operação</option>
+                  <option value="demonstracao">Demonstração</option>
+                  <option value="todos">Todos</option>
+                </select>
+              </div>
+            </div>
+            <label className="consent">
+              <input type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} />
+              <span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span>
+            </label>
+            {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
+            <div className="actions">
+              <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Entrar na lista'}</button>
+              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Prefiro agendar demonstração</button>
+            </div>
+            {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
+          </form>
+        )}
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── 10 · Dúvidas ───────────────────────── */
+const FAQ = [
+  { q: 'O Cerne já está disponível?', a: 'O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste.', tbd: true },
+  { q: 'Como funciona o teste?', a: 'Entre na lista de espera ou agende uma demonstração com a nossa equipe.', tbd: true },
+  { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
+  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte, confinamento e agricultura.', tbd: true },
+]
+
+export function FaqSection() {
+  return (
+    <section className="sec sec-light faq" id="duvidas" aria-labelledby="duvidas-title">
+      <div className="wrap faq-inner">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Dúvidas</span>
+          <h2 id="duvidas-title">O que mais perguntam.</h2>
+        </header>
+        <div className="faq-list">
+          {FAQ.map((f) => (
+            <details key={f.q} data-reveal>
+              <summary>{f.q}</summary>
+              <p>{f.a} {f.tbd && <Tbd />}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────────── Rodapé ───────────────────────── */
+export function Footer() {
+  return (
+    <footer className="footer">
+      <div className="wrap footer-inner">
+        <div>
+          <img src="/logo-white.svg" alt="Cerne" height={28} />
+          <p>uma solução GB Agritech</p>
+        </div>
+        <nav aria-label="Rodapé">
+          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#duvidas">Dúvidas</a>
+        </nav>
+        <div className="legal">
+          <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
+          <a href="#contato">Política de Privacidade <Tbd>link</Tbd></a>
+        </div>
+      </div>
+    </footer>
+  )
+}

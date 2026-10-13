@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cerne Wireframe LP</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #111; background: #fff; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section { border-bottom: 2px solid #111; padding: 64px 0; position: relative; }
+  h1, h2, h3, p { margin: 0 0 12px; }
+  h1 { font-size: 44px; line-height: 1.1; }
+  h2 { font-size: 32px; line-height: 1.15; }
+  h3 { font-size: 20px; }
+  .muted { color: #666; }
+  .tag { display: inline-block; border: 1px solid #111; padding: 2px 10px; font-size: 13px; margin-bottom: 16px; }
+  .btn { display: inline-block; border: 2px solid #111; padding: 10px 20px; margin: 8px 8px 0 0; font-weight: 600; }
+  .btn.solid { background: #111; color: #fff; }
+  .ph { border: 2px dashed #888; background: #f4f4f4; color: #555; display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px; font-size: 14px; min-height: 160px; }
+  .ph.tall { min-height: 360px; }
+  .grid { display: grid; gap: 24px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .card { border: 1px solid #111; padding: 20px; }
+  .note { background: #fff8c5; border-left: 4px solid #b59b00; padding: 8px 12px; font-size: 13px; margin-bottom: 24px; }
+  .note b { display: block; }
+  .label { position: absolute; top: 8px; right: 12px; font-size: 12px; background: #111; color: #fff; padding: 2px 8px; }
+  nav { border-bottom: 2px solid #111; padding: 16px 0; }
+  nav .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  nav ul { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
+  ol, ul.list { margin: 0; padding-left: 20px; }
+  form { display: grid; gap: 12px; max-width: 520px; }
+  input, select { width: 100%; padding: 10px; border: 1px solid #111; font: inherit; background: #fff; }
+  label { font-size: 14px; display: grid; gap: 4px; }
+  .chk { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+  .chk input { width: auto; margin-top: 4px; }
+  footer { padding: 32px 0; font-size: 14px; }
+  .center { text-align: center; }
+  .hero { min-height: 90vh; display: flex; align-items: center; }
+  @media (max-width: 800px) {
+    h1 { font-size: 32px; } h2 { font-size: 26px; }
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+    section { padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap"><div class="note" style="margin-top:16px"><b>WIREFRAME v1: estrutura e copy.</b>Sem cor, imagem, vídeo ou animação. Caixas tracejadas = mídia futura. Notas amarelas = anotações internas (não entram na página).</div></div>
+
+<nav>
+  <div class="wrap">
+    <strong>[LOGO CERNE]</strong>
+    <ul><li>Sistema</li><li>Edições</li><li>Perfis</li><li>Contato</li></ul>
+    <span class="btn solid" style="margin:0">Entrar na lista</span>
+  </div>
+</nav>
+
+<!-- 1 HERO -->
+<section class="hero">
+  <span class="label">BLOCO 1 · HERO</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Dizer o que é e para quem em 5 segundos; gerar o primeiro clique.<b>Scroll:</b>Seção fixa (pin) ~200vh; vídeo A avança com o scroll (fazenda → painel do sistema); headline some ao fim.<b>Mídia:</b>Vídeo A em tela cheia atrás do texto.</div>
+    <div class="ph tall" style="margin-bottom:32px">[VÍDEO A · TELA CHEIA · fazenda ao amanhecer → painel de Pecuária]</div>
+    <span class="tag">Cerne Web disponível · Apps em breve</span>
+    <h1>Do campo ao financeiro,<br>num só sistema.</h1>
+    <p class="muted" style="max-width:640px">O Cerne reúne rebanho, confinamento, suprimentos e financeiro da sua fazenda em um ERP web feito para o agro.</p>
+    <span class="btn solid">Entrar na lista de espera</span><span class="btn">Agendar demonstração</span>
+    <p class="muted" style="margin-top:24px;font-size:14px">↓ Role para conhecer</p>
+  </div>
+</section>
+
+<!-- 2 PROVA -->
+<section>
+  <span class="label">BLOCO 2 · FAIXA DE PROVA</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Mostrar o escopo do produto em um olhar.<b>Scroll:</b>Itens entram em sequência; números contam de 0 ao valor.<b>Atenção:</b>Números abaixo são dados de exemplo do protótipo; só publicar com a marcação "exemplo" ou valores reais.</div>
+    <div class="grid g4">
+      <div class="card"><h3>Multifazendas</h3><p class="muted">Várias fazendas na mesma visão, com dados separados por unidade.</p><small>[EXEMPLO: 10 fazendas]</small></div>
+      <div class="card"><h3>Rebanho e confinamento</h3><p class="muted">Lotes, currais, dieta, trato e leitura de cocho.</p><small>[EXEMPLO: 4.280 cabeças]</small></div>
+      <div class="card"><h3>Suprimentos e estoque</h3><p class="muted">Da solicitação ao recebimento, com fábrica de ração.</p></div>
+      <div class="card"><h3>Financeiro e ativos</h3><p class="muted">Custos, resultado e depreciação sem planilha paralela.</p></div>
+    </div>
+    <div class="note" style="margin-top:24px"><b>Novo (v1.1):</b>Faixa "para quem" e "onde acessar". Segmentos listados só se o Cerne cobrir de fato hoje (web tem pecuária, confinamento e agricultura). Fiscal (NF-e, CT-e, MDF-e, LCDPR) é argumento forte no segmento: confirmar o que o Cerne entrega antes de citar.</div>
+    <p><b>Feito para:</b> pecuária de corte · confinamento · agricultura &nbsp;[+ outros segmentos a confirmar]</p>
+    <p><b>Acesse de onde estiver:</b> computador hoje; celular e tablet com os apps em breve.</p>
+    <p class="muted">[FISCAL · a confirmar] Emissão e obrigações fiscais integradas ao dia a dia da fazenda.</p>
+  </div>
+</section>
+
+<!-- 3 PROBLEMA -->
+<section>
+  <span class="label">BLOCO 3 · PROBLEMA → CERNE</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Criar identificação com a dor e posicionar o Cerne como a virada.<b>Scroll:</b>Texto revela por palavra; três fragmentos (planilha, caderno, WhatsApp) em camadas com parallax e se fundem num painel único.<b>Mídia:</b>Ilustração/colagem em camadas.</div>
+    <div class="grid g2">
+      <div>
+        <h2>Planilha aqui, caderno ali, WhatsApp no meio.</h2>
+        <p class="muted">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
+        <ul class="list">
+          <li>Número diferente em cada controle</li>
+          <li>O que o campo anota demora a chegar ao escritório</li>
+          <li>Resultado por lote ou curral só no fim do mês, se der</li>
+        </ul>
+        <h3 style="margin-top:24px">O Cerne junta tudo em um lugar.</h3>
+      </div>
+      <div class="ph tall">[CAMADAS: planilha · caderno · conversa → fundem em painel]</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 TRAILER -->
+<section>
+  <span class="label">BLOCO 4 · TRAILER DO PRODUTO</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Mostrar o sistema real funcionando.<b>Scroll:</b>Seção fixa; vídeo B avança com o scroll e a legenda muda a cada capítulo (4 capítulos). Opcional: botão "assistir completo".<b>Mídia:</b>Vídeo B com telas reais do web.</div>
+    <h2 class="center">Veja o Cerne em 30 segundos.</h2>
+    <div class="ph tall" style="margin:24px 0">[VÍDEO B · telas reais do web]</div>
+    <div class="grid g4">
+      <div class="card"><b>01 · Visão geral</b><p class="muted">Indicadores da fazenda num painel só.</p></div>
+      <div class="card"><b>02 · Mapa de confinamento</b><p class="muted">Cada curral, lote e ocupação à vista.</p></div>
+      <div class="card"><b>03 · Lotação de currais</b><p class="muted">Quem está onde e o que precisa de atenção.</p></div>
+      <div class="card"><b>04 · Custos</b><p class="muted">Quanto custa cada fase, sem esperar o fechamento.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 EDIÇÕES -->
+<section>
+  <span class="label">BLOCO 5 · EDIÇÕES</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Deixar claro o que existe hoje e o que vem; sem prometer o que ainda é protótipo.<b>Scroll:</b>Cards entram em cascata; hover inclina em 3D.<b>Mídia:</b>Tela do web e dois celulares.</div>
+    <h2>Um sistema. Três formas de usar.</h2>
+    <div class="grid g3" style="margin-top:24px">
+      <div class="card">
+        <span class="tag">Disponível</span>
+        <div class="ph" style="margin-bottom:16px">[TELA WEB]</div>
+        <h3>Cerne Web</h3>
+        <p class="muted">O ERP completo no navegador: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p>
+        <span class="btn solid">Agendar demonstração</span>
+      </div>
+      <div class="card">
+        <span class="tag">Em construção · em teste</span>
+        <div class="ph" style="margin-bottom:16px">[CELULAR ADM]</div>
+        <h3>Cerne Administração</h3>
+        <p class="muted">Para gestores e escritório: resultado, rebanho, ordens de serviço e, no futuro, banco, crédito e marketplace.</p>
+        <span class="btn">Quero testar</span>
+      </div>
+      <div class="card">
+        <span class="tag">Em construção · em teste</span>
+        <div class="ph" style="margin-bottom:16px">[CELULAR OPERAÇÃO]</div>
+        <h3>Cerne Operação</h3>
+        <p class="muted">Para o campo: minhas ordens de serviço, trato, cocho, pesagem e sanitário, com registro em etapas.</p>
+        <span class="btn">Quero testar</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:16px;font-size:14px">Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. [Confirmar texto com produto/jurídico]</p>
+  </div>
+</section>
+
+<!-- 6 PERFIS -->
+<section>
+  <span class="label">BLOCO 6 · DOIS PERFIS</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Mostrar o ciclo escritório ↔ campo, o diferencial do conjunto.<b>Scroll:</b>Seção fixa; vídeo C: celular entra, OS sai do escritório, é executada no campo e o apontamento volta ao painel. Quatro passos acendem em sequência.<b>Mídia:</b>Vídeo C.</div>
+    <h2>Quem decide e quem executa, no mesmo fluxo.</h2>
+    <div class="grid g2" style="margin:24px 0">
+      <div class="card">
+        <h3>Gestor</h3>
+        <ul class="list"><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos do campo</li><li>Auditoria: consultas e exportação de logs</li></ul>
+      </div>
+      <div class="card">
+        <h3>Campo</h3>
+        <ul class="list"><li>Minhas ordens de serviço: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem, sanitário, transferência e nascimentos</li><li>Cadastro guiado em etapas, com revisão</li></ul>
+      </div>
+    </div>
+    <div class="ph tall">[VÍDEO C · celular entra · fluxo da OS]</div>
+    <ol style="margin-top:24px"><li><b>Escritório</b> cria a ordem de serviço.</li><li><b>Campo</b> recebe e executa.</li><li><b>Apontamento</b> é registrado em etapas.</li><li><b>Gestor</b> avalia e vê o resultado.</li></ol>
+    <p class="muted" style="font-size:14px">[Itens de offline, scanner SISBOV e hardware: só entram quando existirem de verdade. Hoje são demonstração.]</p>
+  </div>
+</section>
+
+<!-- 6B PROVA SOCIAL -->
+<section>
+  <span class="label">BLOCO 6B · CONFIANÇA (opcional)</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Reduzir risco percebido. Só entra com material real e validado para o Cerne; não herdar depoimentos, parcerias ou certificações de outro produto sem aprovação. Sem números vazios ("0+"): ou valor real, ou o bloco não aparece.<b>Scroll:</b>Carrossel simples.</div>
+    <h2>Quem constrói o Cerne conhece o campo.</h2>
+    <div class="grid g3" style="margin-top:24px">
+      <div class="ph">[DEPOIMENTO 1 · nome, fazenda, cargo]</div>
+      <div class="ph">[DEPOIMENTO 2]</div>
+      <div class="ph">[PARCERIAS / SELOS · a validar]</div>
+    </div>
+    <p class="muted" style="margin-top:16px">Alternativa sem prova de cliente: "Desenvolvido pela GB Agritech, com mais de duas décadas no agro." [tempo de mercado do site da GB: confirmar redação]</p>
+  </div>
+</section>
+
+<!-- 7 CTA FINAL -->
+<section>
+  <span class="label">BLOCO 7 · CTA FINAL</span>
+  <div class="wrap">
+    <div class="note"><b>Objetivo:</b>Capturar o lead.<b>Scroll:</b>Fundo transita suavemente; formulário revela ao centro.<b>Campos:</b>mínimos para qualificar. Destino do envio: a definir.</div>
+    <div class="grid g2">
+      <div>
+        <h2>Entre na lista e fale com a gente.</h2>
+        <p class="muted">Receba o acesso ao Cerne Web, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
+      </div>
+      <form onsubmit="return false">
+        <label>Nome<input placeholder="Seu nome"></label>
+        <label>E-mail<input type="email" placeholder="voce@fazenda.com.br"></label>
+        <label>Telefone / WhatsApp<input placeholder="(00) 00000-0000"></label>
+        <label>Tamanho da operação
+          <select><option>Selecione</option><option>Até 1.000 cabeças</option><option>1.000 a 5.000</option><option>Acima de 5.000</option><option>Agricultura / outro</option></select>
+        </label>
+        <label>Tenho interesse em
+          <select><option>Cerne Web</option><option>App Administração</option><option>App Operação</option><option>Todos</option></select>
+        </label>
+        <div class="chk"><input type="checkbox"><span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span></div>
+        <span class="btn solid" style="text-align:center">Entrar na lista</span>
+        <span class="btn" style="text-align:center">Prefiro agendar demonstração</span>
+        <span class="btn" style="text-align:center">Falar agora no WhatsApp</span>
+        <small class="muted">Um caminho principal (lista) e dois atalhos (demo e WhatsApp), sempre com o mesmo texto em toda a página.</small>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap grid g3">
+    <div><strong>[LOGO CERNE]</strong><br><span class="muted">uma solução GB Agritech</span></div>
+    <div>Sistema · Edições · Perfis · Contato</div>
+    <div class="muted">gbagritech.com.br · Política de Privacidade · Termos<br>[redes sociais] · © GB Agritech</div>
+  </div>
+</footer>
+
+</body>
+</html>

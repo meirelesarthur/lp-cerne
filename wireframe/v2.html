@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cerne Wireframe LP v2</title>
+<style>
+  /* ===== Tokens (apenas cinzas com leve matiz verde) ===== */
+  :root {
+    --bg: #f3f5f4;
+    --bg-2: #e9edeb;
+    --surface: #fbfcfb;
+    --ink: #121715;
+    --ink-2: #4a5350;
+    --line: #cfd6d3;
+    --dark: #121715;
+    --dark-2: #1b2220;
+    --dark-line: #34403c;
+    --dark-ink: #e8edeb;
+    --dark-ink-2: #9aa6a2;
+    --ph: #dfe5e2;
+    --ph-dark: #26302d;
+    --gutter: clamp(20px, 5vw, 64px);
+    --max: 1240px;
+    --sec: clamp(96px, 14vh, 168px);   /* respiro vertical padrão entre seções */
+    --r: 12px;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; font: 400 17px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, p, ul, ol, figure { margin: 0; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .dark :focus-visible { outline-color: var(--dark-ink); }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+  .dark { background: var(--dark); color: var(--dark-ink); }
+  .alt { background: var(--bg-2); }
+  .sec { padding: var(--sec) 0; position: relative; }
+
+  /* ===== Tipografia ===== */
+  .eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+  .dark .eyebrow { color: var(--dark-ink-2); }
+  h1 { font-size: clamp(44px, 8vw, 112px); line-height: .98; letter-spacing: -.035em; font-weight: 600; }
+  h2 { font-size: clamp(34px, 5vw, 64px); line-height: 1.04; letter-spacing: -.028em; font-weight: 600; max-width: 18ch; }
+  h3 { font-size: 22px; line-height: 1.25; letter-spacing: -.01em; font-weight: 600; }
+  .lead { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; color: var(--ink-2); max-width: 56ch; }
+  .dark .lead { color: var(--dark-ink-2); }
+  .small { font-size: 14px; color: var(--ink-2); }
+  .dark .small { color: var(--dark-ink-2); }
+  .stack > * + * { margin-top: 24px; }
+  .head { display: grid; gap: 24px; margin-bottom: clamp(48px, 7vw, 88px); }
+
+  /* ===== Botões e chips ===== */
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 600; font-size: 16px; text-decoration: none; cursor: pointer; background: transparent; color: inherit; transition: background .2s var(--ease), color .2s var(--ease); }
+  .btn.solid { background: var(--ink); color: var(--bg); }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .dark .btn { border-color: var(--dark-ink); }
+  .dark .btn.solid { background: var(--dark-ink); color: var(--dark); }
+  .dark .btn:hover { background: var(--dark-ink); color: var(--dark); }
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid currentColor; border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; letter-spacing: .02em; opacity: .85; }
+  .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .chip.hollow::before { background: transparent; border: 1.5px solid currentColor; }
+
+  /* ===== Placeholders de mídia ===== */
+  .ph { position: relative; display: grid; place-items: center; text-align: center; padding: 24px; min-height: 200px; border: 1.5px dashed #8b9692; border-radius: var(--r); color: var(--ink-2); font-size: 14px; background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(0,0,0,.035) 14px 15px), var(--ph); }
+  .dark .ph { border-color: #5b6965; color: var(--dark-ink-2); background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,255,255,.03) 14px 15px), var(--ph-dark); }
+  .ph b { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+  .r169 { aspect-ratio: 16/9; } .r43 { aspect-ratio: 4/3; } .r916 { aspect-ratio: 9/19; max-height: 560px; } .r11 { aspect-ratio: 1; }
+
+  /* ===== Anotações (toggle) ===== */
+  .tag { position: absolute; top: 20px; left: var(--gutter); z-index: 5; font: 600 11px/1 ui-monospace, Consolas, monospace; letter-spacing: .06em; background: #fff3b0; color: #3a3300; padding: 6px 10px; border-radius: 4px; }
+  .note { margin-top: 48px; background: #fff8d0; color: #3a3300; border-left: 4px solid #b59b00; padding: 12px 16px; font-size: 13px; line-height: 1.5; border-radius: 0 8px 8px 0; max-width: 760px; }
+  .note b { display: inline-block; min-width: 72px; }
+  body:has(#ann:not(:checked)) .tag, body:has(#ann:not(:checked)) .note { display: none; }
+  .toggle { position: fixed; right: 16px; bottom: 16px; z-index: 100; background: #fff3b0; color: #3a3300; font: 600 12px/1 ui-monospace, Consolas, monospace; padding: 10px 14px; border-radius: 8px; display: flex; gap: 8px; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+
+  /* ===== Header ===== */
+  header.top { position: sticky; top: 0; z-index: 50; background: rgba(243,245,244,.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 24px; }
+  .logo { font-weight: 700; letter-spacing: .02em; border: 1.5px solid var(--ink); padding: 6px 14px; border-radius: 6px; }
+  header.top nav { display: flex; gap: 32px; font-size: 15px; font-weight: 500; }
+  header.top nav a { text-decoration: none; color: var(--ink-2); } header.top nav a:hover { color: var(--ink); }
+  header.top .btn { min-height: 44px; padding: 0 20px; font-size: 15px; }
+
+  /* ===== 01 Hero (pin) ===== */
+  .track { position: relative; }
+  .track.t200 { height: 200vh; } .track.t300 { height: 300vh; } .track.t250 { height: 250vh; }
+  .pin { position: sticky; top: 72px; height: calc(100svh - 72px); overflow: hidden; }
+  .hero .pin { display: grid; grid-template-rows: 1fr auto; }
+  .hero .bg { position: absolute; inset: 0; border-radius: 0; border: 0; min-height: 0; opacity: .9; place-items: start end; padding: 96px var(--gutter) 0; text-align: right; }
+  .hero .content { position: relative; z-index: 2; display: grid; grid-template-columns: 7fr 5fr; gap: clamp(32px, 6vw, 96px); align-items: center; padding-top: 24px; }
+  .hero h1 { font-size: clamp(40px, 5.8vw, 88px); }
+  .hform { background: rgba(18,23,21,.82); border: 1px solid var(--dark-line); border-radius: 20px; padding: 28px; display: grid; gap: 14px; backdrop-filter: blur(8px); }
+  .hform h3 { font-size: 22px; } .hform input { min-height: 48px; } .hform .btn { width: 100%; }
+  .hform a.small { text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 900px) { .hero .content { grid-template-columns: 1fr; align-content: center; gap: 24px; } .hero .pin { overflow: auto; } }
+  .hero .base { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: end; gap: 24px; padding-bottom: 40px; border-top: 1px solid var(--dark-line); padding-top: 24px; flex-wrap: wrap; }
+  .scrollcue { display: flex; align-items: center; gap: 12px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dark-ink-2); }
+  .scrollcue i { width: 1.5px; height: 40px; background: var(--dark-ink-2); display: block; }
+  .facts { display: flex; gap: 40px; flex-wrap: wrap; }
+  .facts div { font-size: 14px; color: var(--dark-ink-2); } .facts b { display: block; color: var(--dark-ink); font-size: 15px; }
+  .progress { height: 2px; background: var(--dark-line); position: relative; margin-top: 16px; } .progress::after { content: ""; position: absolute; inset: 0 70% 0 0; background: var(--dark-ink); }
+
+  /* ===== 02 Prova ===== */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--ink); }
+  .stat { padding: 32px 24px 32px 0; border-right: 1px solid var(--line); } .stat + .stat { padding-left: 24px; } .stat:last-child { border-right: 0; }
+  .stat .n { font-size: clamp(40px, 5vw, 72px); letter-spacing: -.03em; line-height: 1; font-weight: 600; margin-bottom: 16px; }
+  .stat .n small { font-size: 12px; letter-spacing: .08em; font-weight: 500; vertical-align: top; color: var(--ink-2); margin-left: 6px; }
+  .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .meta h3 { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+
+  /* ===== 03 Problema ===== */
+  .split { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(40px, 7vw, 120px); align-items: start; }
+  .split .sticky { position: sticky; top: 120px; }
+  .layers { display: grid; gap: 24px; }
+  .layers .ph:nth-child(2) { margin-left: 12%; } .layers .ph:nth-child(3) { margin-left: 24%; }
+  .pains { list-style: none; padding: 0; margin-top: 32px; border-top: 1px solid var(--line); }
+  .pains li { padding: 20px 0; border-bottom: 1px solid var(--line); display: flex; gap: 16px; } .pains li span { font: 600 13px/1.9 ui-monospace, Consolas, monospace; color: var(--ink-2); }
+  .turn { margin-top: 40px; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.2; letter-spacing: -.02em; font-weight: 600; }
+
+  /* ===== 04 Trailer ===== */
+  .trailer .pin { display: grid; grid-template-columns: 4fr 8fr; gap: clamp(32px, 5vw, 80px); align-items: center; }
+  .chapters { list-style: none; padding: 0; display: grid; gap: 4px; }
+  .chapters li { padding: 18px 0 18px 24px; border-left: 2px solid var(--dark-line); color: var(--dark-ink-2); }
+  .chapters li.on { border-color: var(--dark-ink); color: var(--dark-ink); }
+  .chapters li b { display: block; font-size: 19px; } .chapters li span { font-size: 14px; }
+  .chapters li:not(.on) span { display: none; }
+
+  /* ===== 05 Sistema (bento) ===== */
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .cell { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; min-height: 280px; }
+  .cell p { color: var(--ink-2); font-size: 16px; margin-top: 8px; max-width: 40ch; }
+  .cell .ph { min-height: 120px; flex: 1; }
+  .c-a { grid-column: span 4; } .c-b { grid-column: span 2; } .c-c { grid-column: span 2; } .c-d { grid-column: span 2; } .c-e { grid-column: span 2; } .c-f { grid-column: span 6; flex-direction: row; align-items: center; }
+  .c-f > div:first-child { max-width: 480px; } .c-f .ph { min-height: 160px; }
+
+  /* ===== 06 Edições ===== */
+  .editions { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; align-items: stretch; }
+  .ed { border: 1px solid var(--line); border-radius: 24px; padding: 32px; background: var(--surface); display: flex; flex-direction: column; gap: 24px; }
+  .ed.main { background: var(--dark); color: var(--dark-ink); border-color: var(--dark); }
+  .ed.main .ph { border-color: #5b6965; color: var(--dark-ink-2); background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,255,255,.03) 14px 15px), var(--ph-dark); }
+  .ed.main p, .ed.main .small { color: var(--dark-ink-2); } .ed.main .btn { border-color: var(--dark-ink); } .ed.main .btn.solid { background: var(--dark-ink); color: var(--dark); }
+  .ed .ph { flex: 1; min-height: 240px; } .ed p { color: var(--ink-2); font-size: 16px; }
+  .ed .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+  /* ===== 07 Perfis ===== */
+  .profiles { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--dark-line); }
+  .profile { padding: 40px 40px 40px 0; } .profile + .profile { padding: 40px 0 40px 40px; border-left: 1px solid var(--dark-line); }
+  .profile ul { list-style: none; padding: 0; margin-top: 24px; } .profile li { padding: 14px 0; border-bottom: 1px solid var(--dark-line); color: var(--dark-ink-2); } .profile li:first-child { border-top: 1px solid var(--dark-line); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 64px; counter-reset: s; }
+  .step { padding: 24px 24px 0 0; border-top: 2px solid var(--dark-line); position: relative; }
+  .step.on { border-color: var(--dark-ink); }
+  .step::before { counter-increment: s; content: "0" counter(s); font: 600 13px/1 ui-monospace, Consolas, monospace; color: var(--dark-ink-2); display: block; margin-bottom: 16px; }
+  .step p { color: var(--dark-ink-2); font-size: 15px; margin-top: 4px; }
+
+  /* ===== 08 Confiança ===== */
+  .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .trust .ph { min-height: 220px; }
+
+  /* ===== 09 FAQ ===== */
+  .faq { max-width: 860px; border-top: 1px solid var(--ink); }
+  details { border-bottom: 1px solid var(--line); }
+  summary { cursor: pointer; padding: 28px 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; list-style: none; display: flex; justify-content: space-between; gap: 24px; min-height: 44px; }
+  summary::-webkit-details-marker { display: none; } summary::after { content: "+"; font-weight: 400; font-size: 28px; line-height: 1; }
+  details[open] summary::after { content: "–"; }
+  details p { padding: 0 0 28px; color: var(--ink-2); max-width: 64ch; }
+
+  /* ===== 10 CTA ===== */
+  .cta { display: grid; grid-template-columns: 6fr 5fr; gap: clamp(40px, 7vw, 120px); align-items: center; min-height: 80svh; }
+  form { display: grid; gap: 20px; }
+  label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; color: var(--dark-ink-2); }
+  input, select { min-height: 52px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--dark-line); background: var(--dark-2); color: var(--dark-ink); font: inherit; font-weight: 400; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chk { display: flex; gap: 12px; font-weight: 400; font-size: 13px; line-height: 1.5; align-items: flex-start; } .chk input { min-height: 0; width: 20px; height: 20px; margin-top: 2px; }
+  .wa { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+
+  footer { background: var(--dark); color: var(--dark-ink-2); border-top: 1px solid var(--dark-line); padding: 64px 0 48px; font-size: 14px; }
+  footer .wrap { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; } footer .logo { border-color: var(--dark-ink); color: var(--dark-ink); display: inline-block; margin-bottom: 16px; }
+  footer ul { list-style: none; padding: 0; display: grid; gap: 8px; } footer b { color: var(--dark-ink); display: block; margin-bottom: 12px; }
+
+  /* ===== Responsivo ===== */
+  @media (max-width: 900px) {
+    header.top nav { display: none; }
+    .stats, .meta, .trust, .flow, .profiles, .editions, footer .wrap { grid-template-columns: 1fr; }
+    .stat, .stat + .stat { padding: 24px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+    .split, .trailer .pin, .cta { grid-template-columns: 1fr; }
+    .split .sticky { position: static; }
+    .trailer .pin { align-content: center; gap: 24px; } .chapters li:not(.on) { display: none; }
+    .bento { grid-template-columns: 1fr; } .c-a, .c-b, .c-c, .c-d, .c-e, .c-f { grid-column: auto; } .c-f { flex-direction: column; align-items: stretch; }
+    .profile, .profile + .profile { padding: 32px 0; border-left: 0; } .profile + .profile { border-top: 1px solid var(--dark-line); }
+    .step { padding-bottom: 24px; } .two { grid-template-columns: 1fr; }
+    .track.t200 { height: 170vh; } .track.t300 { height: 220vh; } .track.t250 { height: 200vh; }
+  }
+</style>
+</head>
+<body>
+
+<label class="toggle"><input type="checkbox" id="ann" checked> Anotações</label>
+
+<header class="top">
+  <div class="wrap">
+    <span class="logo">[ CERNE ]</span>
+    <nav aria-label="Principal"><a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#faq">Dúvidas</a></nav>
+    <a class="btn solid" href="#entrada">Entrar na lista</a>
+  </div>
+</header>
+
+<main>
+
+<!-- 01 HERO -->
+<div class="track t200 dark hero">
+  <span class="tag">01 · HERO · pin 200vh · vídeo A</span>
+  <div class="pin">
+    <div class="ph bg"><span><b>Vídeo A · tela cheia · ~6 s de scrub</b>1) campo aberto → 2) zoom até o notebook → 3) tela abre no dashboard<br>(abaixo: estado final, com texto e form sobre o dashboard)</span></div>
+    <div class="wrap content">
+      <div class="stack">
+        <span class="chip">Cerne Web disponível · Apps em breve</span>
+        <h1>Do campo ao<br>financeiro, num<br>só sistema.</h1>
+        <p class="lead">O Cerne reúne rebanho, confinamento, suprimentos e financeiro da sua fazenda em um ERP web feito para o agro.</p>
+      </div>
+      <form class="hform" id="entrada" onsubmit="return false" aria-label="Entrar na lista de espera">
+        <h3>Entre na lista de espera</h3>
+        <p class="small">Acesso ao Cerne Web e novidades dos apps.</p>
+        <label>E-mail<input type="email" placeholder="voce@fazenda.com.br" autocomplete="email"></label>
+        <label>WhatsApp<input type="tel" placeholder="(00) 00000-0000" autocomplete="tel"></label>
+        <button class="btn solid" type="submit">Entrar na lista</button>
+        <label class="chk"><input type="checkbox"><span>Concordo em receber contato da GB Agritech (LGPD).</span></label>
+        <a class="small" href="#lista">Prefiro agendar uma demonstração →</a>
+      </form>
+    </div>
+    <div class="wrap base">
+      <div class="scrollcue"><i></i>Role para conhecer</div>
+      <div class="facts"><div><b>ERP web</b>disponível</div><div><b>App Administração</b>em teste</div><div><b>App Operação</b>em teste</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 PROVA -->
+<section class="sec">
+  <span class="tag">02 · ESCOPO · altura livre ~ 80vh</span>
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">O que o Cerne cobre</span><h2>Tudo da fazenda em uma visão só.</h2></div>
+    <div class="stats">
+      <div class="stat"><div class="n">10<small>EXEMPLO</small></div><h3>Fazendas</h3><p class="small">Várias unidades na mesma visão, dados separados.</p></div>
+      <div class="stat"><div class="n">4.280<small>EXEMPLO</small></div><h3>Cabeças</h3><p class="small">Lotes, currais, dieta, trato e leitura de cocho.</p></div>
+      <div class="stat"><div class="n">1</div><h3>Suprimentos</h3><p class="small">Da solicitação ao recebimento, com fábrica de ração.</p></div>
+      <div class="stat"><div class="n">1</div><h3>Financeiro</h3><p class="small">Custos, resultado e depreciação sem planilha paralela.</p></div>
+    </div>
+    <div class="meta">
+      <div><h3>Feito para</h3><p>Pecuária de corte, confinamento e agricultura. <span class="small">[segmentos extras a confirmar]</span></p></div>
+      <div><h3>Acesse de onde estiver</h3><p>Computador hoje. Celular e tablet com os apps em breve.</p></div>
+      <div><h3>Fiscal</h3><p>Emissão e obrigações fiscais integradas ao dia a dia. <span class="small">[a confirmar]</span></p></div>
+    </div>
+    <div class="note"><b>Objetivo</b> Mostrar o escopo em 10 segundos. <b>Scroll</b> Números contam de 0 ao valor; colunas entram em stagger de 40ms. <b>Atenção</b> Números "EXEMPLO" são do protótipo: usar só com marcação ou valores reais.</div>
+  </div>
+</section>
+
+<!-- 03 PROBLEMA -->
+<section class="sec alt">
+  <span class="tag">03 · PROBLEMA → CERNE · ~ 120vh</span>
+  <div class="wrap split">
+    <div class="sticky stack">
+      <span class="eyebrow">O ponto de partida</span>
+      <h2>Planilha aqui, caderno ali, WhatsApp no meio.</h2>
+      <p class="lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
+      <ul class="pains"><li><span>01</span>Número diferente em cada controle</li><li><span>02</span>O que o campo anota demora a chegar ao escritório</li><li><span>03</span>Resultado por lote ou curral só no fechamento, se der</li></ul>
+      <p class="turn">O Cerne junta tudo em um lugar.</p>
+    </div>
+    <div class="layers" aria-hidden="true">
+      <div class="ph r43"><span><b>Camada 1</b>planilha</span></div>
+      <div class="ph r43"><span><b>Camada 2</b>caderno</span></div>
+      <div class="ph r43"><span><b>Camada 3</b>conversa</span></div>
+      <div class="ph r169" style="border-style:solid"><span><b>Fusão</b>as três camadas viram um painel único</span></div>
+    </div>
+  </div>
+  <div class="wrap"><div class="note"><b>Objetivo</b> Identificação com a dor. <b>Scroll</b> Texto à esquerda fixo (sticky); camadas à direita entram com parallax e fundem no painel final. Headline revela por palavra.</div></div>
+</section>
+
+<!-- 04 TRAILER -->
+<div class="track t300 dark trailer" id="video">
+  <span class="tag">04 · TRAILER · pin 300vh · vídeo B · 4 capítulos</span>
+  <div class="pin wrap">
+    <div class="stack">
+      <span class="eyebrow">Veja o Cerne em 30 segundos</span>
+      <ol class="chapters">
+        <li class="on"><b>01 · Visão geral</b><span>Indicadores da fazenda num painel só.</span></li>
+        <li><b>02 · Mapa de confinamento</b><span>Cada curral, lote e ocupação à vista.</span></li>
+        <li><b>03 · Lotação de currais</b><span>Quem está onde e o que precisa de atenção.</span></li>
+        <li><b>04 · Custos</b><span>Quanto custa cada fase, sem esperar o fechamento.</span></li>
+      </ol>
+      <div class="progress" role="presentation"></div>
+    </div>
+    <div class="ph r169"><span><b>Vídeo B · telas reais do web</b>troca de capítulo a cada 25% do scroll</span></div>
+  </div>
+</div>
+
+<!-- 05 SISTEMA -->
+<section class="sec" id="sistema">
+  <span class="tag">05 · SISTEMA (bento) · ~ 110vh</span>
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">O sistema</span><h2>Seis frentes. Um só cadastro.</h2></div>
+    <div class="bento">
+      <div class="cell c-a"><div><h3>Pecuária e confinamento</h3><p>Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.</p></div><div class="ph"><span><b>Tela</b>Mapa de confinamento</span></div></div>
+      <div class="cell c-b"><div><h3>Agricultura</h3><p>Planejamento, romaneios e rastreabilidade.</p></div><div class="ph"><span><b>Tela</b>Planejamento</span></div></div>
+      <div class="cell c-c"><div><h3>Suprimentos e estoque</h3><p>Cotação, compra, recebimento e fábrica de ração.</p></div></div>
+      <div class="cell c-d"><div><h3>Financeiro e ativos</h3><p>Custos, resultado e depreciação.</p></div></div>
+      <div class="cell c-e"><div><h3>Cadastros</h3><p>Fazendas, safras, produtos, pessoas e perfis de acesso.</p></div></div>
+      <div class="cell c-f"><div><h3>Dashboards e relatórios</h3><p>Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.</p></div><div class="ph" style="flex:1"><span><b>Tela</b>Dashboard Visão Geral</span></div></div>
+    </div>
+    <div class="note"><b>Objetivo</b> Responder "o que tem dentro?". <b>Scroll</b> Cards entram em cascata; hover eleva 4px. <b>Origem</b> Módulos do menu real do web.</div>
+  </div>
+</section>
+
+<!-- 06 EDIÇÕES -->
+<section class="sec alt" id="edicoes">
+  <span class="tag">06 · EDIÇÕES · ~ 100vh</span>
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">Como usar</span><h2>Um sistema. Três formas de usar.</h2></div>
+    <div class="editions">
+      <article class="ed main">
+        <div class="row"><span class="chip">Disponível</span><span class="small">Navegador</span></div>
+        <div class="ph"><span><b>Tela web</b>Dashboard em GB Mode</span></div>
+        <div><h3>Cerne Web</h3><p>O ERP completo: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p></div>
+        <a class="btn solid" href="#lista">Agendar demonstração</a>
+      </article>
+      <article class="ed">
+        <div class="row"><span class="chip hollow">Em construção · em teste</span></div>
+        <div class="ph r916"><span><b>Celular</b>App Administração</span></div>
+        <div><h3>Cerne Administração</h3><p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p></div>
+        <a class="btn" href="#lista">Quero testar</a>
+      </article>
+      <article class="ed">
+        <div class="row"><span class="chip hollow">Em construção · em teste</span></div>
+        <div class="ph r916"><span><b>Celular</b>App Operação</span></div>
+        <div><h3>Cerne Operação</h3><p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p></div>
+        <a class="btn" href="#lista">Quero testar</a>
+      </article>
+    </div>
+    <p class="small" style="margin-top:24px">Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. [texto a validar com produto/jurídico]</p>
+    <div class="note"><b>Objetivo</b> Clareza sobre o que existe hoje. <b>Scroll</b> Web entra primeiro e maior; apps entram 120ms depois, com leve inclinação 3D no hover.</div>
+  </div>
+</section>
+
+<!-- 07 PERFIS -->
+<div class="track t250 dark" id="perfis">
+  <span class="tag">07 · PERFIS · pin 250vh · vídeo C</span>
+  <div class="pin wrap" style="display:grid;align-content:center;gap:40px">
+    <div class="head" style="margin-bottom:0"><span class="eyebrow">Escritório e campo</span><h2>Quem decide e quem executa, no mesmo fluxo.</h2></div>
+    <div class="profiles">
+      <div class="profile"><h3>Gestor</h3><ul><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos</li></ul></div>
+      <div class="profile"><h3>Campo</h3><ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul></div>
+    </div>
+    <div class="flow">
+      <div class="step on"><h3>Escritório</h3><p>Cria a ordem de serviço.</p></div>
+      <div class="step"><h3>Campo</h3><p>Recebe e executa.</p></div>
+      <div class="step"><h3>Apontamento</h3><p>Registrado em etapas.</p></div>
+      <div class="step"><h3>Gestor</h3><p>Avalia e vê o resultado.</p></div>
+    </div>
+  </div>
+</div>
+<section class="dark" style="padding:0 0 var(--sec)">
+  <div class="wrap"><div class="ph r169"><span><b>Vídeo C · celular entra · fluxo da OS</b>acompanha os 4 passos acima; no pin, ocupa o fundo do quadro</span></div>
+  <p class="small" style="margin-top:16px">[Offline, scanner SISBOV e hardware: só entram quando existirem de verdade.]</p>
+  <div class="note"><b>Objetivo</b> Mostrar o ciclo escritório ↔ campo. <b>Scroll</b> Cada 25% do pin acende um passo; vídeo C avança junto.</div></div>
+</section>
+
+<!-- 08 CONFIANÇA -->
+<section class="sec">
+  <span class="tag">08 · CONFIANÇA · ~ 80vh · opcional</span>
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">Quem constrói</span><h2>Feito por quem conhece o campo.</h2></div>
+    <div class="trust"><div class="ph"><span><b>Depoimento 1</b>nome · fazenda · cargo</span></div><div class="ph"><span><b>Depoimento 2</b></span></div><div class="ph"><span><b>Parcerias / selos</b>a validar</span></div></div>
+    <p class="small" style="margin-top:24px">Alternativa sem prova de cliente: "Desenvolvido pela GB Agritech, com mais de duas décadas no agro." [confirmar redação]</p>
+    <div class="note"><b>Regra</b> Só entra com material real validado para o Cerne. Sem números vazios.</div>
+  </div>
+</section>
+
+<!-- 10 CTA -->
+<section class="sec dark" id="lista">
+  <span class="tag">09 · FORM COMPLETO · min 80svh</span>
+  <div class="wrap cta">
+    <div class="stack">
+      <span class="eyebrow">Lista de espera</span>
+      <h2>Entre na lista e fale com a gente.</h2>
+      <p class="lead">Receba o acesso ao Cerne Web, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
+      <div class="wa"><a class="btn" href="#lista">Falar agora no WhatsApp</a></div>
+    </div>
+    <form onsubmit="return false" aria-label="Lista de espera">
+      <label>Nome<input placeholder="Seu nome" autocomplete="name"></label>
+      <div class="two"><label>E-mail<input type="email" placeholder="voce@fazenda.com.br" autocomplete="email"></label><label>WhatsApp<input type="tel" placeholder="(00) 00000-0000" autocomplete="tel"></label></div>
+      <div class="two">
+        <label>Tamanho da operação<select><option>Selecione</option><option>Até 1.000 cabeças</option><option>1.000 a 5.000</option><option>Acima de 5.000</option><option>Agricultura / outro</option></select></label>
+        <label>Interesse<select><option>Cerne Web</option><option>App Administração</option><option>App Operação</option><option>Todos</option></select></label>
+      </div>
+      <label class="chk"><input type="checkbox"><span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span></label>
+      <button class="btn solid" type="submit">Entrar na lista</button>
+      <button class="btn" type="button">Prefiro agendar demonstração</button>
+    </form>
+  </div>
+  <div class="wrap"><div class="note"><b>Regra</b> Um caminho principal (lista) e dois atalhos (demo, WhatsApp), sempre com o mesmo texto. Destino do envio: a definir.</div></div>
+</section>
+
+<!-- 09 FAQ -->
+<section class="sec alt" id="faq">
+  <span class="tag">10 · DÚVIDAS · ~ 70vh · última seção</span>
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">Dúvidas</span><h2>O que mais perguntam.</h2></div>
+    <div class="faq">
+      <details open><summary>O Cerne já está disponível?</summary><p>O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste. [confirmar]</p></details>
+      <details><summary>Como funciona o teste?</summary><p>Entre na lista de espera ou agende uma demonstração com a nossa equipe. [definir fluxo de teste]</p></details>
+      <details><summary>Quanto custa?</summary><p>[Definir: sob consulta ou planos visíveis.]</p></details>
+      <details><summary>Serve para a minha operação?</summary><p>O Cerne atende pecuária de corte, confinamento e agricultura. [segmentos a confirmar]</p></details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><span class="logo">[ CERNE ]</span><p>uma solução GB Agritech</p></div>
+    <div><b>Navegação</b><ul><li>Sistema</li><li>Edições</li><li>Perfis</li><li>Dúvidas</li></ul></div>
+    <div><b>GB Agritech</b><ul><li>gbagritech.com.br</li><li>Política de Privacidade</li><li>Termos de uso</li></ul></div>
+  </div>
+</footer>
+
+</body>
+</html>

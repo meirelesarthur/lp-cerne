@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1740, height=1200" />
+    <title>Cerne System Loop</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1740px; height: 1200px; overflow: hidden; background: #f3f4f3; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #f3f4f3; }
+      .scene { position: absolute; inset: 0; overflow: hidden; background: #f3f4f3; }
+      .page { position: absolute; inset: 0; background: #f3f4f3; }
+      .page img { position: absolute; left: 0; top: 0; width: 1740px; height: auto; display: block; will-change: transform; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1740" data-height="1200">
+      <section id="visao" class="clip scene" data-start="0" data-duration="4" data-track-index="0">
+        <div class="page" id="visao-page"><img id="visao-img" src="assets/visao-geral-full.jpg" alt="" /></div>
+      </section>
+      <section id="pecuaria" class="clip scene" data-start="3.6" data-duration="3.2" data-track-index="1">
+        <div class="page" id="pecuaria-page"><img id="pecuaria-img" src="assets/pecuaria-full.jpg" alt="" /></div>
+      </section>
+      <section id="lotacao" class="clip scene" data-start="6.4" data-duration="3.2" data-track-index="2">
+        <div class="page" id="lotacao-page"><img id="lotacao-img" src="assets/lotacao-currais-full.jpg" alt="" /></div>
+      </section>
+      <section id="custos" class="clip scene" data-start="9.2" data-duration="3.2" data-track-index="3">
+        <div class="page" id="custos-page"><img id="custos-img" src="assets/custos-confinamento-full.jpg" alt="" /></div>
+      </section>
+      <section id="financeiros" class="clip scene" data-start="12" data-duration="3.4" data-track-index="4">
+        <div class="page" id="financeiros-page"><img id="financeiros-img" src="assets/financeiros-full.jpg" alt="" /></div>
+      </section>
+      <section id="final" class="clip scene" data-start="15" data-duration="3" data-track-index="5">
+        <div class="page" id="final-page"><img id="final-img" src="assets/visao-geral-full.jpg" alt="" /></div>
+      </section>
+    </div>
+    <script>
+    const scenes = [{"id":"visao","img":"visao-geral","t":0,"d":4,"pan":[0,0.32],"extra":2060},{"id":"pecuaria","img":"pecuaria","t":3.6,"d":3.2,"pan":[0,1],"extra":0},{"id":"lotacao","img":"lotacao-currais","t":6.4,"d":3.2,"pan":[0,1],"extra":0},{"id":"custos","img":"custos-confinamento","t":9.2,"d":3.2,"pan":[0,1],"extra":0},{"id":"financeiros","img":"financeiros","t":12,"d":3.4,"pan":[0,1],"extra":221},{"id":"final","img":"visao-geral","t":15,"d":3,"pan":[0,0],"extra":2060}];
+    const tl = gsap.timeline({ paused: true });
+    scenes.forEach((sc, i) => {
+      const img = "#" + sc.id + "-img", pg = "#" + sc.id + "-page";
+      if (sc.extra > 0 && sc.pan[1] !== sc.pan[0]) {
+        tl.fromTo(img, { y: -sc.extra * sc.pan[0] }, { y: -sc.extra * sc.pan[1], duration: sc.d - 0.6, ease: "sine.inOut" }, sc.t + 0.3);
+      } else {
+        tl.set(img, { y: 0 }, sc.t);
+      }
+      if (i > 0) tl.fromTo(pg, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power1.out" }, sc.t);
+    });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
