@@ -33,10 +33,15 @@
 .fz-svg .fz-bar { fill: #a7d8bf; }
 .fz-svg .fz-tile-flash { fill: var(--fz-accent); opacity: 0; pointer-events: none; }
 
-/* pulsos de dados */
+/* pacote de dados: cubinho isométrico verde */
 .fz-svg .fz-pulse { pointer-events: none; }
-.fz-svg .fz-pulse-dot { fill: var(--fz-accent); stroke: #fff; stroke-width: 0.8px; vector-effect: non-scaling-stroke; }
-.fz-svg .fz-pulse-halo { fill: var(--fz-accent); opacity: 0.22; }
+.fz-svg .fz-cube path { stroke: #ffffff; stroke-width: 0.7px; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-cube-t { fill: #4ade80; }
+.fz-svg .fz-cube-y { fill: #059669; }
+.fz-svg .fz-cube-x { fill: #047857; }
+.fz-svg .fz-pulse-halo { fill: var(--fz-accent); opacity: 0.18; filter: blur(2px); }
+.fz-svg .fz-cube { animation: fz-bob 0.9s ease-in-out infinite alternate; }
+@keyframes fz-bob { from { transform: translateY(-1px); } to { transform: translateY(1.5px); } }
 
 /* gado comendo no cocho */
 .fz-svg .fz-head { animation: fz-eat 2.6s ease-in-out infinite; animation-delay: calc(var(--hd, 0s) * -1); }
@@ -45,17 +50,27 @@
 
 /* setores clicáveis: o escolhido fica em destaque, os outros recuam */
 .fz-svg .fz-hit { fill: transparent; cursor: pointer; }
-.fz-svg [data-zone] { transition: opacity 0.4s var(--anatomy-ease); }
 .fz-svg[data-focus='lavoura'] [data-zone]:not([data-zone='lavoura']),
 .fz-svg[data-focus='confinamento'] [data-zone]:not([data-zone='confinamento']),
 .fz-svg[data-focus='estoque'] [data-zone]:not([data-zone='estoque']),
-.fz-svg[data-focus='sede'] [data-zone]:not([data-zone='sede']) { opacity: 0.38; }
+.fz-svg[data-focus='sede'] [data-zone]:not([data-zone='sede']) { opacity: 0.5; }
+/* o setor escolhido sobe e deixa a sombra no gramado */
+.fz-svg [data-zone] { transition: opacity 0.4s var(--anatomy-ease), transform 0.55s var(--anatomy-ease); }
+.fz-svg[data-focus='lavoura'] [data-zone='lavoura'],
+.fz-svg[data-focus='confinamento'] [data-zone='confinamento'],
+.fz-svg[data-focus='estoque'] [data-zone='estoque'],
+.fz-svg[data-focus='sede'] [data-zone='sede'] { transform: translate(var(--lift-x, 0), var(--lift-y, 0)); }
+.fz-svg .fz-zshadow { fill: #23402a; opacity: 0; filter: blur(5px); transition: opacity 0.55s var(--anatomy-ease); }
+.fz-svg[data-focus='lavoura'] [data-zshadow='lavoura'],
+.fz-svg[data-focus='confinamento'] [data-zshadow='confinamento'],
+.fz-svg[data-focus='estoque'] [data-zshadow='estoque'],
+.fz-svg[data-focus='sede'] [data-zshadow='sede'] { opacity: 0.32; }
 .fz-svg[data-hover='lavoura'] .fz-hit[data-hit='lavoura'],
 .fz-svg[data-hover='confinamento'] .fz-hit[data-hit='confinamento'],
 .fz-svg[data-hover='estoque'] .fz-hit[data-hit='estoque'],
 .fz-svg[data-hover='sede'] .fz-hit[data-hit='sede'] { fill: rgba(5, 150, 105, 0.06); stroke: rgba(5, 150, 105, 0.5); stroke-width: 1px; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fz-svg .fz-head { animation: none; }
+  .fz-svg .fz-head, .fz-svg .fz-cube { animation: none; }
   .fz-svg [data-zone] { transition: none; }
 }

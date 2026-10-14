@@ -183,7 +183,7 @@ export function mountFarm(svg: SVGSVGElement, data: FarmData, cb: FarmCallbacks)
         })
         stripsG.style.opacity = ''
         tractorEl.style.opacity = ''
-        cb.readout('Lavoura · nova safra: o talhão volta para o preparo')
+        cb.readout('Plantação · nova safra: o talhão volta para o preparo')
       }
       return
     }
@@ -204,7 +204,7 @@ export function mountFarm(svg: SVGSVGElement, data: FarmData, cb: FarmCallbacks)
     if ((right && lx >= X1) || (!right && lx <= X0)) {
       planted[lane] = [t2.x0 + 1, t2.x1 - 1]
       drawStrip(lane)
-      emit(lx, laneY(lane), 10, 'lavoura', `Lavoura · plantio apontado na faixa ${lane + 1} do talhão 2`)
+      emit(lx, laneY(lane), 10, 'lavoura', `Plantação · plantio apontado na faixa ${lane + 1} do talhão 2`)
       if (lane >= t2.lanes - 1) reset = 0.0001
       else tractorTurn = 0.0001
     }
@@ -327,6 +327,9 @@ export function mountFarm(svg: SVGSVGElement, data: FarmData, cb: FarmCallbacks)
 
   return {
     focus(zone: Zone | null, zoom: boolean) {
+      // o setor escolhido sobe alguns centímetros da maquete
+      svg.style.setProperty('--lift-x', `${(data.uz[0] * 22).toFixed(2)}px`)
+      svg.style.setProperty('--lift-y', `${(data.uz[1] * 22).toFixed(2)}px`)
       if (zone) svg.dataset.focus = zone
       else delete svg.dataset.focus
       fly(zoom ? zone : null)

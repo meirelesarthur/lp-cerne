@@ -69,6 +69,15 @@ for (let i = 0; i < 36; i++) {
 ground.push(M("soil", D(pebbles, { size: 0.7, tone: "mid" })));
 ground.push(M("grass", S(box(BASE, -4, 4, 8, 1), { crease: "lo" })));
 
+// sombra de cada setor no gramado: aparece quando o setor escolhido sobe
+const LIFT_SHADOW = {
+  lavoura: { x: -258, y: -182, w: 228, d: 160 },
+  confinamento: { x: 26, y: -178, w: 230, d: 162 },
+  estoque: { x: -258, y: 24, w: 216, d: 160 },
+  sede: { x: 76, y: 56, w: 138, d: 116 },
+};
+ground.push(`<g class="fz-zshadows">${Object.entries(LIFT_SHADOW).map(([z, pl]) => `<path class="fz-zshadow" data-zshadow="${z}" d="${flatPlan(pl)}"/>`).join("")}</g>`);
+
 // estradas de chão
 const ROAD_X = { x: -264, y: -8, w: 528, d: 18 };
 const ROAD_Y = { x: -14, y: -184, w: 18, d: 368 };
@@ -284,7 +293,7 @@ const fl = (u0, z0, u1, z1, r = 0) => k.pathOf(k.roundedPlan({ x: u0, y: z0, w: 
 // painel na parede do fundo: 4 blocos, um por setor, com contador
 const TV = { u0: 102, u1: 190, z0: 13, z1: 40 };
 const TILES = ["lavoura", "confinamento", "estoque", "financeiro"];
-const TILE_NAMES = { lavoura: "Lavoura", confinamento: "Confinamento", estoque: "Estoque", financeiro: "Financeiro" };
+const TILE_NAMES = { lavoura: "Plantação", confinamento: "Confinamento", estoque: "Estoque", financeiro: "Financeiro" };
 const TILE_SUB = { lavoura: "apontamentos", confinamento: "tratos", estoque: "saídas", financeiro: "lançamentos" };
 const tileCenter = {};
 function office() {
@@ -369,7 +378,8 @@ const TRACTOR = [
 const vehicle = (name, parts, dirs) => `<g class="fz-veh" data-veh="${name}">${dirs.map((d, i) => `<g data-dir="${d}"${i ? ' style="display:none"' : ""}>${assemble(parts, d, 0, 0)}</g>`).join("")}</g>`;
 const TRUCK_Y = 1;
 const VEH_TRUCK = vehicle("truck", TRUCK, ["+x", "-x"]).replace('class="fz-veh"', `class="fz-veh" transform="${k.translateAlong(P, [BIN.x, TRUCK_Y, 0])}"`);
-const VEH_TRACTOR = vehicle("tractor", TRACTOR, ["+x", "-x", "+y"]).replace('class="fz-veh"', `class="fz-veh" data-zone="lavoura" transform="${k.translateAlong(P, [T2.x + 8, T2.y + LANE / 2, 0])}"`);
+const VEH_TRACTOR = vehicle("tractor", TRACTOR, ["+x", "-x", "+y"]).replace('class="fz-veh"', `class="fz-veh" transform="${k.translateAlong(P, [T2.x + 8, T2.y + LANE / 2, 0])}"`);
+const VEH_TRACTOR_Z = `<g data-zone="lavoura">${VEH_TRACTOR}</g>`;
 
 // ───────── montagem ─────────
 // Ordem: o que fica atrás da estrada principal (y < 0), o caminhão, e o que fica na frente.
@@ -382,9 +392,18 @@ const toSvg = (it) => {
 };
 const behind = items.filter((it) => it.y < 0);
 const front = items.filter((it) => it.y >= 0);
-const placed = [toSvg(behind[0]), VEH_TRACTOR, ...behind.slice(1).map(toSvg), VEH_TRUCK, ...front.map(toSvg)];
+const placed = [toSvg(behind[0]), VEH_TRACTOR_Z, ...behind.slice(1).map(toSvg), VEH_TRUCK, ...front.map(toSvg)];
 // pulsos de dados (campo → sede)
-const pulses = `<g class="fz-pulses">${Array.from({ length: 6 }, (_, i) => `<g class="fz-pulse" data-pulse="${i}" style="opacity:0"><circle r="5" class="fz-pulse-halo"/><circle r="2.2" class="fz-pulse-dot"/></g>`).join("")}</g>`;
+// o dado que viaja: um cubinho isométrico centrado na origem
+const CUBE = 10;
+const c0 = at([CUBE / 2, CUBE / 2, CUBE / 2]);
+const face = (pts) => k.pathOf(pts.map((p) => { const [x, y] = at(p); return [x - c0[0], y - c0[1]]; }), true);
+const cube =
+  `<ellipse class="fz-pulse-halo" rx="${(CUBE * 1.5).toFixed(1)}" ry="${(CUBE * 0.9).toFixed(1)}"/>` +
+  `<path class="fz-cube-x" d="${face([[CUBE, 0, 0], [CUBE, CUBE, 0], [CUBE, CUBE, CUBE], [CUBE, 0, CUBE]])}"/>` +
+  `<path class="fz-cube-y" d="${face([[0, CUBE, 0], [CUBE, CUBE, 0], [CUBE, CUBE, CUBE], [0, CUBE, CUBE]])}"/>` +
+  `<path class="fz-cube-t" d="${face([[0, 0, CUBE], [CUBE, 0, CUBE], [CUBE, CUBE, CUBE], [0, CUBE, CUBE]])}"/>`;
+const pulses = `<g class="fz-pulses">${Array.from({ length: 6 }, (_, i) => `<g class="fz-pulse" data-pulse="${i}" style="opacity:0"><g class="fz-cube">${cube}</g></g>`).join("")}</g>`;
 
 // áreas de clique: envoltória de cada setor (chão + altura)
 const hull = (pts) => {

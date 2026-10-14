@@ -7,10 +7,10 @@ Uma maquete de fazenda sobre um bloco de terra, na seção **05 · Sistema** ("S
 
 | Setor | O que está desenhado | O que anima sozinho |
 |---|---|---|
-| Sede | escritório em corte: gestor na mesa olhando um painel na parede com 4 blocos (Lavoura, Confinamento, Estoque, Financeiro) | contadores sobem e piscam quando chega um pulso |
+| Sede | escritório em corte: gestor na mesa olhando um painel na parede com 4 blocos (Plantação, Confinamento, Estoque, Financeiro) | contadores sobem e piscam quando chega um pulso |
 | Confinamento | 3 currais com gado Nelore, bebedouros, cocho de concreto | caminhão de trato enche o cocho curral a curral; o gado come; o cocho esvazia |
 | Estoque | galpão de insumos, sacaria, 2 silos, fábrica de ração, moega de carga | caminhão carrega na moega (saída de ração) |
-| Lavoura | talhão de milho formado e talhão 2 em plantio | trator planta faixa a faixa; ao fim do talhão, nova safra |
+| Plantação | talhão de milho formado e talhão 2 em plantio | trator planta faixa a faixa; ao fim do talhão, nova safra |
 
 Cada operação (saída de estoque, trato registrado, plantio apontado) solta um **pulso** que viaja até o bloco do setor no painel da sede. Todo evento também soma em Financeiro, porque toda operação gera custo.
 
@@ -41,4 +41,4 @@ Regerar a arte: `node tools/iso/fazenda/build.mjs`
 ## Pendências
 - Testar em celular real e com CPU lenta.
 - Validar com o time os textos "onde o dado nasce" e as telas escolhidas para cada setor.
-- Lavoura não tem tela real do Cerne no `/screens`; hoje mostra só tópicos.
+- Plantação não tem tela real do Cerne no `/screens`; hoje mostra só tópicos.
