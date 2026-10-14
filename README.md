@@ -18,7 +18,7 @@ Formulário: copie `.env.example` para `.env` e preencha `VITE_FORM_ENDPOINT` (P
 | `src/lib` | `scroll` (Lenis + ScrollTrigger), `stage` (geometria da cena final), `form` (validação/envio), `reveal`, `defer` |
 | `src/lib/scroll.ts` | Lenis sincronizado ao ScrollTrigger; detecção de movimento reduzido e conexão lenta |
 | `src/styles` | `tokens.css` (tema claro + GB Mode, Outfit self-hosted) e `app.css` |
-| `public/frames/hero/{desktop,mobile}` | quadros WebP, cena final (`final`, `final-fg`), chão da 2ª seção e `manifest.json` |
+| `public/frames/hero/{desktop,desktop-hd,mobile}` | quadros WebP, cena final (`final`, `final-fg`), chão da 2ª seção e `manifest.json` |
 | `public/app`, `public/video` | Visão Geral completa (rola no tablet) e vídeo do sistema em loop |
 | `video/hero-a` | `build_v2.py` + `track_screen.py` (composição) e `system-loop/` (HyperFrames) |
 | `assets/capture` | screenshots reais do web (usuário mock; `light/` = modo claro) |
@@ -37,8 +37,9 @@ Formulário: copie `.env.example` para `.env` e preencha `VITE_FORM_ENDPOINT` (P
    python video/hero-a/build_v2.py mobile
    ```
    Requer Python com OpenCV (`opencv-python-headless`), numpy e Pillow, e ffmpeg no PATH.
-4. Vídeo do sistema no tablet: `video/hero-a/system-loop/` (HyperFrames), renders em `public/video/`.
-5. QA: `cd tools && node shots.mjs 1440 900 d1440` (e `390 844 m390 mobile`), screenshots em `docs/shots/v2/`.
+4. Seção Perfis ("do campo ao escritório"): `python video/hero-a/build_campo.py desktop` e `mobile` (clip em `assets/gen-v3/clip-campo.mp4`; telas do app Operação via `tools/capture-app.mjs`, com o build web servido em :5190).
+5. Vídeo do sistema no tablet: `video/hero-a/system-loop/` (HyperFrames), renders em `public/video/`.
+6. QA: `cd tools && node shots.mjs 1440 900 d1440` (e `390 844 m390 mobile`), screenshots em `docs/shots/v2/`.
 
 Detalhes do funcionamento: `docs/07-hero-v2.md`. Arquitetura da página, copy e cores: `docs/08-arquitetura-da-pagina.md`.
 
@@ -49,4 +50,6 @@ QA da página inteira: `cd tools && node page.mjs 1440 900 d1440 0 <url>` (scree
 - Primeiro quadro desenhado de imediato; o resto carrega em lotes de 6.
 - `prefers-reduced-motion` ou conexão lenta/Save-Data: poster final e conteúdo visíveis, sem scrub nem Lenis.
 - Mobile (≤ 820 px): plano vertical separado, título em cima, tablet no meio e form embaixo.
+- Desktop com tela ≥ 1600 px reais e 4G: sequência HD em AVIF 1920 px (`desktop-hd`); demais: WebP 1280 px.
+- Header: compõe com a cena durante todo o Hero (logo branco no close escuro, colorido no céu) e vira vidro claro ao sair do Hero.
 - A cena final e o chão da 2ª seção só carregam após o primeiro scroll (ou 3,5 s), para não disputar banda com o primeiro quadro.

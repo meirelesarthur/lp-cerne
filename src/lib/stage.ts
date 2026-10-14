@@ -16,6 +16,24 @@ export interface Manifest {
   ground?: { src: string; w: number; h: number; frame: Rect }
 }
 
+/** Suporte a AVIF (todos os navegadores atuais; Safari desde 16.4). */
+export function supportsAvif() {
+  const safari = /Version\/(\d+)\.(\d+).*Safari/.exec(navigator.userAgent)
+  if (safari && (Number(safari[1]) < 16 || (Number(safari[1]) === 16 && Number(safari[2]) < 4))) return false
+  return 'createImageBitmap' in window
+}
+
+/**
+ * Quadros HD (AVIF 1920 px) só onde eles aparecem de fato e a rede aguenta: tela larga (≥ `minPx` px reais),
+ * sem economia de dados, conexão 4G ou melhor, e navegador com AVIF. O resto usa a versão 1280 px.
+ */
+export function prefersHd(minPx = 1600) {
+  if (window.innerWidth * Math.min(window.devicePixelRatio || 1, 2) < minPx) return false
+  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+  if (c?.saveData || (c?.effectiveType && c.effectiveType !== '4g')) return false
+  return supportsAvif()
+}
+
 export interface Box { left: number; top: number; width: number; height: number }
 export interface Zoom { s: number; tx: number; ty: number }
 

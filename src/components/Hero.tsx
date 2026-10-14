@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
-import { coverBox, finalZoom, type Box, type Manifest, type Zoom } from '../lib/stage'
+import { coverBox, finalZoom, prefersHd, type Box, type Manifest, type Zoom } from '../lib/stage'
 import { HeroForm } from './HeroForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
@@ -30,21 +30,6 @@ const ZOOMS = {
 
 let heroTrigger: ScrollTrigger | null = null
 
-/**
- * Versão HD (AVIF 1920 px) só onde ela aparece de fato e a rede aguenta: tela larga (≥ 1600 px reais),
- * sem economia de dados, conexão 4G ou melhor, e navegador com AVIF. O resto usa o WebP 1280 px.
- */
-function prefersHd() {
-  if (window.innerWidth * Math.min(window.devicePixelRatio || 1, 2) < 1600) return false
-  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
-  if (c?.saveData || (c?.effectiveType && c.effectiveType !== '4g')) return false
-  // suporte a AVIF (todos os navegadores atuais; Safari desde 16.4)
-  const ua = navigator.userAgent
-  const safari = /Version\/(\d+)\.(\d+).*Safari/.exec(ua)
-  if (safari && (Number(safari[1]) < 16 || (Number(safari[1]) === 16 && Number(safari[2]) < 4))) return false
-  return 'createImageBitmap' in window
-}
-
 /** CTA do header: leva ao estado final do Hero e foca o e-mail. */
 export function focusHeroForm() {
   const focus = () => document.getElementById(EMAIL_ID)?.focus({ preventScroll: true })
@@ -71,7 +56,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
   const [stageReady, setStageReady] = useState(false)
   const [geo, setGeo] = useState<{ box: Box; zoom: Zoom; zoomApp: Zoom; vw: number; vh: number } | null>(null)
 
-  const [hd] = useState(prefersHd)
+  const [hd] = useState(() => prefersHd())
   const variant = mobile ? 'mobile' : hd ? 'desktop-hd' : 'desktop'
   const dir = `/frames/hero/${variant}`
   const m = manifest?.variant === variant ? manifest.data : null

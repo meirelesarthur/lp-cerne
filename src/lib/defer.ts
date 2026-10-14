@@ -12,3 +12,16 @@ export function useAfterFirstScroll(ms = 3500) {
   }, [ok, ms])
   return ok
 }
+
+/** true quando o elemento chega a `margin` da tela (uma vez): carrega mídia pesada só perto de ser vista. */
+export function useNear(ref: React.RefObject<Element | null>, margin = '120% 0px') {
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || near) return
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect() } }, { rootMargin: margin })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [ref, margin, near])
+  return near
+}

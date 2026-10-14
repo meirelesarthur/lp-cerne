@@ -1,7 +1,9 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
 import { gsap } from '../lib/scroll'
-import { useAfterFirstScroll } from '../lib/defer'
+import { useAfterFirstScroll, useNear } from '../lib/defer'
+import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
+import { prefersHd, supportsAvif } from '../lib/stage'
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -127,7 +129,7 @@ export function TrailerSection() {
   }, [])
 
   return (
-    <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title">
+    <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
       <div className="wrap">
         <header className="sec-head center" data-reveal>
           <span className="eyebrow">O sistema em funcionamento</span>
@@ -163,7 +165,7 @@ export function TrailerSection() {
 // grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
 const MODULOS = [
   { k: 'a', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', img: 'lotacao-currais' },
-  { k: 'b', t: 'Agricultura', d: 'Planejamento, romaneios e rastreabilidade.', chips: ['Planejamento de safra', 'Romaneios', 'Rastreabilidade', 'Talhões'] },
+  { k: 'b', t: 'Agricultura', d: 'Talhões, planejamento de safra, romaneios e rastreabilidade.', img: 'talhoes' },
   { k: 'c', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', img: 'suprimentos' },
   { k: 'd', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', img: 'financeiros' },
   { k: 'e', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
@@ -258,44 +260,112 @@ const PASSOS = [
   { t: 'Apontamento', d: 'Registrado em etapas.' },
   { t: 'Gestor', d: 'Avalia e vê o resultado.' },
 ]
+/** Onde cada passo acende (fração do scroll): OS já no celular, leitura de cocho, subida até a vista da fazenda, escritório. */
+const PASSO_EM = [0, 0.05, 0.27, 0.74]
+/** O plano termina aqui; o resto do scroll segura o escritório com o cartão do gestor. */
+const PLANO_FIM = 0.9
+const PIN_MQ = '(prefers-reduced-motion: no-preference)'
 
+type PerfisManifest = { count: number; width: number; height: number }
+
+/**
+ * Plano contínuo em tela cheia: leitura de cocho com a OS no celular -> a câmera sobe e mostra a fazenda inteira
+ * (confinamento, armazém, silos, caminhão carregando) -> desce e entra no escritório do gestor. Textos em vidro
+ * por cima, em três momentos (campo, fazenda, gestor), e os 4 passos da OS acendendo no rodapé.
+ */
 export function ProfilesSection() {
   const root = useRef<HTMLElement>(null)
-  const [step, setStep] = useState(-1)
+  const scrub = useRef<ScrubHandle>(null)
+  const frames = useRef(0)
+  const near = useNear(root)
+  const [step, setStep] = useState(0)
+  const [mobile] = useState(() => window.matchMedia('(max-width: 820px) and (orientation: portrait)').matches)
+  const [still] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  // celular: recorte vertical; desktop a partir de 1200 px reais com boa rede: HD 1920 px (a seção ocupa a tela
+  // inteira, então o 1280 px já perde nitidez em ~1400 px); demais: 1280 px. AVIF sempre que houver suporte
+  const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
+  const [ext] = useState(() => (supportsAvif() ? 'avif' : 'webp') as 'avif' | 'webp')
+  const [m, setM] = useState<PerfisManifest | null>(null)
+  const dir = `/frames/perfis/${variant}`
+
+  useEffect(() => {
+    if (!near || still) return
+    fetch(`${dir}/manifest.json`).then((r) => r.json()).then((d: PerfisManifest) => { frames.current = d.count - 1; setM(d) }).catch(() => {})
+  }, [near, still, dir])
+
+  // pin criado já na montagem (a altura da página não muda depois); os quadros entram quando o manifest chega
   useLayoutEffect(() => {
     const mm = gsap.matchMedia()
-    mm.add(DESKTOP_PIN, () => {
-      gsap.timeline({
+    mm.add(PIN_MQ, () => {
+      const tl = gsap.timeline({
+        defaults: { ease: 'power1.out' },
         scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=160%', pin: true, scrub: true, refreshPriority: 4,
-          onUpdate: (self) => setStep(Math.min(PASSOS.length - 1, Math.floor(self.progress * (PASSOS.length + 0.6)) - 0)),
+          trigger: root.current, start: 'top top', end: '+=480%', pin: true, scrub: 0.5, refreshPriority: 4,
+          onUpdate: (st) => {
+            const p = st.progress
+            scrub.current?.setFrame(Math.min(1, p / PLANO_FIM) * frames.current)
+            let k = 0
+            PASSO_EM.forEach((at, i) => { if (p >= at) k = i })
+            setStep(k)
+          },
         },
-      }).fromTo('.flow-fill', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 })
+      })
+      // 1 = toda a duração; cada momento entra e sai no seu trecho
+      tl.set({}, {}, 1)
+        .fromTo('.pf-campo', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -24, duration: 0.06 }, 0.2)
+        .fromTo('.pf-fazenda', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.06 }, 0.27)
+        .to('.pf-fazenda', { autoAlpha: 0, y: -24, duration: 0.06 }, 0.5)
+        .fromTo('.pf-gestor', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.06 }, 0.72)
+        .fromTo('.pf-fill', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
     })
     return () => mm.revert()
   }, [])
+
   return (
-    <section ref={root} className="sec sec-mint profiles" id="perfis" aria-labelledby="perfis-title">
-      <div className="wrap">
-        <header className="sec-head" data-reveal>
-          <span className="eyebrow">Escritório e campo</span>
-          <h2 id="perfis-title">Quem decide e quem executa, no mesmo fluxo.</h2>
-        </header>
-        <div className="profiles-grid">
-          <article className="profile" data-reveal>
+    <section ref={root} className={`perfis${still ? ' still' : ''}`} id="perfis" aria-labelledby="perfis-title">
+      <div className="pf-media" aria-hidden="true">
+        {still || !m
+          ? <img src={`${dir}/poster-${still ? 'last' : 'first'}.webp`} alt="" loading="lazy" decoding="async" />
+          : <ScrubCanvas key={dir} ref={scrub} dir={dir} count={m.count} ext={ext} poster={`${dir}/poster-first.webp`} />}
+        <div className="pf-shade" />
+      </div>
+
+      <div className="pf-overlay">
+        <div className="pf-phase pf-campo">
+          <header className="pf-glass pf-head">
+            <span className="eyebrow">Escritório e campo</span>
+            <h2 id="perfis-title">Quem decide e quem executa, no mesmo fluxo.</h2>
+          </header>
+          <article className="pf-glass pf-card">
+            <span className="pf-kicker">No curral</span>
+            <h3>Campo</h3>
+            <ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul>
+            <p className="note">Pelo app Operação, em construção.</p>
+          </article>
+        </div>
+
+        <div className="pf-phase pf-fazenda">
+          <div className="pf-glass pf-card pf-center">
+            <span className="pf-kicker">A fazenda inteira</span>
+            <h3>Do cocho ao armazém, o apontamento chega ao escritório.</h3>
+            <p>Confinamento, estoque e carga registrados no mesmo sistema.</p>
+          </div>
+        </div>
+
+        <div className="pf-phase pf-gestor">
+          <article className="pf-glass pf-card">
+            <span className="pf-kicker">No escritório</span>
             <h3>Gestor</h3>
             <ul><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos</li></ul>
           </article>
-          <article className="profile" data-reveal>
-            <h3>Campo</h3>
-            <ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul>
-            <p className="note">Pelos apps em construção.</p>
-          </article>
         </div>
-        <ol className="flow">
-          <li className="flow-track" aria-hidden="true"><i className="flow-fill" /></li>
+
+        <ol className="pf-glass pf-steps" aria-label="Fluxo da ordem de serviço">
+          <li className="pf-track" aria-hidden="true"><i className="pf-fill" /></li>
           {PASSOS.map((p, i) => (
-            <li key={p.t} className={i <= step ? 'on' : ''} data-reveal><b>{i + 1}</b><h3>{p.t}</h3><p>{p.d}</p></li>
+            <li key={p.t} className={i <= step || still ? 'on' : ''} aria-current={i === step && !still ? 'step' : undefined}>
+              <b>{i + 1}</b><span><strong>{p.t}</strong><small>{p.d}</small></span>
+            </li>
           ))}
         </ol>
       </div>
@@ -459,7 +529,7 @@ export function FaqSection() {
 /* ───────────────────────── Rodapé ───────────────────────── */
 export function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" data-header-dark>
       <div className="wrap footer-inner">
         <div>
           <img src="/logo-white.svg" alt="Cerne" height={28} />

@@ -34,4 +34,6 @@ dist-ssr
 # Renders regeneráveis (1.3 GB) — gerados por video/hero-a/*.py
 video/hero-a/out/
 video/hero-a/out-v2/
+video/hero-a/out-campo/
+video/hero-a/out-perfis/
 .hyperframes/

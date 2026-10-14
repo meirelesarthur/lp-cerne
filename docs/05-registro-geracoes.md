@@ -48,3 +48,37 @@ Gerado sozinho, com teto de 20.000 créditos. **Gasto real: 14.730 créditos** (
 **Pendência visual conhecida (desktop):** entre 4 e 6 s do clip 16:9 aparece uma faixa coberta (parece telhado/painel) na borda esquerda dos lotes. Refazer o clip custaria 9.480 créditos e estouraria o teto; o mobile não tem esse problema.
 
 Prompts completos: `docs/06-hero-v2-prompts.md` (o do clip contínuo foi usado quase literalmente; o K3 pediu o tablet centralizado com ~45% da largura).
+
+---
+
+# Perfis v1 (2026-10-13): "do campo ao escritório"
+
+Gasto: **8.500 créditos** (saldo 214.037 → 205.537). Originais em `assets/gen-v3/`. Usados com a tag **perfis-v1** + Approved.
+
+| Arquivo | Tipo | Modelo | Seed | Referência | Créditos | Resultado |
+|---|---|---|---|---|---|---|
+| A-a/A-b.png | imagem 16:9 2k | seedream-5-pro | 6100 | K0 (Hero) | 200 | descartadas: lotes com cobertura vistos pela janela |
+| A2-a.png | imagem 16:9 2k | seedream-5-pro | 6110 | K0 | 100 | alternativa |
+| A2-b.png | imagem 16:9 2k | seedream-5-pro | 6111 | K0 | 100 | **escolhida (fim)**: gestor no escritório claro, notebook magenta, lotes abertos pela janela |
+| B-a.png | imagem 16:9 2k | seedream-5-pro | 6120 | K3 (Hero) | 100 | alternativa (névoa, cocho) |
+| B-b.png | imagem 16:9 2k | seedream-5-pro | 6121 | K3 | 100 | **escolhida (início)**: vaqueiro com celular magenta junto ao cocho, Nelores, céu aberto |
+| clip-campo.mp4 | vídeo 16:9 10 s 1080p | seedance-pro-2.5 | 6200 | start B-b, end A2-b | 7.900 | **usado**: um plano contínuo, a câmera acompanha o vaqueiro até o escritório e entra pela janela |
+
+Telas compostas: app Operação real (build web, login de demonstração, OS #2198 "Vacinação — Lote 12") no celular; painel real de Pecuária de Corte (web, modo claro, barras recolhidas) no notebook. A tela "Lista de OS" do web não foi usada porque ainda está como "será implementada em breve".
+
+# Perfis v2 (2026-10-13): campo → fazenda inteira → escritório, em tela cheia
+
+Teto combinado: 20 mil créditos. Gasto real: **17.675 créditos** (saldo 205.537 → 187.862). A soma estimada era 16.400 (6 imagens × 100 + 2 vídeos × 7.900); a diferença de 1.275 aparece no saldo e não foi detalhada pela API. Originais em `assets/gen-v4/`. Usados com a tag **perfis-v2** + Approved. A v1 (`assets/gen-v3/clip-campo.mp4`) saiu da página.
+
+| Arquivo | Tipo | Modelo | Seed | Referência | Créditos | Resultado |
+|---|---|---|---|---|---|---|
+| A-a.png | imagem 16:9 2k | seedream-5-pro | 7100 | K3 (Hero) | 100 | **escolhida (início)**: vaqueiro na leitura de cocho, celular magenta grande, Nelores, confinamento sem cobertura |
+| A-b.png | imagem 16:9 2k | seedream-5-pro | 7101 | K3 | 100 | alternativa (celular pequeno demais) |
+| B-a | imagem 16:9 2k | seedream-5-pro | 7200 | K3 | 100 | não usada |
+| B-b.png | imagem 16:9 2k | seedream-5-pro | 7201 | K3 | 100 | **escolhida (meio)**: aérea com confinamento aberto, armazém, silos, prédio administrativo, caminhão carregando, soja e morros com névoa |
+| C-a.png | imagem 16:9 2k | seedream-5-pro | 7300 | K3 | 100 | alternativa |
+| C-b.png | imagem 16:9 2k | seedream-5-pro | 7301 | K3 | 100 | **escolhida (fim)**: escritório amplo, parede de vidro para silos com bitrem carregando e currais |
+| clip-1.mp4 | vídeo 16:9 10 s 1080p | seedance-pro-2.5 | — | start A-a, end B-b | 7.900 | **usado**: a câmera segura no celular e sobe até a vista da fazenda inteira |
+| clip-2.mp4 | vídeo 16:9 10 s 1080p | seedance-pro-2.5 | — | start B-b, end C-b | 7.900 | **usado**: desce sobre os currais, passa pelo armazém, entra pela fachada de vidro e chega ao gestor |
+
+Montagem (`video/hero-a/build_perfis.py`): os dois clipes viram um plano de 20 s (a emenda descarta o quadro repetido). Telas compostas: OS #2198 "Vacinação — Lote 12" do app Operação no celular; painel de Pecuária de Corte no notebook. No celular, o recorte vertical acompanha o aparelho em foco.

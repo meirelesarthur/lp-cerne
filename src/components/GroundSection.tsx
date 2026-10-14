@@ -4,8 +4,8 @@ import type { HeroGeometry } from './Hero'
 
 /**
  * 02 · Escopo. Fundo: o resto da fazenda, continuando pixel a pixel o último quadro do Hero (mesma escala e
- * posição do zoom final) e fixo (`sticky`) enquanto o conteúdo passa. No fim da seção a plantação se funde
- * num verde lavoura sólido e, abaixo, um degradê leva ao tom claro do resto da página.
+ * posição do zoom final) e fixo (`sticky`) enquanto o conteúdo passa. No fim da seção a própria foto se
+ * esmaece, de baixo para cima, até o fundo claro do resto da página.
  */
 const FRENTES = [
   { t: 'Multifazendas', d: 'Várias propriedades na mesma visão, com dados separados por fazenda.' },
@@ -33,13 +33,14 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
     style = { width, height, left, top }
   }
 
-  // a plantação vai se fundindo no verde lavoura conforme a seção avança
+  // o véu claro sobe enquanto o conteúdo sai e a próxima seção entra; a borda de baixo do véu já é o fundo
+  // claro, então a foto pode continuar se esmaecendo depois de soltar o sticky sem marcar emenda
   useLayoutEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      gsap.fromTo('.ground-veil', { opacity: 0 }, {
-        opacity: 1, ease: 'none',
-        scrollTrigger: { trigger: '.ground-fade', start: 'top 170%', end: 'top bottom', scrub: true },
+      gsap.fromTo('.ground-veil', { yPercent: 0 }, {
+        yPercent: -40, ease: 'none',
+        scrollTrigger: { trigger: '.fatos', start: 'top bottom', endTrigger: document.getElementById('problema'), end: 'top 35%', scrub: true },
       })
     }, root)
     return () => ctx.revert()

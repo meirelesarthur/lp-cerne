@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "isometric",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "C:/Users/Arthur/Downloads/lp-cerne-isometric"],
+      "port": 5180,
+      "autoPort": true
     }
   ]
 }
