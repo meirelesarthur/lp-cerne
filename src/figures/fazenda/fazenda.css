@@ -1,0 +1,61 @@
+/* Maquete "Fazenda no Cerne": tokens do kit Anatomy (tema claro) + peças próprias */
+.fz-figure.iso[data-theme='light'] {
+  --anatomy-card: #ffffff;
+  --anatomy-paper: #ffffff;
+  --anatomy-text: var(--muted, #4a5b50);
+  --anatomy-muted: #7b8b80;
+  --anatomy-halo: #4f6b55;
+  --anatomy-halo-opacity: 0.28;
+  --anatomy-weight: 0.55px;
+  --fz-accent: var(--accent, #059669);
+}
+
+.fz-stage .fz-svg { overflow: hidden; }
+.fz-svg .fz-flat { stroke: none; }
+.fz-svg .fz-shadow { opacity: 0.16; filter: blur(2px); transform: none; }
+.fz-svg .fz-rail { fill: none; stroke: #8a6744; stroke-width: 1.5px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-pipe { fill: none; stroke: #8f999b; stroke-width: 1.6px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-dark { fill: #4b4a45; stroke: #3a3934; stroke-width: 0.5px; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-glass { fill: #cfe6ee; stroke: #8fa9b2; stroke-width: 0.5px; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-glow { fill: #e9f6ef; stroke: #5d6b64; stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-strip { fill: var(--mc); stroke: none; }
+.fz-svg .fz-feed { stroke: none; }
+
+/* painel da sede */
+.fz-svg .fz-tv { fill: #f4f8f5; }
+.fz-svg .fz-tv-bar { fill: #0e2a1d; }
+.fz-svg .fz-tv-h { fill: #e2f0e8; font-family: var(--font, system-ui); font-weight: 600; }
+.fz-svg .fz-live { fill: #4ade80; }
+.fz-svg .fz-tile-bg { fill: #ffffff; stroke: #d3dfd6; stroke-width: 0.4px; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-tile-t { fill: #4a5b50; font-family: var(--font, system-ui); font-weight: 600; }
+.fz-svg .fz-tile-n { fill: #0e2a1d; font-family: var(--font, system-ui); font-weight: 700; font-variant-numeric: tabular-nums; }
+.fz-svg .fz-tile-s { fill: #7b8b80; font-family: var(--font, system-ui); }
+.fz-svg .fz-bar { fill: #a7d8bf; }
+.fz-svg .fz-tile-flash { fill: var(--fz-accent); opacity: 0; pointer-events: none; }
+
+/* pulsos de dados */
+.fz-svg .fz-pulse { pointer-events: none; }
+.fz-svg .fz-pulse-dot { fill: var(--fz-accent); stroke: #fff; stroke-width: 0.8px; vector-effect: non-scaling-stroke; }
+.fz-svg .fz-pulse-halo { fill: var(--fz-accent); opacity: 0.22; }
+
+/* gado comendo no cocho */
+.fz-svg .fz-head { animation: fz-eat 2.6s ease-in-out infinite; animation-delay: calc(var(--hd, 0s) * -1); }
+@keyframes fz-eat { 0%, 30%, 100% { transform: translate(0, 0); } 45%, 80% { transform: translate(var(--hx), var(--hy)); } }
+.fz-figure[data-paused] .fz-head { animation-play-state: paused; }
+
+/* setores clicáveis: o escolhido fica em destaque, os outros recuam */
+.fz-svg .fz-hit { fill: transparent; cursor: pointer; }
+.fz-svg [data-zone] { transition: opacity 0.4s var(--anatomy-ease); }
+.fz-svg[data-focus='lavoura'] [data-zone]:not([data-zone='lavoura']),
+.fz-svg[data-focus='confinamento'] [data-zone]:not([data-zone='confinamento']),
+.fz-svg[data-focus='estoque'] [data-zone]:not([data-zone='estoque']),
+.fz-svg[data-focus='sede'] [data-zone]:not([data-zone='sede']) { opacity: 0.38; }
+.fz-svg[data-hover='lavoura'] .fz-hit[data-hit='lavoura'],
+.fz-svg[data-hover='confinamento'] .fz-hit[data-hit='confinamento'],
+.fz-svg[data-hover='estoque'] .fz-hit[data-hit='estoque'],
+.fz-svg[data-hover='sede'] .fz-hit[data-hit='sede'] { fill: rgba(5, 150, 105, 0.06); stroke: rgba(5, 150, 105, 0.5); stroke-width: 1px; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fz-svg .fz-head { animation: none; }
+  .fz-svg [data-zone] { transition: none; }
+}

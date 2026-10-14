@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { CerneAxle } from '../figures/cerne/CerneAxle'
+import { FazendaCerne } from '../figures/fazenda/FazendaCerne'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
@@ -230,6 +230,7 @@ export function SystemSection() {
           <h2 id="sistema-title">Seis frentes. Um só cadastro.</h2>
           <p className="sec-lead">Os módulos que já estão no menu do Cerne Web.</p>
         </header>
+        <FazendaCerne />
         <div className="bento">
           {MODULOS.map((m) => (
             <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
@@ -268,9 +269,7 @@ export function EditionsSection() {
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Como usar</span>
           <h2 id="edicoes-title">Um sistema. Três formas de usar.</h2>
-          <p className="sec-lead">Escritório, gestor e campo trabalham na mesma ordem de serviço, porque as três edições giram em torno de um só cadastro.</p>
         </header>
-        <CerneAxle />
         <div className="editions-grid">
           <article className="edition web" data-reveal>
             <span className="badge on">Disponível · navegador</span>
