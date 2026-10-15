@@ -1,6 +1,6 @@
 # Maquete isométrica: Fazenda no Cerne (2026-10-14)
 
-Branch `isometric`. Substitui o piloto do "Eixo do Cerne" (feedback: estética abstrata demais, o cliente não reconheceria a fazenda). Feita com a skill **Anatomy** (MIT; kit em `tools/iso/kit/` e `src/figures/iso/`).
+Branch `isometric`. Substitui o piloto do "Eixo do Cerne" (feedback: estética abstrata demais, o cliente não reconheceria a fazenda). Feita com a skill **Anatomy** (MIT; kit em `workbench/tools/iso/kit/` e `src/figures/iso/`).
 
 ## O que mostra
 Uma maquete de fazenda sobre um bloco de terra, na seção **05 · Sistema** ("Seis frentes. Um só cadastro."), acima do bento:
@@ -30,13 +30,13 @@ Cada operação (saída de estoque, trato registrado, plantio apontado) solta um
 Para comparar: os quadros do Hero somam 8–9 MB. O espaço da figura fica reservado por `aspect-ratio`, sem CLS.
 
 ## Arquivos
-- `tools/iso/fazenda/build.mjs`: geometria, materiais (cores) e ordem de pintura. Gera `src/figures/fazenda/art.ts` e `materials.css`.
+- `workbench/tools/iso/fazenda/build.mjs`: geometria, materiais (cores) e ordem de pintura. Gera `src/figures/fazenda/art.ts` e `materials.css`.
 - `src/figures/fazenda/live.ts`: caminhão, trator, cocho, faixas plantadas, pulsos, contadores, câmera do mobile.
 - `src/figures/fazenda/model.ts`: textos de cada setor (mesma copy da seção Sistema).
 - `src/figures/fazenda/FazendaCerne.tsx` + `fazenda.css` + `panel.css`: card, etiquetas, abas e painel.
-- `tools/iso/harness/`: bancada só com a figura.
+- `workbench/tools/iso/harness/`: bancada só com a figura.
 
-Regerar a arte: `node tools/iso/fazenda/build.mjs`
+Regerar a arte: `node workbench/tools/iso/fazenda/build.mjs`
 
 ## Pendências
 - Testar em celular real e com CPU lenta.

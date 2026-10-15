@@ -12,6 +12,6 @@
     ]
   },
   "ignorePatterns": [
-    "tools/iso/kit/**"
+    "workbench/tools/iso/kit/**"
   ]
 }

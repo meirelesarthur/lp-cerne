@@ -9,7 +9,7 @@ import * as k from "../kit/iso-kit.mjs";
 import * as G from "../kit/lathe.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(HERE, "..", "..", "..");
+const ROOT = join(HERE, "..", "..", "..", "..");
 const OUT_TS = join(ROOT, "src", "figures", "fazenda");
 const OUT_HTML = join(HERE, "out");
 
