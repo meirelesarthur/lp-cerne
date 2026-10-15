@@ -110,3 +110,8 @@ Saldo 177.112 → 174.962 (2.150 créditos: 8 imagens a 100 e 1 upscale 4x a 1.3
 Saldo 174.962 → 173.212 (1.750 créditos: 4 imagens a 100 e 1 upscale 4x a 1.350).
 - `assets/gen-mocks/field916-1..4.png` (seedream-5-pro, 9:16, "4k" = 1440×2560), com a cena 16:9 escolhida (field16-6) como referência: mesma mesa, mesmos aparelhos e arranjo, grupo centralizado na parte de baixo, lavoura e céu livres em cima. **Escolhida: field916-3** (grupo inteiro com margem dos dois lados e mesa inteira).
 - Upscale 4x (Magnific Precision sublime, balanced): `field916-3-up4x.jpg`, 5760×10240.
+
+### Rodada 7: notebook + celular em fundo branco, 16:9 para impressão (2026-10-15)
+Saldo 173.212 → 171.462 (1.750 créditos: 4 imagens a 100 e 1 upscale 4x a 1.350).
+- `assets/gen-mocks/duo-1..4.png` (seedream-5-pro, 16:9, "4k" = 2560×1440): estúdio, fundo branco, notebook de frente e um celular em pé ao lado, sem sobreposição, sem mãos, telas magenta. **Escolhida: duo-4** (aparelhos maiores e centralizados).
+- Upscale 4x (Magnific Precision sublime, balanced): `duo-4-up4x.jpg`, 10240×5760. Fundo levado a branco puro com `assets/mocks/whiten_bg.py` → `duo-4-up4x-branco.png`.

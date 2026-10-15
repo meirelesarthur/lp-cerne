@@ -74,3 +74,13 @@ Pedido: refazer o `mock-notebook-e-apps-v3-4000` em 16:9, fundo de campo em vez 
 - Mesmas telas da v3. Celulares com ~780 px de largura de tela (reduzidos das capturas de 1170 px). A tela do notebook tem ~3220 px, maior que a captura da Visão Geral (2560 px): foi ampliada 1,26x e fica um pouco mais macia que os celulares. Para nitidez total, recapturar a Visão Geral em 4K e recompor.
 - Regerar: `OUTW=5760 OCC=0.02 python assets/mocks/compose_multi2.py assets/gen-mocks/field916-3-up4x.jpg <saida>`.
 - Tamanho de impressão: ~49×87 cm a 300 dpi ou ~98×173 cm a 150 dpi.
+
+## Notebook + celular em fundo branco: Financeiro e app GB (2026-10-15)
+Pedido: fundo branco sólido, notebook com o dashboard Financeiro do Cerne e um celular ao lado com o print "Adicionar talhão" (app GB Agritech) enviado por Arthur; sem mãos; alta resolução para impressão.
+
+- Arquivos: `assets/mocks/out/mock-notebook-e-celular-financeiro-talhao-branco-16x9-10240x5760.png` (mestre), `...-10240x5760.jpg` (q95, 300 dpi, cópia em `design/mocks/`) e `...-preview-2560.jpg`.
+- Telas: notebook com `capture/light/financeiros-3x2.png` (recorte 3200×2134 do topo de `financeiros-full.png`, para caber na tela 3:2 sem cortar as laterais); celular com `capture/app/gb-adicionar-talhao.png` (print enviado, 941×2000, achatado sobre branco; a barra de status é a do próprio print, sem redesenho).
+- Fundo: `whiten_bg.py` divide a imagem pela luz estimada do fundo e força 255 longe dos aparelhos (remove a textura que o upscale inventa no fundo liso). Cantos e bordas saem em #FFFFFF exato; as sombras de contato ficam.
+- Resolução das telas: a tela do notebook tem ~4250 px na saída (captura de 3200 px, ampliada 1,33x) e a do celular ~1365 px (print de 941 px, ampliado 1,45x). O texto continua legível, mas para nitidez máxima em impressão grande vale recapturar o Financeiro em 4K e pedir o print do app em resolução nativa (ex.: 1290×2796).
+- Regerar: `python assets/mocks/whiten_bg.py assets/gen-mocks/duo-4-up4x.jpg assets/gen-mocks/duo-4-up4x-branco.png` e depois `SHOTS="light/financeiros-3x2.png:laptop:1.5,app/gb-adicionar-talhao.png:phone:0.47:raw" RANK=0,1 OUTW=10240 OCC=0.012 python assets/mocks/compose_multi2.py assets/gen-mocks/duo-4-up4x-branco.png <saida>`. `compose_multi2.py` agora aceita `SHOTS` e `RANK` por variável de ambiente (flag `raw` = print já tem barra de status).
+- Tamanho de impressão: ~87×49 cm a 300 dpi ou ~173×98 cm a 150 dpi.
