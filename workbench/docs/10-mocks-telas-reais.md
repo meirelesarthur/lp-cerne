@@ -58,3 +58,12 @@ Pedido: banner grande impresso, imagem 9:16 com os aparelhos no terço inferior 
 - Cenas geradas com tela magenta (chroma key), ampliadas 2x no Magnific antes da composição; a tela é aplicada em resolução total (`compose_key.py`, `OUTW=2880`, `--despill-global` tira o reflexo magenta da mesa, das mãos e da moldura). Como a máscara é a própria cor, a mão nunca é coberta.
 - Para banners maiores que ~48×87 cm a 150 dpi, ampliar mais (4x dá ~5760×10240) e recompor com os mesmos scripts.
 - Os prints têm limite de resolução próprio (Visão geral 2560 px, Twin 1600 px): se o banner for muito grande, recapturar em 4K, principalmente o Twin.
+
+## Atualização: notebook e apps no campo, 16:9 para impressão (2026-10-15)
+Pedido: refazer o `mock-notebook-e-apps-v3-4000` em 16:9, fundo de campo em vez de branco, aparelhos no terço direito, telas iguais às atuais, altíssima resolução para impressão.
+
+- Arquivos: `assets/mocks/out/mock-notebook-e-apps-v3-campo-16x9-10240x5760.png` (mestre, sem perdas), `...-10240x5760.jpg` (q95, 300 dpi, cópia em `design/mocks/`) e `...-preview-2560.jpg`.
+- Cena: lavoura de soja ao pôr do sol, mesa de madeira à direita; notebook de 67,6% a 88% da largura. Os 2/3 da esquerda ficam livres (céu, colinas, soja).
+- Telas: as mesmas capturas da v3 (Visão Geral claro; Rebanho e confinamento > Visão geral, retocada; OS #2198). Na saída, a tela do notebook tem ~2100 px e as dos celulares ~490 px de largura, todas reduzidas a partir das capturas originais, então ficam nítidas.
+- Regerar: `OUTW=10240 OCC=0.012 python assets/mocks/compose_multi2.py assets/gen-mocks/field16-6-up4x.jpg <saida>`. `compose_multi2.py` agora aceita `OUTW` e `OCC` (zona de oclusão relativa) por variável de ambiente, e o mínimo de pontos por borda escala com o tamanho da tela (aparelhos pequenos na cena).
+- Tamanho de impressão: 10240×5760 dá ~87×49 cm a 300 dpi ou ~173×98 cm a 150 dpi.

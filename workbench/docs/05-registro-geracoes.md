@@ -99,3 +99,9 @@ Saldo 187.062 → 183.112 (3.950 créditos no total: 14 imagens a 100 e 2 upscal
 - `assets/gen-mocks/desk-1..5.png`, `field-1..5.png` (seedream-5-pro, 9:16, 2k = 1440×2560): cenas com tela magenta. Os aparelhos saíram na metade de baixo.
 - `desk-6/7.png` e `field-6/7.png`: variações "câmera mais afastada" usando a candidata 2 como imagem de referência; funcionou e levou os aparelhos ao terço inferior. **Escolhidas: desk-6 e field-6.**
 - Upscale 2x (Magnific Precision "photo", balanced): `desk-final-up.png` e `field-final-up.png`, 2880×5120.
+
+### Rodada 5: notebook e apps no campo, 16:9 para impressão (2026-10-15)
+Saldo 177.112 → 174.962 (2.150 créditos: 8 imagens a 100 e 1 upscale 4x a 1.350).
+- `assets/gen-mocks/field16-1..4.png` (seedream-5-pro, 16:9, "4k" = 2560×1440): mesa de madeira na beira da lavoura de soja, pôr do sol, mesmo arranjo da v3 com telas magenta. Aparelhos saíram grandes demais (metade da cena).
+- `field16-5..8.png`: variação "câmera mais afastada, grupo inteiro no terço direito" com a candidata 2 como referência. **Escolhida: field16-6** (notebook começa em 67,6% da largura).
+- Upscale 4x (Magnific Precision sublime, balanced): `field16-6-up4x.jpg`, 10240×5760.
