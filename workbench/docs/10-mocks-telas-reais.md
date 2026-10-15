@@ -67,3 +67,10 @@ Pedido: refazer o `mock-notebook-e-apps-v3-4000` em 16:9, fundo de campo em vez 
 - Telas: as mesmas capturas da v3 (Visão Geral claro; Rebanho e confinamento > Visão geral, retocada; OS #2198). Na saída, a tela do notebook tem ~2100 px e as dos celulares ~490 px de largura, todas reduzidas a partir das capturas originais, então ficam nítidas.
 - Regerar: `OUTW=10240 OCC=0.012 python assets/mocks/compose_multi2.py assets/gen-mocks/field16-6-up4x.jpg <saida>`. `compose_multi2.py` agora aceita `OUTW` e `OCC` (zona de oclusão relativa) por variável de ambiente, e o mínimo de pontos por borda escala com o tamanho da tela (aparelhos pequenos na cena).
 - Tamanho de impressão: 10240×5760 dá ~87×49 cm a 300 dpi ou ~173×98 cm a 150 dpi.
+
+### Versão 9:16 (2026-10-15)
+- Arquivos: `assets/mocks/out/mock-notebook-e-apps-v3-campo-9x16-5760x10240.png` (mestre), `...-5760x10240.jpg` (q95, 300 dpi, cópia em `design/mocks/`) e `...-preview-1440.jpg`.
+- Aparelhos centralizados de ~62% a ~92% da altura; os 60% de cima são céu, colinas e soja, livres para degradê ou texto.
+- Mesmas telas da v3. Celulares com ~780 px de largura de tela (reduzidos das capturas de 1170 px). A tela do notebook tem ~3220 px, maior que a captura da Visão Geral (2560 px): foi ampliada 1,26x e fica um pouco mais macia que os celulares. Para nitidez total, recapturar a Visão Geral em 4K e recompor.
+- Regerar: `OUTW=5760 OCC=0.02 python assets/mocks/compose_multi2.py assets/gen-mocks/field916-3-up4x.jpg <saida>`.
+- Tamanho de impressão: ~49×87 cm a 300 dpi ou ~98×173 cm a 150 dpi.

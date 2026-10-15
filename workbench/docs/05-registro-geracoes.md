@@ -105,3 +105,8 @@ Saldo 177.112 → 174.962 (2.150 créditos: 8 imagens a 100 e 1 upscale 4x a 1.3
 - `assets/gen-mocks/field16-1..4.png` (seedream-5-pro, 16:9, "4k" = 2560×1440): mesa de madeira na beira da lavoura de soja, pôr do sol, mesmo arranjo da v3 com telas magenta. Aparelhos saíram grandes demais (metade da cena).
 - `field16-5..8.png`: variação "câmera mais afastada, grupo inteiro no terço direito" com a candidata 2 como referência. **Escolhida: field16-6** (notebook começa em 67,6% da largura).
 - Upscale 4x (Magnific Precision sublime, balanced): `field16-6-up4x.jpg`, 10240×5760.
+
+### Rodada 6: notebook e apps no campo, 9:16 para impressão (2026-10-15)
+Saldo 174.962 → 173.212 (1.750 créditos: 4 imagens a 100 e 1 upscale 4x a 1.350).
+- `assets/gen-mocks/field916-1..4.png` (seedream-5-pro, 9:16, "4k" = 1440×2560), com a cena 16:9 escolhida (field16-6) como referência: mesma mesa, mesmos aparelhos e arranjo, grupo centralizado na parte de baixo, lavoura e céu livres em cima. **Escolhida: field916-3** (grupo inteiro com margem dos dois lados e mesa inteira).
+- Upscale 4x (Magnific Precision sublime, balanced): `field916-3-up4x.jpg`, 5760×10240.
