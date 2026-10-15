@@ -41,7 +41,7 @@ FPS = 24
 variant = sys.argv[1]
 c = CFG[variant]
 WORK = f'{ROOT}/video/hero-a/out-perfis'
-OUT = f'{ROOT}/public/frames/perfis/{variant}'
+OUT = f'{ROOT}/../public/frames/perfis/{variant}'
 
 if not glob.glob(f'{WORK}/src/*.png'):
     shutil.rmtree(WORK, ignore_errors=True); os.makedirs(f'{WORK}/src')

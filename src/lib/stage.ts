@@ -2,7 +2,7 @@
 
 export interface Rect { x: number; y: number; w: number; h: number }
 
-/** Gerado por video/hero-a/build_v2.py junto com os quadros. Rects normalizados (0-1). */
+/** Gerado por workbench/video/hero-a/build_v2.py junto com os quadros. Rects normalizados (0-1). */
 export interface Manifest {
   count: number
   width: number

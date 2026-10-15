@@ -32,13 +32,13 @@ CFG = {
 }
 SCREEN_ASPECT = 1.45            # tela do tablet (largura/altura); a base fica escondida pelos morros
 HAND_SCREEN = f'{ROOT}/assets/capture/light/visao-geral.png'
-APP_FULL = f'{ROOT}/public/app/visao-geral-full.webp'
+APP_FULL = f'{ROOT}/../public/app/visao-geral-full.webp'
 FPS = 24
 
 variant = sys.argv[1]
 c = CFG[variant]
 WORK = f'{ROOT}/video/hero-a/out-v2/{variant}'
-OUT = f'{ROOT}/public/frames/hero/{variant}'
+OUT = f'{ROOT}/../public/frames/hero/{variant}'
 shutil.rmtree(WORK, ignore_errors=True); os.makedirs(f'{WORK}/src')
 
 

@@ -32,11 +32,11 @@ dist-ssr
 .claude/settings.local.json
 
 # Renders regeneráveis (1.3 GB) — gerados por video/hero-a/*.py
-video/hero-a/out/
-video/hero-a/out-v2/
-video/hero-a/out-campo/
-video/hero-a/out-perfis/
+workbench/video/hero-a/out/
+workbench/video/hero-a/out-v2/
+workbench/video/hero-a/out-campo/
+workbench/video/hero-a/out-perfis/
 .hyperframes/
 
 # material de trabalho (mocks, capturas, geracoes): nao compoe o site
-/assets/
+/workbench/assets/
