@@ -52,7 +52,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .fatos li::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 3px; background: linear-gradient(180deg, var(--accent), #4ade80); }
 .fatos h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; color: var(--text); }
 .fatos p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--muted); }
-.ground-fade { position: relative; z-index: 1; height: 4vh; }
+.ground-fade { position: relative; z-index: 1; height: 80vh; }
 @media (prefers-reduced-motion: reduce) {
   .ground-veil { display: none; }
   .ground-fade { background: linear-gradient(180deg, rgba(245, 248, 244, 0), var(--canvas)); }

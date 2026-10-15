@@ -38,9 +38,10 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
   useLayoutEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      gsap.fromTo('.ground-veil', { yPercent: 0 }, {
-        yPercent: -40, ease: 'none',
-        scrollTrigger: { trigger: '.fatos', start: 'top bottom', endTrigger: document.getElementById('problema'), end: 'top 35%', scrub: true },
+      // o véu começa abaixo da tela (foto limpa atrás dos cards) e só sobe quando os cards já estão saindo
+      gsap.fromTo('.ground-veil', { yPercent: 52 }, {
+        yPercent: -36, ease: 'none',
+        scrollTrigger: { trigger: '.fatos', start: 'top 42%', endTrigger: root.current, end: 'bottom 92%', scrub: true },
       })
     }, root)
     return () => ctx.revert()
