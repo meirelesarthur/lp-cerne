@@ -37,3 +37,6 @@ video/hero-a/out-v2/
 video/hero-a/out-campo/
 video/hero-a/out-perfis/
 .hyperframes/
+
+# material de trabalho (mocks, capturas, geracoes): nao compoe o site
+/assets/

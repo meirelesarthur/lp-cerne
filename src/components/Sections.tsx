@@ -7,57 +7,92 @@ import { prefersHd, supportsAvif } from '../lib/stage'
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
-/* ───────────────────────── 03 · Problema ───────────────────────── */
+/* ───────────────────────── 03 · Problema → Cerne ───────────────────────── */
+// Palco em duas etapas, fixo no desktop: (A) a dor, com planilha, caderno e conversa; (B) a virada, com o produto
+// inteiro (notebook e os dois apps) em grande. No celular e com movimento reduzido as duas etapas ficam empilhadas.
+const PRODUTOS = [
+  { n: 'Cerne Web', s: 'disponível', on: true },
+  { n: 'Cerne Administração', s: 'em teste' },
+  { n: 'Cerne Operação', s: 'em teste' },
+]
+const PROBLEM_PIN = '(min-width: 961px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)'
+
 export function ProblemSection() {
   const root = useRef<HTMLElement>(null)
   const media = useAfterFirstScroll()
-  // planilha, caderno e conversa convergem no painel único conforme o scroll
+
   useLayoutEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ scrollTrigger: { trigger: '.layers', start: 'top 75%', end: 'bottom 40%', scrub: 0.6 } })
-      tl.from('.layer-a', { x: -60, y: -40, rotate: -6 }, 0)
-        .from('.layer-b', { x: 50, y: 10, rotate: 5 }, 0)
-        .from('.layer-c', { x: -30, y: 60, rotate: -3 }, 0)
-        .to('.layer', { opacity: 0, scale: 0.92, duration: 0.5 }, 0.6)
-        .fromTo('.layer-panel', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.5 }, 0.65)
-    }, root)
-    return () => ctx.revert()
+    const mm = gsap.matchMedia()
+    mm.add(PROBLEM_PIN, () => {
+      const tl = gsap.timeline({
+        defaults: { ease: 'power2.inOut' },
+        scrollTrigger: { trigger: root.current, start: 'top top', end: '+=240%', pin: true, scrub: 0.6, refreshPriority: 6 },
+      })
+      // 0 → 1 = toda a duração
+      tl.fromTo('.layer-a', { x: -70, y: -40, rotate: -7 }, { x: 18, y: 26, rotate: -2, duration: 0.3 }, 0)
+        .fromTo('.layer-b', { x: 60, y: 6, rotate: 6 }, { x: -22, y: 0, rotate: 1.5, duration: 0.3 }, 0)
+        .fromTo('.layer-c', { x: -36, y: 64, rotate: -4 }, { x: 22, y: -64, rotate: -1, duration: 0.3 }, 0)
+        .to('.stage-a', { autoAlpha: 0, y: -40, duration: 0.14 }, 0.36)
+        .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.5)
+        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.14 }, 0.5)
+        .fromTo('.product-img', { autoAlpha: 0, scale: 0.86, y: 70, rotateX: 10, transformPerspective: 1200 }, { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, duration: 0.28 }, 0.54)
+        .fromTo('.product-tags li', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.1 }, 0.8)
+    })
+    return () => mm.revert()
   }, [])
 
   return (
     <section ref={root} className="sec sec-light problem" id="problema" aria-labelledby="problema-title">
-      <div className="wrap problem-grid">
-        <div className="problem-copy">
-          <header className="sec-head" data-reveal>
-            <span className="eyebrow">O ponto de partida</span>
-            <h2 id="problema-title">Planilha aqui, caderno ali, WhatsApp no meio.</h2>
-            <p className="sec-lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
-          </header>
-          <ol className="pains">
-            <li data-reveal><b>01</b> Número diferente em cada controle.</li>
-            <li data-reveal><b>02</b> O que o campo anota demora a chegar ao escritório.</li>
-            <li data-reveal><b>03</b> Resultado por lote ou curral só no fechamento, se der.</li>
-          </ol>
-          <p className="problem-answer" data-reveal>O Cerne junta tudo em um lugar.</p>
+      <div className="problem-stage">
+        <div className="stage-a">
+          <div className="wrap problem-grid">
+            <div className="problem-copy">
+              <header className="sec-head">
+                <span className="eyebrow">O ponto de partida</span>
+                <h2 id="problema-title">Planilha aqui, caderno ali, WhatsApp no meio.</h2>
+                <p className="sec-lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
+              </header>
+              <ol className="pains">
+                <li><b>01</b> Número diferente em cada controle.</li>
+                <li><b>02</b> O que o campo anota demora a chegar ao escritório.</li>
+                <li><b>03</b> Resultado por lote ou curral só no fechamento, se der.</li>
+              </ol>
+            </div>
+            <div className="layers" aria-hidden="true">
+              <div className="layer layer-a">
+                <span className="layer-tag">Planilha</span>
+                <div className="sheet">{Array.from({ length: 30 }, (_, i) => <i key={i} />)}</div>
+              </div>
+              <div className="layer layer-b">
+                <span className="layer-tag">Caderno</span>
+                <div className="notebook"><p>Curral 4: trato 6h30</p><p>Lote 12: pesar sexta</p><p>Ração: pedir 8 t</p></div>
+              </div>
+              <div className="layer layer-c">
+                <span className="layer-tag">Conversa</span>
+                <div className="chat"><p className="in">Quantos bois no curral 7?</p><p className="out">Acho que 84, vou confirmar</p></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="layers" aria-hidden="true">
-          <div className="layer layer-a">
-            <span className="layer-tag">Planilha</span>
-            <div className="sheet">{Array.from({ length: 24 }, (_, i) => <i key={i} />)}</div>
+        <div className="stage-b">
+          <div className="wrap product">
+            <header className="product-head">
+              <span className="eyebrow">A virada</span>
+              <h2>O Cerne junta tudo em um lugar.</h2>
+              <p className="sec-lead">Um sistema no navegador hoje, com os apps de escritório e de campo a caminho.</p>
+            </header>
+            <figure className="product-fig">
+              {media && (
+                <img className="product-img" src="/mocks/cerne-produtos-1400.webp" srcSet="/mocks/cerne-produtos-1400.webp 1400w, /mocks/cerne-produtos-2400.webp 2400w" sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" loading="lazy" decoding="async" />
+              )}
+              <ul className="product-tags">
+                {PRODUTOS.map((p) => (
+                  <li key={p.n} className={p.on ? 'on' : ''}><i aria-hidden="true" />{p.n}<small>{p.s}</small></li>
+                ))}
+              </ul>
+            </figure>
           </div>
-          <div className="layer layer-b">
-            <span className="layer-tag">Caderno</span>
-            <div className="notebook"><p>Curral 4: trato 6h30</p><p>Lote 12: pesar sexta</p><p>Ração: pedir 8 t</p></div>
-          </div>
-          <div className="layer layer-c">
-            <span className="layer-tag">Conversa</span>
-            <div className="chat"><p className="in">Quantos bois no curral 7?</p><p className="out">Acho que 84, vou confirmar</p></div>
-          </div>
-          <figure className="layer-panel">
-            {media && <img src="/screens/visao-geral.webp" alt="Painel Visão Geral do Cerne com mapa de talhões e indicadores" loading="lazy" />}
-          </figure>
         </div>
       </div>
     </section>
@@ -164,12 +199,12 @@ export function TrailerSection() {
 /* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
 // grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
 const MODULOS = [
-  { k: 'a', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', img: 'lotacao-currais' },
-  { k: 'b', t: 'Agricultura', d: 'Talhões, planejamento de safra, romaneios e rastreabilidade.', img: 'talhoes' },
-  { k: 'c', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', img: 'suprimentos' },
-  { k: 'd', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', img: 'financeiros' },
-  { k: 'e', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
-  { k: 'f', t: 'Dashboards e relatórios', d: 'Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.', img: 'custos-confinamento' },
+  { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', feats: ['Mapa de currais', 'Dieta e batelada', 'Trato e cocho', 'Manejo e reprodução'], img: 'lotacao-currais' },
+  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões, planejamento de safra, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Pesagem rodoviária'], img: 'talhoes' },
+  { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', feats: ['Cotações', 'Recebimentos', 'Fábrica de ração'], img: 'suprimentos' },
+  { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', feats: ['Livro caixa', 'Depreciações', 'Ativos'], img: 'financeiros' },
+  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
+  { k: 'f', n: '06', tag: 'Gestão', t: 'Dashboards e relatórios', d: 'Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Lotação de currais', 'Desempenho de lotes', 'Pluviometria'], img: 'custos-confinamento' },
 ]
 
 export function SystemSection() {
@@ -198,16 +233,25 @@ export function SystemSection() {
           {MODULOS.map((m) => (
             <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
               <div className="cell-text">
+                <div className="cell-top"><span className="cell-n">{m.n}</span><span className="cell-tag">{m.tag}</span></div>
                 <h3>{m.t}</h3>
                 <p>{m.d}</p>
+                {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
               </div>
               {m.img ? (
                 <div className="shot">{media && <img src={`/screens/${m.img}.webp`} alt="" loading="lazy" decoding="async" />}</div>
               ) : (
-                <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
+                <div className="base">
+                  <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
+                  <p className="base-note"><i aria-hidden="true" />Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.</p>
+                </div>
               )}
             </article>
           ))}
+        </div>
+        <div className="spine" data-reveal aria-hidden="true">
+          <span>Um só cadastro</span>
+          <ol>{MODULOS.map((m) => <li key={m.k}><i />{m.t}</li>)}</ol>
         </div>
       </div>
     </section>

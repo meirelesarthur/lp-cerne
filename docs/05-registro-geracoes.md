@@ -82,3 +82,20 @@ Teto combinado: 20 mil créditos. Gasto real: **17.675 créditos** (saldo 205.53
 | clip-2.mp4 | vídeo 16:9 10 s 1080p | seedance-pro-2.5 | — | start B-b, end C-b | 7.900 | **usado**: desce sobre os currais, passa pelo armazém, entra pela fachada de vidro e chega ao gestor |
 
 Montagem (`video/hero-a/build_perfis.py`): os dois clipes viram um plano de 20 s (a emenda descarta o quadro repetido). Telas compostas: OS #2198 "Vacinação — Lote 12" do app Operação no celular; painel de Pecuária de Corte no notebook. No celular, o recorte vertical acompanha o aparelho em foco.
+
+## Mocks com telas reais (2026-10-14)
+Cenas com tela em magenta chapado (chroma key), geradas em `seedream-5-pro`, 3:2, 2k (2496×1664), 100 créditos cada. Total: 500 créditos (saldo 187.862 → 187.362).
+
+| Arquivo | Uso | Prompt (resumo) | Resultado |
+|---|---|---|---|
+| `assets/gen-mocks/tablet-key-A.png`, `tablet-key-B.png` | Tablet no campo (2 candidatas) | mãos segurando tablet rugged em landscape na soja, pôr do sol, tela magenta, dedos só nas laterais | **B escolhida**: tela grande e inteira, mãos fora da tela |
+| `assets/gen-mocks/devices-1.png` a `devices-3.png` | Notebook + 2 celulares (3 candidatas) | estúdio fundo branco, notebook à esquerda e dois celulares de frente, afastados, telas magenta, pill da câmera | **2 escolhida**; a 3 cortava o notebook, a 1 deixava os aparelhos pequenos |
+
+### Rodada 3: aparelhos juntos e sobrepostos (2026-10-14)
+`assets/gen-mocks/devices-v3-1.png` a `devices-v3-3.png`: seedream-5-pro, 3:2, 2k, 100 créditos cada (300 no total; saldo 187.362 → 187.062). Prompt: notebook à esquerda, dois celulares de frente à direita, agrupados; o da esquerda à frente do canto inferior direito do notebook, o da direita um pouco atrás, ~10% escondido; telas magenta e pill da câmera. **v3-1 escolhida**: a que menos tampa a tela do notebook.
+
+### Rodada 4: mocks 9:16 para banner impresso (2026-10-14)
+Saldo 187.062 → 183.112 (3.950 créditos no total: 14 imagens a 100 e 2 upscales).
+- `assets/gen-mocks/desk-1..5.png`, `field-1..5.png` (seedream-5-pro, 9:16, 2k = 1440×2560): cenas com tela magenta. Os aparelhos saíram na metade de baixo.
+- `desk-6/7.png` e `field-6/7.png`: variações "câmera mais afastada" usando a candidata 2 como imagem de referência; funcionou e levou os aparelhos ao terço inferior. **Escolhidas: desk-6 e field-6.**
+- Upscale 2x (Magnific Precision "photo", balanced): `desk-final-up.png` e `field-final-up.png`, 2880×5120.
