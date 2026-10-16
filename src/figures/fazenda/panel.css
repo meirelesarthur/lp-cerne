@@ -69,7 +69,7 @@
 
 /* ===== tela cheia: sem card branco; o texto do setor vem num vidro por cima da maquete ===== */
 .fz-figure.fz-full { position: relative; margin: 0; width: 100%; }
-.fz-full .fz-canvas { position: relative; width: min(100%, 1680px); margin: 0 auto; }
+.fz-full .fz-canvas { position: relative; width: min(100%, 1100px, calc((100svh - 190px) * 760 / 430)); margin: 0 auto; }
 .fz-full .fz-stage { max-width: none; }
 .fz-full .fz-labels { top: 0; left: 0; width: 100%; max-width: none; transform: none; }
 .fz-hint { position: absolute; left: 50%; bottom: 2%; transform: translateX(-50%); margin: 0; padding: 7px 16px; border-radius: 20px; background: rgba(255, 255, 255, .5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, .6); font-size: 13.5px; color: #1f3326; white-space: nowrap; }
@@ -87,7 +87,7 @@
 @media (max-width: 719px) {
   .fz-full .fz-card { position: static; transform: none; width: auto; margin: 10px var(--gutter) 0; }
   .fz-hint { position: static; transform: none; display: block; width: max-content; max-width: calc(100% - 32px); margin: 8px auto 0; white-space: normal; text-align: center; }
-  .fz-full .fz-canvas { width: 170%; margin-left: -35%; }
+  .fz-full .fz-canvas { width: 118%; margin-left: -9%; }
 }
 .fz-figure[data-side='left'] .fz-card { right: auto; left: clamp(16px, 3vw, 56px); }
 @media (max-width: 719px) { .fz-figure[data-side='left'] .fz-card { left: auto; } }

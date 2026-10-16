@@ -304,9 +304,12 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .ground-content { padding-top: 24vh; }
 }
 
-/* ===== Sistema: maquete em tela cheia ===== */
-.farm { padding: 0; background: linear-gradient(180deg, var(--canvas) 0%, #eef4ea 50%, var(--canvas) 100%); overflow: hidden; }
-.farm .fz-figure { margin: 0; padding-top: 64px; display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
+/* ===== Sistema: maquete em tela cheia, sobre uma foto suave da lavoura ===== */
+.farm { position: relative; padding: 0; background: var(--canvas); overflow: hidden; isolation: isolate; }
+.farm::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+  linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, .74) 22%, rgba(245, 248, 244, .62) 55%, rgba(245, 248, 244, .8) 82%, var(--canvas) 100%),
+  url('/frames/sistema-bg.webp') center 62% / cover no-repeat; }
+.farm .fz-figure { margin: 0; padding-top: 120px; display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
 .farm .farm-head { position: absolute; left: 0; right: 0; top: clamp(88px, 12vh, 130px); z-index: 4; pointer-events: none; transition: opacity .35s; }
 .farm .farm-head .sec-head { margin: 0; max-width: 460px; pointer-events: auto; }
 .farm .farm-head h2 { font-size: clamp(28px, 3vw, 44px); }

@@ -26,3 +26,7 @@ Animação: a dor sai; o mockup dos três produtos surge desfocado; planilha, ca
 
 ## Verificação
 Capturas em desktop (1440×900) e celular (390×844); `npm run build` ok; lint sem avisos novos. Scripts: `workbench/tools/{seam,fade-check,fly-check,farm-shot,iso-shot}.mjs`.
+
+## Correções (mesmo dia)
+- **Emenda duplicada no Hero:** o manifesto da versão HD (`desktop-hd/manifest.json`) ainda tinha as medidas do chão antigo, então a imagem nova saía esticada e repetia o curral e o drone. Agora ele é sincronizado (e `ground_v5.py` passou a atualizá-lo junto).
+- **Maquete:** as montanhas, talhões, árvores externas e o gado refeito foram retirados (perspectiva estranha); voltou a arte original (360 KB gzip->~70 KB). Ficaram o layout em tela cheia e os cartões de vidro. Ao fundo, uma foto suave da lavoura (`public/frames/sistema-bg.webp`, 86 KB) sob um véu claro. A versão enriquecida está guardada em git (commit 7819a98) e o gerador anterior em `workbench/assets/backup/fazenda-build-v1.mjs`.

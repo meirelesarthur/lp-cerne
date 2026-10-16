@@ -8,7 +8,7 @@ import { ZONES, ZONE_ORDER, type Zone } from './model'
 
 const MOBILE = '(max-width: 719px)'
 // proporção fixa da arte (igual ao build) para reservar o espaço antes de ela chegar
-const RATIO = '1160 / 600'
+const RATIO = '760 / 430'
 type Art = { SVG: string; DATA: FarmData }
 
 export function FazendaCerne() {

@@ -29,16 +29,13 @@ const MAT_CSS = Object.entries(MATS)
   .join("\n");
 
 // ───────── mundo e câmera ─────────
-const W0 = 760;
-const H0 = 430;
-const W = 1200;   // tela maior: a base mantém a escala e sobra espaço para morros e plantação ao redor
-const H = 660;
+const W = 760;
+const H = 430;
 const BASE = { x: -270, y: -190, w: 540, d: 380, r: 16 };
-const P0 = k.fitProjection(
+const P = k.fitProjection(
   [...k.boxCorners(BASE, -28, 0), [-120, 60, 66], [-100, 84, 74], [-205, 110, 50], [14, -170, 30]],
-  W0, H0, { pad: 6 },
+  W, H, { pad: 6 },
 );
-const P = { ...P0, origin: [P0.origin[0] + (W - W0) / 2, P0.origin[1] + (H - H0) / 2 + 36] };
 const at = (p) => k.iso(p, P);
 const S = (paths, style = {}) => k.solidSvg(paths, { tone: "mid", ...style });
 const L = (d, style) => k.lineSvg(d, style);
@@ -55,49 +52,6 @@ const flatPlan = (plan, z = 0) => k.pathOf(k.roundedPlan({ r: 0, ...plan }, 3).m
 // itens em ordem de pintura: chave = profundidade do ponto de referência
 const items = [];
 const put = (ref, svg, zone, bias = 0) => items.push({ key: depth(ref) + bias, y: ref[1], svg, zone });
-
-// ───────── cenário ao redor: chão externo, morros, talhões vizinhos e árvores ─────────
-const backdrop = [];
-const Z0 = -6;                                   // nível do chão externo (um pouco abaixo do gramado da base)
-const mid = at([0, 0, Z0]);
-backdrop.push(`<defs><radialGradient id="fz-land" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#cfe4c2"/><stop offset="0.55" stop-color="#d9ead0" stop-opacity="0.85"/><stop offset="1" stop-color="#e9f2e4" stop-opacity="0"/></radialGradient>` +
-  `<linearGradient id="fz-haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf2e8" stop-opacity="0.9"/><stop offset="1" stop-color="#eaf2e8" stop-opacity="0"/></linearGradient></defs>`);
-backdrop.push(`<ellipse cx="${mid[0].toFixed(1)}" cy="${(mid[1] + 14).toFixed(1)}" rx="${(W * 0.49).toFixed(0)}" ry="${(H * 0.46).toFixed(0)}" fill="url(#fz-land)"/>`);
-// talhões vizinhos (faixas de plantio no chão externo), nos lados e ao fundo
-const patchField = (plan, mat) => {
-  const rowsP = [];
-  for (let y = plan.y + 4; y < plan.y + plan.d - 2; y += 7) rowsP.push(k.onTop([[plan.x + 1, y], [plan.x + plan.w - 1, y]], Z0 + 2, P));
-  return M(mat, S(box(plan, Z0, 2, 2, 0.4), { crease: "lo" }) + L(rowsP.join(""), { tone: "lo" }));
-};
-const FIELDS = [
-  [{ x: 292, y: -140, w: 78, d: 96, r: 5 }, "crop"],
-  [{ x: 292, y: -30, w: 78, d: 80, r: 5 }, "cropDark"],
-  [{ x: -362, y: -150, w: 78, d: 100, r: 5 }, "cropDark"],
-  [{ x: -362, y: -36, w: 78, d: 90, r: 5 }, "crop"],
-  [{ x: -150, y: -268, w: 120, d: 70, r: 5 }, "crop"],
-  [{ x: 8, y: -268, w: 120, d: 70, r: 5 }, "cropDark"],
-  [{ x: 292, y: 70, w: 78, d: 70, r: 5 }, "field"],
-  [{ x: -362, y: 62, w: 78, d: 70, r: 5 }, "cropDark"],
-  [{ x: 150, y: -268, w: 110, d: 70, r: 5 }, "crop"],
-  [{ x: -290, y: -268, w: 130, d: 70, r: 5 }, "field"],
-];
-for (const [plan, mat] of FIELDS) backdrop.push(patchField(plan, mat));
-// morros: cúpulas baixas e largas; os mais ao fundo primeiro
-const HILLS = [];
-// morros de verdade: cúpulas com altura ~40% do raio, em três arcos baixos ao redor da base, sobrepostos como uma serra
-const arc = (n, from, step, k0, mk) => { for (let i = 0; i < n; i++) HILLS.push(mk(from + i * step, k0 + (i % 2) * 18, i)); };
-arc(6, -300, 120, -640, (t, sum, i) => [(sum + t) / 2, (sum - t) / 2, 96 + (i % 3) * 14, 38 + (i % 3) * 8, i % 2 ? "leaf2" : "grass"]);
-arc(3, -120, 130, -690, (t, dif, i) => [(t + dif) / 2, (t - dif) / 2, 78 + (i % 2) * 12, 30 + (i % 2) * 8, i % 2 ? "grass" : "leaf2"]);
-arc(3, -120, 130, 690, (t, dif, i) => [(t + dif) / 2, (t - dif) / 2, 80 + ((i + 1) % 2) * 12, 30 + ((i + 1) % 2) * 8, i % 2 ? "leaf2" : "grass"]);
-HILLS.sort((a, b) => depth([a[0], a[1], 0]) - depth([b[0], b[1], 0]));
-for (const [hx, hy, r, h, mat] of HILLS) {
-  const F = G.frameAlong([hx, hy, Z0], [0, 0, 1]);
-  backdrop.push(`<path class="iso-halo fz-shadow" d="${k.cylinder(hx + 6, hy + 6, r * 0.96, Z0, 0.1, P, 36).fill}"/>`);
-  backdrop.push(M(mat, S(G.solidOf([[0, r], [h * 0.14, r * 0.97], [h * 0.4, r * 0.82], [h * 0.72, r * 0.52], [h, r * 0.16]], F, P), { tone: "mid", crease: "none" })));
-}
-// árvores no chão externo, junto dos morros e dos talhões
-const OUTER_TREES = [[-300, -230, 1.1, "leaf"], [-260, -190, 0.9, "leaf2"], [-390, -230, 1, "leaf2"], [-340, 10, 1, "leaf"], [318, -250, 1.1, "leaf2"], [270, -215, 0.9, "leaf"], [388, -180, 1, "leaf"],
-  [380, -10, 1, "leaf2"], [392, 50, 0.9, "leaf"], [-60, -300, 1, "leaf"], [-190, -240, 1.1, "leaf2"], [140, -300, 1, "leaf2"], [190, -250, 0.9, "leaf"], [-350, 70, 1, "leaf2"], [-420, -70, 1, "leaf"], [420, -85, 1, "leaf2"]];
 
 // ───────── base: bloco de terra com gramado ─────────
 const ground = [];
@@ -159,8 +113,6 @@ for (const [x, y, s, kind] of [[14, -172, 1, "leaf"], [16, -136, 0.9, "leaf2"], 
   put([x, y, 0], tree(x, y, s, kind), null);
 }
 
-for (const [x, y, sc, kind] of OUTER_TREES) backdrop.push(tree(x, y, sc, kind));
-
 // ───────── CONFINAMENTO (fundo, à direita) ─────────
 const PEN_X = [28, 103.3, 178.6, 254];
 const PEN_Y0 = -176;
@@ -219,26 +171,18 @@ function assemble(parts, dir, ox, oy, oz = 0) {
   return placed.map((p) => (p.wrap ? p.wrap(M(p.mat, S(box(p.plan, p.z + oz, p.h, p.steps ?? 2, p.bevel ?? 0), { crease: p.crease ?? "faint", tone: p.tone ?? "mid" }))) : M(p.mat, S(box(p.plan, p.z + oz, p.h, p.steps ?? 2, p.bevel ?? 0), { crease: p.crease ?? "faint", tone: p.tone ?? "mid" })))).join("");
 }
 const HEAD_DROP = k.axisVector(P, [0, 0, -2.6]);
-function cow(x, y, dir, dark = false, eats = false, sc = 1, spot = false) {
+function cow(x, y, dir, dark = false, eats = false) {
   const body = dark ? "cowDark" : "cow";
+  const legs = [-5.6, 4.0].map((lx) => ({ plan: { x: lx, y: -2.6, w: 1.6, d: 5.2, r: 0.3 }, z: 0, h: 7, mat: body, bias: -0.5, crease: "none" }));
   const front = dir === "+x" || dir === "+y";
   const head = { plan: { x: 6.6, y: -2, w: 5.4, d: 4, r: 1 }, z: 9, h: 5, mat: body, crease: "none", bias: front ? 1 : -1, wrap: eats ? (s) => `<g class="fz-head" style="--hx:${HEAD_DROP[0].toFixed(2)}px;--hy:${HEAD_DROP[1].toFixed(2)}px;--hd:${((x * 7 + y * 3) % 17) / 10}s">${s}</g>` : null };
-  const muzzle = { plan: { x: 10.4, y: -1.4, w: 2.2, d: 2.8, r: 0.8 }, z: 9, h: 2.8, mat: "cowDark", crease: "none", bias: front ? 1.2 : -1.2 };
-  const ears = [-2.7, 1.5].map((ey) => ({ plan: { x: 7.4, y: ey, w: 1.5, d: 1.2, r: 0.4 }, z: 13, h: 1.1, mat: body, crease: "none", bias: front ? 1.1 : -1.1 }));
-  const legs = [[-5.8, -3.1], [-5.8, 1.5], [3.9, -3.1], [3.9, 1.5]].flatMap(([lx, ly]) => [
-    { plan: { x: lx, y: ly, w: 1.6, d: 1.6, r: 0.3 }, z: 1.3, h: 5.8, mat: body, bias: -0.5, crease: "none" },
-    { plan: { x: lx - 0.1, y: ly - 0.1, w: 1.8, d: 1.8, r: 0.3 }, z: 0, h: 1.4, mat: "tyre", bias: -0.45, crease: "none" },
-  ]);
-  const tail = { plan: { x: -8.8, y: -0.5, w: 1, d: 1, r: 0.3 }, z: 4.6, h: 8.4, mat: "cowDark", crease: "none", bias: -1.5 };
-  const patches = spot ? [{ plan: { x: -3.6, y: -3.5, w: 4.6, d: 7, r: 1.2 }, z: 12.9, h: 0.5, mat: "cowDark", crease: "none", bias: 0.3 }] : [];
   const parts = [
-    ...legs, tail,
+    ...legs,
     { plan: { x: -7.4, y: -3.4, w: 14.8, d: 6.8, r: 2 }, z: 6, h: 7, mat: body, steps: 3 },
-    ...patches,
-    { plan: { x: 1.4, y: -2.2, w: 5.2, d: 4.4, r: 1.6 }, z: 13, h: 3.6, mat: "cowDark", steps: 3, crease: "none" },
-    muzzle, ...ears, head,
-  ].map((p) => (sc === 1 ? p : { ...p, plan: { ...p.plan, x: p.plan.x * sc, y: p.plan.y * sc, w: p.plan.w * sc, d: p.plan.d * sc }, z: p.z * sc, h: p.h * sc }));
-  return `<path class="iso-halo fz-shadow" d="${k.cylinder(x + 1, y + 1, 7 * sc, 0, 0.1, P, 20).fill}"/>` + assemble(parts, dir, x, y);
+    { plan: { x: 2.2, y: -1.8, w: 3.6, d: 3.6, r: 1.2 }, z: 13, h: 2.6, mat: "cowDark", steps: 3, crease: "none" },
+    head,
+  ];
+  return `<path class="iso-halo fz-shadow" d="${k.cylinder(x + 1, y + 1, 7, 0, 0.1, P, 20).fill}"/>` + assemble(parts, dir, x, y);
 }
 const HERD = [
   // curral 1
@@ -248,9 +192,7 @@ const HERD = [
   // curral 3
   [198, -36, "+y", false, true], [222, -38, "+y", true, true], [242, -36, "+y", false, true], [206, -110, "+x", false], [234, -76, "-x", false], [218, -150, "+y", true],
 ];
-for (const [x, y, dir, dark, eats] of HERD) put([x, y + (dir === "+y" ? 6 : 0), 0], `<g data-zone="confinamento">${cow(x, y, dir, dark, eats, 1, ((x * 3 + y) | 0) % 5 === 0)}</g>`, "confinamento");
-// bezerros perto das vacas
-for (const [x, y, dir] of [[66, -76, "+x"], [112, -122, "-x"], [182, -96, "+y"], [236, -128, "-y"], [90, -148, "+y"]]) put([x, y + (dir === "+y" ? 3 : 0), 0], `<g data-zone="confinamento">${cow(x, y, dir, false, false, 0.62)}</g>`, "confinamento");
+for (const [x, y, dir, dark, eats] of HERD) put([x, y + (dir === "+y" ? 6 : 0), 0], `<g data-zone="confinamento">${cow(x, y, dir, dark, eats)}</g>`, "confinamento");
 
 // ───────── ESTOQUE (frente, à esquerda) ─────────
 const YARD = { x: -258, y: 24, w: 216, d: 160 };
@@ -494,7 +436,7 @@ const svg = k.figureSvg({
   width: W,
   height: H,
   label,
-  body: [backdrop.join(""), ground.join(""), `<g class="fz-items">${placed.join("")}</g>`, pulses, `<g class="fz-hits">${hits.join("")}</g>`].join(""),
+  body: [ground.join(""), `<g class="fz-items">${placed.join("")}</g>`, pulses, `<g class="fz-hits">${hits.join("")}</g>`].join(""),
   className: "fz-svg",
 });
 
