@@ -358,12 +358,52 @@ const MODULOS: Modulo[] = [
   { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 11 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Programa ABC Corte', 'Pluviometria'], img: 'custos-confinamento' },
 ]
 
-const DIFERENCIAIS = [
-  { t: 'Rastreio aberto ao comprador', d: 'Uma página pública mostra a origem do produto, a fazenda e o produtor.' },
-  { t: 'Da balança à nota', d: 'O peso do caminhão entra direto no sistema e vira romaneio e NF-e.' },
-  { t: 'Cotação respondida por link', d: 'O fornecedor recebe pelo WhatsApp e preenche o preço sem precisar de login.' },
-  { t: 'Programa ABC Corte', d: 'Arroba por hectare, lotação e ganho de peso num painel próprio.' },
+// ícones das conquistas (traço 24px, herdam a cor do medalhão)
+const ICONES = {
+  rastreio: <><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" /><path d="m9.5 10.5 1.8 1.8 3.2-3.3" /></>,
+  balanca: <><path d="M3 17V8h10v9" /><path d="M13 11h4l3 3v3h-7" /><circle cx="7" cy="18" r="1.6" /><circle cx="16.5" cy="18" r="1.6" /><path d="M6 11.5h4" /></>,
+  link: <><path d="M5 18.5V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H9.5L5 18.5Z" /><path d="M9 9.5h6M9 12h3.5" /></>,
+  abc: <><path d="M4 20h16" /><path d="M7 16v-3M12 16V9M17 16V6" /><path d="m14.5 6 2.5-2.5L19.5 6" /></>,
+}
+
+const DIFERENCIAIS: { t: string; d: string; i: keyof typeof ICONES }[] = [
+  { t: 'Rastreio aberto ao comprador', d: 'Uma página pública mostra a origem do produto, a fazenda e o produtor.', i: 'rastreio' },
+  { t: 'Da balança à nota', d: 'O peso do caminhão entra direto no sistema e vira romaneio e NF-e.', i: 'balanca' },
+  { t: 'Cotação respondida por link', d: 'O fornecedor recebe pelo WhatsApp e preenche o preço sem precisar de login.', i: 'link' },
+  { t: 'Programa ABC Corte', d: 'Arroba por hectare, lotação e ganho de peso num painel próprio.', i: 'abc' },
 ]
+
+/** Cada diferencial é "conquistado" ao entrar na tela: o anel do medalhão se desenha, o selo aparece e um brilho passa pelo card. */
+function Diferenciais() {
+  const ref = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    const items = Array.from(ref.current?.children ?? [])
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return
+        e.target.classList.add('is-earned')
+        io.unobserve(e.target)
+      })
+    }, { rootMargin: '0px 0px -12% 0px' })
+    items.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+  return (
+    <ul ref={ref}>
+      {DIFERENCIAIS.map((d, n) => (
+        <li key={d.t} className="conq" style={{ '--n': n } as React.CSSProperties}>
+          <span className="medal" aria-hidden="true">
+            <svg className="medal-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" pathLength="1" /></svg>
+            <svg className="medal-icon" viewBox="0 0 24 24">{ICONES[d.i]}</svg>
+            <i className="medal-check" />
+          </span>
+          <strong>{d.t}</strong>
+          <span className="conq-d">{d.d}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 export function SystemSection() {
   const root = useRef<HTMLElement>(null)
@@ -421,16 +461,12 @@ export function SystemSection() {
           ))}
         </div>
         <div className="spine" data-reveal aria-hidden="true">
-          <span>Um só cadastro</span>
+          <span>Um só sistema</span>
           <ol>{MODULOS.map((m) => <li key={m.k}><i />{m.t}</li>)}</ol>
         </div>
         <div className="diferenciais">
           <h3 className="eyebrow" data-reveal>O que pouca gente tem</h3>
-          <ul>
-            {DIFERENCIAIS.map((d) => (
-              <li key={d.t} data-reveal><strong>{d.t}</strong><span>{d.d}</span></li>
-            ))}
-          </ul>
+          <Diferenciais />
         </div>
       </div>
     </section>

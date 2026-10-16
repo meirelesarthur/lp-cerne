@@ -17,9 +17,12 @@ export function FazendaCerne() {
   const scroller = useRef<HTMLDivElement>(null)
   const farm = useRef<Farm | null>(null)
   const [mobile, setMobile] = useState(() => matchMedia(MOBILE).matches)
+  // com movimento reduzido não há letreiro: a última operação continua no aviso abaixo da maquete
+  const [still] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [art, setArt] = useState<Art | null>(null)
   const [zone, setZone] = useState<Zone | null>(null)
   const [readout, setReadout] = useState('')
+  const feed = useRef<((text: string) => void) | null>(null)
 
   useEffect(() => {
     const mq = matchMedia(MOBILE)
@@ -47,7 +50,7 @@ export function FazendaCerne() {
   useLayoutEffect(() => {
     const svg = stage.current?.querySelector('svg')
     if (!art || !svg) return
-    const f = mountFarm(svg, art.DATA, { readout: setReadout })
+    const f = mountFarm(svg, art.DATA, { readout: (t) => { setReadout(t); feed.current?.(t) } })
     farm.current = f
     return () => {
       f.dispose()
@@ -121,9 +124,10 @@ export function FazendaCerne() {
             ))}
           </div>
         )}
+        {art && !still && <WallTicker feed={feed} />}
       </div>
       </div>
-      <p className="fz-hint" aria-live="polite">{readout || (mobile ? 'Arraste para os lados e toque num setor' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
+      <p className="fz-hint" aria-live="polite">{(still && readout) || (mobile ? 'Arraste para os lados e toque num setor' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
 
       {zone && (
         <aside className="fz-card" aria-live="polite" role="region" aria-label={ZONES[zone].title}>
@@ -149,5 +153,72 @@ export function FazendaCerne() {
         </aside>
       )}
     </figure>
+  )
+}
+
+// setor de cada operação → cor do ponto no letreiro
+const TILE: Record<string, string> = { 'Plantação': 'lavoura', Estoque: 'estoque', Confinamento: 'confinamento' }
+const SPEED = 0.07 // fração da parede percorrida por segundo
+const GAP = 28 // px entre uma operação e a seguinte
+
+/**
+ * Letreiro "ao vivo" pintado na parede de terra da frente da maquete: cada operação emitida pela parte viva
+ * entra pelo canto do estoque e desliza até a quina da sede. Fila curta: se chegar mais rápido do que passa, as mais antigas caem.
+ */
+function WallTicker({ feed }: { feed: React.MutableRefObject<((text: string) => void) | null> }) {
+  const track = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = track.current
+    if (!el) return
+    const fig = el.closest('figure')
+    const queue: string[] = []
+    const items: { el: HTMLElement; x: number; w: number }[] = []
+    feed.current = (text) => {
+      if (!text.includes(' · ')) return
+      queue.push(text)
+      if (queue.length > 3) queue.shift()
+    }
+    let raf = 0
+    let last = performance.now()
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
+      if (!fig?.hasAttribute('data-paused')) {
+        const W = el.clientWidth
+        const tail = items[items.length - 1]
+        if (queue.length && (!tail || tail.x >= GAP)) {
+          const [zone, ...rest] = queue.shift()!.split(' · ')
+          const it = document.createElement('span')
+          it.className = 'fz-tk-item'
+          it.dataset.tile = TILE[zone] ?? 'sede'
+          it.innerHTML = '<i></i><b></b><span></span>'
+          it.children[1].textContent = zone
+          it.children[2].textContent = rest.join(' · ')
+          el.appendChild(it)
+          const w = it.offsetWidth
+          items.push({ el: it, x: -w, w })
+        }
+        for (const it of items) {
+          it.x += W * SPEED * dt
+          it.el.style.transform = `translate3d(${it.x.toFixed(1)}px,0,0)`
+        }
+        while (items.length && items[0].x > W) items.shift()!.el.remove()
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(raf)
+      feed.current = null
+      items.forEach((it) => it.el.remove())
+    }
+  }, [feed])
+  return (
+    <div className="fz-wall" style={{ aspectRatio: RATIO }} aria-hidden="true">
+      <div className="fz-tk">
+        <span className="fz-tk-live">Ao vivo</span>
+        <div ref={track} className="fz-tk-track" />
+      </div>
+    </div>
   )
 }
