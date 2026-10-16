@@ -30,3 +30,6 @@ Capturas em desktop (1440×900) e celular (390×844); `npm run build` ok; lint s
 ## Correções (mesmo dia)
 - **Emenda duplicada no Hero:** o manifesto da versão HD (`desktop-hd/manifest.json`) ainda tinha as medidas do chão antigo, então a imagem nova saía esticada e repetia o curral e o drone. Agora ele é sincronizado (e `ground_v5.py` passou a atualizá-lo junto).
 - **Maquete:** as montanhas, talhões, árvores externas e o gado refeito foram retirados (perspectiva estranha); voltou a arte original (360 KB gzip->~70 KB). Ficaram o layout em tela cheia e os cartões de vidro. Ao fundo, uma foto suave da lavoura (`public/frames/sistema-bg.webp`, 86 KB) sob um véu claro. A versão enriquecida está guardada em git (commit 7819a98) e o gerador anterior em `workbench/assets/backup/fazenda-build-v1.mjs`.
+
+## Fundo da maquete (2026-10-15, rodada 3)
+Foto trocada por uma ilustração gerada no Magnific no estilo da própria maquete (seedream-5-pro, 16:9 2k, referência de estilo = render da maquete). 3 opções (300 créditos); escolhida a 1 (`workbench/assets/gen-v5/bg-1.png`, as outras em bg-2 e bg-3). Servida em `public/frames/sistema-bg.webp` (162 KB), sem desfoque e com véu só nas pontas para fundir com a página; título com halo claro para manter a leitura.
