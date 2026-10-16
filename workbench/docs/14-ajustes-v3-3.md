@@ -49,3 +49,6 @@ A imagem do mockup do Ponto de partida passa a existir desde o início (a anima�
 ## Rodada mobile 2 (2026-10-16)
 - **Escopo no celular:** a foto do chão cobria só 578 de 844 px da tela, então o fim aparecia. `ground_v5.py mobile` estica o rodapé da plantação de forma progressiva até a imagem ter ~4,1× a largura (4428 px), e a imagem ganhou máscara de transparência no rodapé (nunca uma borda seca).
 - **Sistema:** clicar/tocar fora da maquete e do cartão volta ao estado inicial (desktop e celular). Maquete menor no celular (128% da largura) e fundo 9:16 próprio (`public/frames/sistema-bg-mobile.webp`, 107 KB; geradas 2 opções, 200 créditos, escolhida a 2; originais em `workbench/assets/gen-v5/bgm-*.png`).
+
+## Sistema: tamanho fixo e título permanente (2026-10-16)
+O título e o subtítulo ficam sempre visíveis (antes sumiam ao abrir um setor). No celular a seção tem altura fixa (`clamp(470px, 64svh, 640px)`) e o cartão é uma folha de vidro sobreposta à parte de baixo (sem entrar no fluxo da página, então nada pula); texto resumido (sem "onde acontece" e sem atalhos). No desktop o cartão abre embaixo, do lado oposto ao setor, para não cobrir o título. Limitação: no celular o cartão cobre parte da maquete (o setor Sede, que fica embaixo, fica parcialmente atrás dele).

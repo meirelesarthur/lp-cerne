@@ -11,10 +11,12 @@ const total = await p.evaluate(() => document.documentElement.scrollHeight)
 for (let y = 0; y < total; y += 500) { await p.evaluate((y) => window.scrollTo(0, y), y); await sleep(90) }
 const top = await p.evaluate(() => document.getElementById('sistema').getBoundingClientRect().top + scrollY)
 const go = async (n, y) => { await p.evaluate((y) => window.scrollTo(0, y), Math.round(y)); await sleep(1500); await p.screenshot({ path: `${OUT}/${tag}-${n}.png` }) }
-await go('0', top)
+await p.evaluate((y) => window.scrollTo(0, y), Math.round(top - 60)); await sleep(1200)
+const secTopF = async () => p.evaluate(() => document.getElementById('sistema').getBoundingClientRect().top + scrollY)
+await go('0', top - 60)
 const click = async (n) => { await p.evaluate((n) => document.querySelectorAll('.fz-label')[n]?.click(), n); await sleep(1600) }
 const secTop = async () => p.evaluate(() => document.querySelector('.fz-figure').getBoundingClientRect().top + scrollY)
-await click(0); await go('1', (await secTop()) - 90)
-await p.evaluate(() => document.querySelectorAll('.fz-label')[1]?.click()); await sleep(1600); await go('2', (await secTop()) - 90)
-await p.evaluate(() => document.querySelectorAll('.fz-label')[3]?.click()); await sleep(1600); await go('3', (await secTop()) - 90)
+await click(0); await go('1', (await secTopF()) - 60)
+await p.evaluate(() => document.querySelectorAll('.fz-label')[1]?.click()); await sleep(1600); await go('2', (await secTopF()) - 60)
+await p.evaluate(() => document.querySelectorAll('.fz-label')[3]?.click()); await sleep(1600); await go('3', (await secTopF()) - 60)
 console.log('erros', errs.slice(0, 3)); await b.close()

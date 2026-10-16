@@ -74,7 +74,7 @@
 .fz-full .fz-labels { top: 0; left: 0; width: 100%; max-width: none; transform: none; }
 .fz-full { --fz-hint-b: 2%; }
 .fz-hint { position: absolute; left: 50%; bottom: 2%; transform: translateX(-50%); margin: 0; padding: 7px 16px; border-radius: 20px; background: rgba(255, 255, 255, .5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, .6); font-size: 13.5px; color: #1f3326; white-space: nowrap; }
-.fz-full .fz-card { position: absolute; right: clamp(16px, 3vw, 56px); top: 50%; transform: translateY(-50%); width: min(380px, calc(100% - 32px)); z-index: 5; padding: clamp(20px, 2vw, 28px); border-radius: 20px; background: linear-gradient(135deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .36)); border: 1px solid rgba(255, 255, 255, .65); backdrop-filter: blur(26px) saturate(1.6) brightness(1.12); -webkit-backdrop-filter: blur(26px) saturate(1.6) brightness(1.12); box-shadow: 0 30px 80px -30px rgba(14, 42, 29, .45), inset 0 1px 0 rgba(255, 255, 255, .7); }
+.fz-full .fz-card { position: absolute; right: clamp(16px, 3vw, 56px); top: auto; bottom: clamp(64px, 9vh, 100px); transform: none; width: min(380px, calc(100% - 32px)); z-index: 5; padding: clamp(20px, 2vw, 28px); border-radius: 20px; background: linear-gradient(135deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .36)); border: 1px solid rgba(255, 255, 255, .65); backdrop-filter: blur(26px) saturate(1.6) brightness(1.12); -webkit-backdrop-filter: blur(26px) saturate(1.6) brightness(1.12); box-shadow: 0 30px 80px -30px rgba(14, 42, 29, .45), inset 0 1px 0 rgba(255, 255, 255, .7); }
 .fz-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .fz-close { width: 32px; height: 32px; border-radius: 12px; border: 1px solid rgba(14, 42, 29, .14); background: rgba(255, 255, 255, .6); color: var(--text); font-size: 20px; line-height: 1; cursor: pointer; }
 .fz-close:hover { background: #fff; }
@@ -89,9 +89,15 @@
   .fz-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
   .fz-scroll::-webkit-scrollbar { display: none; }
   .fz-full .fz-canvas { width: 128%; min-width: 500px; margin: 0; }
-  .fz-full .fz-card { position: static; transform: none; width: auto; margin: 10px var(--gutter) 0; }
-  .fz-hint { position: static; transform: none; display: block; width: max-content; max-width: calc(100% - 32px); margin: 6px auto 0; white-space: normal; text-align: center; }
+  /* altura da seção fixa: o cartão é uma folha de vidro sobre a parte de baixo, sem mexer no resto */
+  .fz-full .fz-card { position: absolute; left: 12px; right: 12px; bottom: 44px; top: auto; width: auto; margin: 0; max-height: 52%; overflow: auto; padding: 14px 16px; }
+  .fz-card-body { gap: 7px; }
+  .fz-full .fz-card h3 { font-size: 18px; }
+  .fz-full .fz-card p { font-size: 13.5px; line-height: 1.45; }
+  .fz-full .fz-card .fz-where, .fz-nav { display: none; }
+  .fz-hint { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); white-space: nowrap; font-size: 12.5px; padding: 5px 12px; }
   .fz-label { font-size: 13px; padding: 6px 12px 6px 24px; min-height: 36px; }
   .fz-label::before { left: 10px; width: 8px; height: 8px; margin-top: -4px; }
-  .fz-figure[data-side='left'] .fz-card { left: auto; }
 }
+.fz-figure[data-side='left'] .fz-card { right: auto; left: clamp(16px, 3vw, 56px); }
+@media (max-width: 719px) { .fz-figure[data-side='left'] .fz-card { left: 12px; right: 12px; } }
