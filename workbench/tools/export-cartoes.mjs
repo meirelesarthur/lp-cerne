@@ -1,5 +1,6 @@
 // Exporta os cartões de visita (workbench/print/cartoes/cartoes.html) para impressão.
-// PNG a 600 dpi (96 × 56 mm com sangria = 2268 × 1323 px) e PDF vetorial por empresa (frente + verso).
+// PNG a 600 dpi (96 × 56 mm com sangria = 2268 × 1323 px) e PDF vetorial por cartão (frente + verso).
+// GB Agritech tem uma frente e um verso por vendedor (Silvio e Marcílio); GB Consult tem um só.
 import puppeteer from 'puppeteer-core'
 import path from 'node:path'
 import os from 'node:os'
@@ -21,7 +22,12 @@ await page.setViewport({ width: 2200, height: 1400, deviceScaleFactor: SCALE })
 await page.goto(URL, { waitUntil: 'networkidle0' })
 await page.evaluate(async g => { if (g) document.body.classList.add('guias'); await document.fonts.ready }, guias)
 
-const faces = ['agritech-frente', 'agritech-verso', 'consult-frente', 'consult-verso']
+const faces = ['agritech-frente', 'agritech-verso-silvio', 'agritech-verso-marcilio', 'consult-frente', 'consult-verso']
+const pdfs = {
+  'agritech-silvio': ['agritech-frente', 'agritech-verso-silvio'],
+  'agritech-marcilio': ['agritech-frente', 'agritech-verso-marcilio'],
+  consult: ['consult-frente', 'consult-verso'],
+}
 for (const id of faces) {
   const el = await page.$('#' + id)
   await el.screenshot({ path: path.join(OUT, `${id}${guias ? '-guias' : ''}.png`) })
@@ -29,15 +35,15 @@ for (const id of faces) {
 
 if (!guias) {
   // PDF: uma página por face, 96 × 56 mm, texto e vetores preservados
-  for (const marca of ['agritech', 'consult']) {
-    await page.evaluate(m => {
-      document.querySelectorAll('.card').forEach(c => { c.style.display = c.id.startsWith(m) ? '' : 'none' })
+  for (const [nome, ids] of Object.entries(pdfs)) {
+    await page.evaluate(ids => {
+      document.querySelectorAll('.card').forEach(c => { c.style.display = ids.includes(c.id) ? '' : 'none'; c.style.breakAfter = '' })
+      document.getElementById(ids[0]).style.breakAfter = 'page'
       const s = document.createElement('style'); s.id = 'print'
-      s.textContent = `@page{size:96mm 56mm;margin:0} body{padding:0;display:block;background:none}
-        .par{display:block} .card{break-after:page} .card:last-child{break-after:auto}`
+      s.textContent = `@page{size:96mm 56mm;margin:0} body{padding:0;display:block;background:none} .par{display:block}`
       document.getElementById('print')?.remove(); document.head.append(s)
-    }, marca)
-    await page.pdf({ path: path.join(OUT, `cartao-${marca}.pdf`), width: '96mm', height: '56mm', scale: 0.377953, printBackground: true, pageRanges: '' })
+    }, ids)
+    await page.pdf({ path: path.join(OUT, `cartao-${nome}.pdf`), width: '96mm', height: '56mm', scale: 0.377953, printBackground: true })
   }
 }
 await browser.close()

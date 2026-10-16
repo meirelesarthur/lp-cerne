@@ -23,7 +23,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #d9dedb; font-family: 'Montserrat', sans-serif; padding: 40px; display: grid; gap: 40px; justify-content: center; }
 .par { display: flex; gap: 40px; }
-.card { width: 960px; height: 560px; position: relative; overflow: hidden; }
+.card { width: 960px; height: 560px; flex: none; position: relative; overflow: hidden; }
 .safe { position: absolute; inset: 60px; }
 body.guias .card::after { content: ''; position: absolute; inset: 30px; outline: 2px dashed rgba(255,0,0,.7); pointer-events: none; z-index: 9; }
 body.guias .safe { outline: 2px dashed rgba(0,160,255,.7); }
@@ -113,7 +113,8 @@ body.guias .safe { outline: 2px dashed rgba(0,160,255,.7); }
     </div>
   </section>
 
-  <section class="card ag-v" id="agritech-verso">
+  <!-- verso do Silvio -->
+  <section class="card ag-v" id="agritech-verso-silvio">
     <svg class="arcos" viewBox="0 0 960 560">
       <circle cx="960" cy="700" r="230" stroke-opacity=".8"/>
       <circle cx="960" cy="700" r="300" stroke-opacity=".6"/>
@@ -126,6 +127,32 @@ body.guias .safe { outline: 2px dashed rgba(0,160,255,.7); }
       <div class="tagline">Sistema de gestão de<br><b>revendas e de fazendas.</b></div>
       <div class="contatos">
         <div class="linha"><span><svg><use href="#i-whats"/></svg><b>(27) 99928-2654</b> <em>Silvio Ventura</em></span></div>
+        <div class="linha">
+          <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
+          <span><svg><use href="#i-insta"/></svg>@gbagritech</span>
+        </div>
+      </div>
+      <div class="qrbox">
+        <img src="assets/qr.svg" alt="QR code lp.greenbelt-ti.com">
+        <div class="rule"></div>
+        <p>Escaneie para<br>conhecer</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- verso do Marcílio -->
+  <section class="card ag-v" id="agritech-verso-marcilio">
+    <svg class="arcos" viewBox="0 0 960 560">
+      <circle cx="960" cy="700" r="230" stroke-opacity=".8"/>
+      <circle cx="960" cy="700" r="300" stroke-opacity=".6"/>
+      <circle cx="960" cy="700" r="370" stroke-opacity=".42"/>
+      <circle cx="960" cy="700" r="440" stroke-opacity=".26"/>
+    </svg>
+    <div class="safe">
+      <img class="logo" src="assets/logo-agritech-branco.png" alt="GB Agritech">
+      <div class="rule"></div>
+      <div class="tagline">Sistema de gestão de<br><b>revendas e de fazendas.</b></div>
+      <div class="contatos">
         <div class="linha"><span><svg><use href="#i-whats"/></svg><b>(27) 99934-0118</b> <em>Marcilio Riegert</em></span></div>
         <div class="linha">
           <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
