@@ -10,14 +10,27 @@ import { prefersHd, supportsAvif } from '../lib/stage'
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
 /* ───────────────────────── 03 · Problema → Cerne ───────────────────────── */
-// Palco em duas etapas, fixo no desktop: (A) a dor, com planilha, caderno e conversa; (B) a virada, com o produto
-// inteiro (notebook e os dois apps) em grande. No celular e com movimento reduzido as duas etapas ficam empilhadas.
-const PRODUTOS = [
-  { n: 'Cerne Web', s: 'disponível', on: true },
-  { n: 'Cerne Administração', s: 'em teste' },
-  { n: 'Cerne Operação', s: 'em teste' },
-]
+// Palco fixo no desktop: (A) a dor, com planilha, caderno e conversa; o texto sobe e some, as três peças vão para o
+// centro, caem num funil e entram na tela do notebook; (B) a virada, com o produto inteiro (notebook e os dois apps).
+// No celular e com movimento reduzido as duas etapas ficam empilhadas e o funil não aparece.
 const PROBLEM_PIN = '(min-width: 961px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)'
+// ponto da tela do notebook (fração da figura) onde o sistema "nasce"; o pulso usa o mesmo ponto no CSS
+const SCREEN_AT = { x: 0.4, y: 0.42 }
+
+const PLANILHA = [
+  ['Lote', 'Curral', 'Cab.', 'Peso (kg)', 'GMD'],
+  ['L-07', 'C4', '84', '412,5', '1,38'],
+  ['L-12', 'C7', '86?', '398,0', '#REF!'],
+  ['L-15', 'C2', '120', '455,2', '1,52'],
+  ['L-18', 'C9', '64', '371,8', '1,21'],
+  ['L-21', 'C3', '—', '', '1,4'],
+]
+const CONVERSA = [
+  { de: 'João Oliveira', cor: '#1f7aec', t: 'Quantos bois no curral 7?', h: '06:42' },
+  { de: null, cor: '', t: 'Acho que 84, vou confirmar', h: '06:45' },
+  { de: 'Marcos · trato', cor: '#c2410c', t: 'Ração acabou no silo 2. Alguém pediu?', h: '06:51' },
+  { de: 'João Oliveira', cor: '#1f7aec', t: 'Manda foto da planilha 🙏', h: '06:52' },
+]
 
 export function ProblemSection() {
   const root = useRef<HTMLElement>(null)
@@ -27,34 +40,56 @@ export function ProblemSection() {
     const mm = gsap.matchMedia()
     mm.add(PROBLEM_PIN, () => {
       const rootEl = root.current!
+      const q = <T extends Element>(sel: string) => rootEl.querySelector(sel) as T
       // posição relativa à seção (que fica fixa), medida sem transformações: offsets do layout, não do que já está animado
-      const rel = (el: Element) => { const r = el.getBoundingClientRect(), q = rootEl.getBoundingClientRect(); return { x: r.left - q.left, y: r.top - q.top, w: r.width, h: r.height } }
-      // onde o sistema "nasce": a tela do notebook no mockup
-      const target = () => { const f = rel(rootEl.querySelector('.product-fig')!); return { x: f.x + f.w * 0.4, y: f.y + f.h * 0.3 } }
-      const toTarget = (axis: 'x' | 'y') => (_i: number, el: Element) => {
-        const lay = rootEl.querySelector('.layers') as HTMLElement
-        const L = rel(lay), e = el as HTMLElement
-        const cx = L.x + e.offsetLeft + e.offsetWidth / 2, cy = L.y + e.offsetTop + e.offsetHeight / 2
-        return axis === 'x' ? target().x - cx : target().y - cy
+      const rel = (el: Element) => { const r = el.getBoundingClientRect(), b = rootEl.getBoundingClientRect(); return { x: r.left - b.left, y: r.top - b.top, w: r.width, h: r.height } }
+      const W = () => rootEl.clientWidth, H = () => rootEl.clientHeight
+      const target = () => { const f = rel(q('.product-fig')); return { x: f.x + f.w * SCREEN_AT.x, y: f.y + f.h * SCREEN_AT.y } }
+      const mouth = () => ({ x: W() / 2, y: H() * 0.17, w: Math.min(W() * 0.46, 620) })
+      // centro de cada peça no layout (o contêiner .layers não se move; só as peças)
+      const center = (el: Element) => { const L = rel(q('.layers')), e = el as HTMLElement; return { x: L.x + e.offsetLeft + e.offsetWidth / 2, y: L.y + e.offsetTop + e.offsetHeight / 2 } }
+      const cluster = () => { const L = rel(q('.layers')); return { x: L.x + L.w / 2, y: L.y + L.h / 2 } }
+      const toCenter = (axis: 'x' | 'y') => () => { const c = cluster(); return axis === 'x' ? W() / 2 - c.x : H() * 0.52 - c.y }
+      const toMouth = (axis: 'x' | 'y') => (i: number, el: Element) => {
+        const m = mouth(), c = center(el)
+        return axis === 'x' ? m.x + (i - 1) * m.w * 0.24 - c.x : m.y + 6 - c.y
       }
+      const toSpout = (axis: 'x' | 'y') => (_i: number, el: Element) => { const t = target(), c = center(el); return axis === 'x' ? t.x - c.x : t.y - c.y }
+
+      // o funil liga a boca (sob as peças) ao ponto da tela do notebook; redesenhado a cada refresh
+      const drawFunnel = () => {
+        const svg = q<SVGSVGElement>('.funnel'), m = mouth(), t = target(), l = m.x - m.w / 2, r = m.x + m.w / 2, d = t.y - m.y
+        svg.setAttribute('viewBox', `0 0 ${W()} ${H()}`)
+        const body = `M ${l} ${m.y} C ${l} ${m.y + d * 0.55}, ${t.x - 16} ${t.y - d * 0.45}, ${t.x - 16} ${t.y} L ${t.x + 16} ${t.y} C ${t.x + 16} ${t.y - d * 0.45}, ${r} ${m.y + d * 0.55}, ${r} ${m.y} Z`
+        svg.querySelector('.funnel-body')!.setAttribute('d', body)
+        const rim = svg.querySelector('.funnel-rim')!
+        rim.setAttribute('cx', `${m.x}`); rim.setAttribute('cy', `${m.y}`); rim.setAttribute('rx', `${m.w / 2}`); rim.setAttribute('ry', `${Math.max(14, m.w * 0.05)}`)
+      }
+      drawFunnel()
+
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=260%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=320%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
       })
       // 0 → 1 = toda a duração
-      tl.fromTo('.layer-a', { x: -70, y: -40, rotate: -7 }, { x: 18, y: 26, rotate: -2, duration: 0.22 }, 0)
-        .fromTo('.layer-b', { x: 60, y: 6, rotate: 6 }, { x: -22, y: 0, rotate: 1.5, duration: 0.22 }, 0)
-        .fromTo('.layer-c', { x: -36, y: 64, rotate: -4 }, { x: 22, y: -64, rotate: -1, duration: 0.22 }, 0)
-        // o mockup surge desfocado ao fundo enquanto as três coisas voam para dentro da tela do notebook
+      tl.fromTo('.layer-a', { x: -60, y: -30, rotate: -7 }, { x: 10, y: 14, rotate: -3, duration: 0.14 }, 0)
+        .fromTo('.layer-b', { x: 50, y: 6, rotate: 6 }, { x: -12, y: 0, rotate: 2, duration: 0.14 }, 0)
+        .fromTo('.layer-c', { x: -30, y: 50, rotate: -4 }, { x: 12, y: -30, rotate: -1.5, duration: 0.14 }, 0)
+        // o texto do ponto de partida sobe e some; as três peças ocupam o meio da tela
+        .to('.stage-a .problem-copy', { autoAlpha: 0, y: -140, ease: 'power2.in', duration: 0.14 }, 0.1)
+        .to('.layer', { x: toCenter('x'), y: toCenter('y'), scale: 1.06, duration: 0.16 }, 0.14)
+        // o mockup surge desfocado ao fundo e o funil se abre
         .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.32)
-        .fromTo('.product-img', { autoAlpha: 0, scale: 0.8, y: 50, rotateX: 8, transformPerspective: 1200, filter: 'blur(16px)' }, { autoAlpha: 0.5, scale: 0.94, y: 12, rotateX: 3, filter: 'blur(8px)', ease: 'power2.out', duration: 0.2 }, 0.32)
-        .to('.stage-a .problem-copy', { autoAlpha: 0, y: -30, duration: 0.1 }, 0.2)
-        .to('.layer', { x: toTarget('x'), y: toTarget('y'), rotate: 0, scale: 0.18, ease: 'power2.inOut', duration: 0.22 }, 0.34)
-        .to('.layer', { autoAlpha: 0, duration: 0.04, ease: 'none' }, 0.54)
-        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.54)
-        .fromTo('.product-pulse', { autoAlpha: 0.7, scale: 0.1 }, { autoAlpha: 0, scale: 9, ease: 'power2.out', duration: 0.24 }, 0.56)
-        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.14 }, 0.62)
-        .fromTo('.product-tags li', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.1 }, 0.84)
+        .fromTo('.product-img', { autoAlpha: 0, scale: 0.86, y: 40, rotateX: 8, transformPerspective: 1200, filter: 'blur(16px)' }, { autoAlpha: 0.45, scale: 0.94, y: 12, rotateX: 3, filter: 'blur(8px)', ease: 'power2.out', duration: 0.18 }, 0.32)
+        .fromTo('.funnel', { autoAlpha: 0, y: -24 }, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.1 }, 0.34)
+        // as peças encolhem até a boca do funil e descem por ele até a tela do notebook
+        .to('.layer', { x: toMouth('x'), y: toMouth('y'), rotate: (i: number) => (i - 1) * 8, scale: 0.34, stagger: 0.02, duration: 0.12 }, 0.4)
+        .to('.layer', { x: toSpout('x'), y: toSpout('y'), rotate: 0, scale: 0.06, ease: 'power2.in', stagger: 0.03, duration: 0.12 }, 0.54)
+        .to('.layer', { autoAlpha: 0, stagger: 0.03, duration: 0.03, ease: 'none' }, 0.63)
+        .to('.funnel', { autoAlpha: 0, duration: 0.06 }, 0.72)
+        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.16 }, 0.7)
+        .fromTo('.product-pulse', { autoAlpha: 0.7, scale: 0.1 }, { autoAlpha: 0, scale: 9, ease: 'power2.out', duration: 0.22 }, 0.7)
+        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.8)
     })
     return () => mm.revert()
   }, [])
@@ -78,16 +113,44 @@ export function ProblemSection() {
             </div>
             <div className="layers" aria-hidden="true">
               <div className="layer layer-a">
-                <span className="layer-tag">Planilha</span>
-                <div className="sheet">{Array.from({ length: 30 }, (_, i) => <i key={i} />)}</div>
+                <div className="xl-bar"><i className="xl-ico">X</i>controle_rebanho_v7_FINAL(2).xlsx</div>
+                <table className="sheet">
+                  <thead><tr><th /><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead>
+                  <tbody>
+                    {PLANILHA.map((row, r) => (
+                      <tr key={r} className={r === 0 ? 'hd' : ''}>
+                        <th>{r + 1}</th>
+                        {row.map((c, k) => <td key={k} className={c === '#REF!' ? 'err' : c.endsWith('?') ? 'warn' : ''}>{c}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="xl-tabs"><span className="on">Rebanho</span><span>Trato</span><span>Cópia de Rebanho</span></div>
               </div>
               <div className="layer layer-b">
-                <span className="layer-tag">Caderno</span>
-                <div className="notebook"><p>Curral 4: trato 6h30</p><p>Lote 12: pesar sexta</p><p>Ração: pedir 8 t</p></div>
+                <div className="spiral">{Array.from({ length: 14 }, (_, i) => <i key={i} />)}</div>
+                <div className="notebook">
+                  <p className="nb-date">Seg, 15/09 · trato</p>
+                  <p>Curral 4: trato 6h30 <s>7h</s></p>
+                  <p>Lote 12: pesar sexta</p>
+                  <p>Ração: pedir 8 t (silo 2)</p>
+                  <p>Vacina L-15: ver c/ João</p>
+                  <p className="nb-note">84 ou 86 no C7??</p>
+                </div>
               </div>
               <div className="layer layer-c">
-                <span className="layer-tag">Conversa</span>
-                <div className="chat"><p className="in">Quantos bois no curral 7?</p><p className="out">Acho que 84, vou confirmar</p></div>
+                <div className="wa-bar">
+                  <span className="wa-av">FS</span>
+                  <span className="wa-tt"><b>Fazenda São Pedro</b><small>João, Marcos, Silvio, você</small></span>
+                </div>
+                <div className="chat">
+                  {CONVERSA.map((m, i) => (
+                    <p key={i} className={m.de ? 'in' : 'out'}>
+                      {m.de && <b style={{ color: m.cor }}>{m.de}</b>}
+                      {m.t}<small>{m.h}{!m.de && <em> ✓✓</em>}</small>
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -103,15 +166,21 @@ export function ProblemSection() {
             <figure className="product-fig">
               <span className="product-pulse" aria-hidden="true" />
               {/* o elemento existe desde o início (a animação precisa dele); só o arquivo espera o primeiro scroll */}
-              <img className="product-img" src={media ? asset('/mocks/cerne-produtos-1400.webp') : undefined} srcSet={media ? `${asset('/mocks/cerne-produtos-1400.webp')} 1400w, ${asset('/mocks/cerne-produtos-2400.webp')} 2400w` : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
-              <ul className="product-tags">
-                {PRODUTOS.map((p) => (
-                  <li key={p.n} className={p.on ? 'on' : ''}><i aria-hidden="true" />{p.n}<small>{p.s}</small></li>
-                ))}
-              </ul>
+              <img className="product-img" src={media ? asset('/mocks/cerne-produtos-recorte-1400.webp') : undefined} srcSet={media ? `${asset('/mocks/cerne-produtos-recorte-1400.webp')} 1400w, ${asset('/mocks/cerne-produtos-recorte-2400.webp')} 2400w` : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
             </figure>
           </div>
         </div>
+
+        <svg className="funnel" aria-hidden="true">
+          <defs>
+            <linearGradient id="funnel-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#059669" stopOpacity=".14" />
+              <stop offset="1" stopColor="#059669" stopOpacity=".42" />
+            </linearGradient>
+          </defs>
+          <path className="funnel-body" fill="url(#funnel-fill)" stroke="#059669" strokeWidth="2" />
+          <ellipse className="funnel-rim" fill="rgba(5,150,105,.10)" stroke="#059669" strokeWidth="2" />
+        </svg>
       </div>
     </section>
   )
@@ -310,14 +379,14 @@ export function EditionsSection() {
             <span className="badge">Em construção · em teste</span>
             <h3>Cerne Administração</h3>
             <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
-            <div className="phone" aria-hidden="true"><span>Tela do app</span></div>
+            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" loading="lazy" decoding="async" />}</div>
             <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Quero testar</a>
           </article>
           <article className="edition app" data-reveal>
             <span className="badge">Em construção · em teste</span>
             <h3>Cerne Operação</h3>
             <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
-            <div className="phone" aria-hidden="true"><span>Tela do app</span></div>
+            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" loading="lazy" decoding="async" />}</div>
             <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Quero testar</a>
           </article>
         </div>
