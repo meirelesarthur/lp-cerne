@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { onFirstInteraction } from '../lib/defer'
 
 export interface ScrubHandle {
   /** Desenha o quadro mais próximo já carregado. */
@@ -43,10 +44,12 @@ export const ScrubCanvas = forwardRef<ScrubHandle, Props>(function ScrubCanvas({
     ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h)
   }
 
+  const pumpRef = useRef<() => void>(() => {})
   useImperativeHandle(ref, () => ({
     setFrame(i) {
       current.current = Math.max(0, Math.min(count - 1, Math.round(i)))
       draw()
+      pumpRef.current()
     },
   }))
 
@@ -85,16 +88,35 @@ export const ScrubCanvas = forwardRef<ScrubHandle, Props>(function ScrubCanvas({
       pi.onload = () => { if (!frames.current[0]) { frames.current[0] = pi; draw() } }
       pi.src = poster
     }
-    ;(async () => {
-      await load(0)
-      const BATCH = 6
-      for (let i = 1; i < count && !cancelled; i += BATCH) {
-        await Promise.all(Array.from({ length: Math.min(BATCH, count - i) }, (_, k) => load(i + k)))
-        draw()
+    // Os quadros só começam a baixar na primeira interação (ou após 10 s parado) e na ordem do que o usuário está vendo:
+    // o poster/1º quadro não disputa rede com o resto da página, e quem rola rápido recebe primeiro os quadros à frente.
+    const net = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+    const CONC = net?.saveData ? 2 : 4
+    const inflight = new Set<number>()
+    let started = false
+    const nextMissing = () => {
+      const cur = current.current
+      for (let d = 0; d < count; d++) {
+        const a = cur + d
+        if (a < count && !frames.current[a] && !inflight.has(a)) return a
+        const b = cur - d
+        if (d > 0 && b >= 0 && !frames.current[b] && !inflight.has(b)) return b
       }
-    })()
-
-    return () => { cancelled = true; window.removeEventListener('resize', resize) }
+      return -1
+    }
+    const pump = () => {
+      if (cancelled || !started) return
+      while (inflight.size < CONC) {
+        const i = nextMissing()
+        if (i < 0) return
+        inflight.add(i)
+        load(i).then(() => { inflight.delete(i); draw(); pump() })
+      }
+    }
+    pumpRef.current = pump
+    load(0)
+    const stop = onFirstInteraction(() => { started = true; pump() }, 10000)
+    return () => { cancelled = true; stop(); pumpRef.current = () => {}; window.removeEventListener('resize', resize) }
   }, [dir, count, ext, poster])
 
   return <canvas ref={canvas} aria-hidden="true" />

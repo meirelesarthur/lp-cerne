@@ -357,6 +357,8 @@ const MODULOS = [
 
 export function SystemSection() {
   const root = useRef<HTMLElement>(null)
+  const farmRef = useRef<HTMLElement>(null)
+  const farmNear = useNear(farmRef, '150% 0px')
   const media = useAfterFirstScroll()
   // leve parallax das telas dentro das molduras (transform só, sem layout)
   useLayoutEffect(() => {
@@ -371,7 +373,7 @@ export function SystemSection() {
 
   return (
     <>
-      <section className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={{ '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } as React.CSSProperties}>
+      <section ref={farmRef} className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={(farmNear ? { '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } : undefined) as unknown as React.CSSProperties}>
         <div className="wrap farm-head">
           <header className="sec-head" data-reveal>
             <span className="eyebrow">O sistema</span>

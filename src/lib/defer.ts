@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react'
 
-/** true depois do primeiro scroll (ou de `ms` ociosos): mídia de seções abaixo não disputa banda com o 1º quadro. */
-export function useAfterFirstScroll(ms = 3500) {
+const INTERACTION = ['scroll', 'wheel', 'touchstart', 'pointerdown', 'keydown'] as const
+
+/** Chama `cb` uma vez: na primeira interação do usuário ou, no máximo, após `ms`. Devolve a função de limpeza. */
+export function onFirstInteraction(cb: () => void, ms = 8000) {
+  let done = false
+  const go = () => { if (done) return; done = true; off(); cb() }
+  const t = window.setTimeout(go, ms)
+  const off = () => { window.clearTimeout(t); INTERACTION.forEach((e) => window.removeEventListener(e, go)) }
+  INTERACTION.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+  return off
+}
+
+/** true depois da primeira interação (ou de `ms` ociosos): mídia de seções abaixo não disputa banda com o 1º quadro. */
+export function useAfterFirstScroll(ms = 8000) {
   const [ok, setOk] = useState(false)
-  useEffect(() => {
-    if (ok) return
-    const go = () => setOk(true)
-    const t = window.setTimeout(go, ms)
-    window.addEventListener('scroll', go, { once: true, passive: true })
-    return () => { window.clearTimeout(t); window.removeEventListener('scroll', go) }
-  }, [ok, ms])
+  useEffect(() => (ok ? undefined : onFirstInteraction(() => setOk(true), ms)), [ok, ms])
   return ok
 }
 

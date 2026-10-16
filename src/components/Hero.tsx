@@ -1,7 +1,8 @@
 import { asset } from '../lib/assets'
+import { onFirstInteraction } from '../lib/defer'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
-import { coverBox, finalZoom, prefersHd, type Box, type Manifest, type Zoom } from '../lib/stage'
+import { coverBox, finalZoom, prefersHd, supportsAvif, type Box, type Manifest, type Zoom } from '../lib/stage'
 import { HeroForm } from './HeroForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
@@ -23,11 +24,13 @@ const FALLBACK: Manifest = { count: 120, width: 1280, height: 720 }
 /** Geometria do estado final, compartilhada com a 2ª seção (emenda da plantação). */
 /** Os caminhos do manifesto são absolutos no site (/frames/...): aponta-os para a base dos arquivos pesados. */
 function absolutize(m: Manifest): Manifest {
+  // as imagens do estágio final têm versão AVIF (~metade do peso); quem não suporta fica no WebP
+  const fmt = (p: string) => asset(supportsAvif() ? p.replace(/\.webp$/, '.avif') : p)
   return {
     ...m,
     poster: m.poster && asset(m.poster),
-    final: m.final && { ...m.final, src: asset(m.final.src), fg: asset(m.final.fg) },
-    ground: m.ground && { ...m.ground, src: asset(m.ground.src) },
+    final: m.final && { ...m.final, src: fmt(m.final.src), fg: fmt(m.final.fg) },
+    ground: m.ground && { ...m.ground, src: fmt(m.ground.src) },
   }
 }
 
@@ -83,10 +86,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
 
   useEffect(() => {
     if (stageReady) return
-    const go = () => setStageReady(true)
-    const t = window.setTimeout(go, 3500)
-    window.addEventListener('scroll', go, { once: true, passive: true })
-    return () => { window.clearTimeout(t); window.removeEventListener('scroll', go) }
+    return onFirstInteraction(() => setStageReady(true), 9000)
   }, [stageReady])
 
   useEffect(() => {
@@ -192,6 +192,8 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
   return (
     <section ref={root} className={`hero${isStatic ? ' static' : ''}`} aria-label="Cerne: ERP para o agro">
       <div ref={pin} className="hero-pin">
+        {/* o poster está no HTML desde o início (descoberto pelo preload, prioridade alta): é ele o LCP, sem esperar manifesto nem JS */}
+        {!isStatic && <img className="poster" src={asset(`/frames/hero/${mobile ? 'mobile' : 'desktop'}/poster-first.webp`)} alt="" fetchPriority="high" decoding="async" />}
         {!isStatic && m && <ScrubCanvas key={variant} ref={scrub} dir={dir} count={m.count} ext={m.ext ?? 'webp'} poster={m.poster} />}
 
         {m?.final && geo && t && (stageReady || isStatic) && (

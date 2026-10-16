@@ -7,7 +7,9 @@ import { gsap, ScrollTrigger } from './scroll'
 export function initReveal() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
   document.documentElement.classList.add('reveal-on')
-  const triggers = ScrollTrigger.batch('[data-reveal]', {
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]:not([data-rb])'))
+  els.forEach((e) => { e.dataset.rb = '1' })
+  const triggers = ScrollTrigger.batch(els, {
     start: 'top 88%',
     once: true,
     onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.08, overwrite: true }),

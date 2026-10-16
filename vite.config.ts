@@ -8,6 +8,11 @@ export default defineConfig(({ mode }) => {
   return {
   // %VITE_ASSET_BASE% no index.html (preloads) vale vazio em dev, para o Vite não deixar o marcador literal
   plugins: [react(), { name: 'asset-base-html', transformIndexHtml: (html: string) => html.replaceAll('%VITE_ASSET_BASE%', base) },
+    // preload da fonte principal (latin variável): o texto do Hero não espera o CSS achar o arquivo
+    { name: 'preload-font', transformIndexHtml: { order: 'post' as const, handler(_html: string, ctx: { bundle?: Record<string, unknown> }) {
+      const f = ctx.bundle && Object.keys(ctx.bundle).find((k) => /outfit-latin-wght-normal.*\.woff2$/.test(k))
+      return f ? [{ tag: 'link', attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `/${f}`, crossorigin: '' }, injectTo: 'head-prepend' as const }] : undefined
+    } } },
     // com os arquivos pesados no R2, o build não precisa levar a cópia local de public/
     { name: 'drop-heavy-public', apply: 'build' as const, closeBundle() { if (base) for (const d of ['frames', 'video', 'app', 'screens', 'mocks']) rmSync(`dist/${d}`, { recursive: true, force: true }) } }],
   // O preview atribui a porta via PORT; sem ela, usa o padrão do Vite (5173).
