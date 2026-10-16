@@ -14,6 +14,7 @@ type Art = { SVG: string; DATA: FarmData }
 export function FazendaCerne() {
   const root = useRef<HTMLElement>(null)
   const stage = useRef<HTMLDivElement>(null)
+  const scroller = useRef<HTMLDivElement>(null)
   const farm = useRef<Farm | null>(null)
   const [mobile, setMobile] = useState(() => matchMedia(MOBILE).matches)
   const [art, setArt] = useState<Art | null>(null)
@@ -56,7 +57,17 @@ export function FazendaCerne() {
 
   // foco no setor: no celular a câmera voa até ele; no desktop os outros setores recuam
   useEffect(() => {
-    farm.current?.focus(zone, mobile)
+    farm.current?.focus(zone, false)
+  }, [zone, mobile, art])
+
+  // celular: a maquete é mais larga que a tela e se arrasta como um mapa; começa no centro e, ao escolher um setor, centraliza nele
+  useEffect(() => {
+    const el = scroller.current
+    if (!el || !mobile || !art) return
+    const z = zone ? art.DATA.zones[zone] : null
+    const frac = z ? (z[0] + z[2] / 2) / art.DATA.width : 0.5
+    const left = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, frac * el.scrollWidth - el.clientWidth / 2))
+    el.scrollTo({ left, behavior: zone ? 'smooth' : 'auto' })
   }, [zone, mobile, art])
 
   const zoneAt = (t: EventTarget) => ((t as Element).closest?.('[data-hit]') as SVGElement | null)?.dataset.hit as Zone | undefined
@@ -66,6 +77,7 @@ export function FazendaCerne() {
   }
   return (
     <figure ref={root} className="fz-figure iso fz-full" data-theme="light" data-open={zone ? 'true' : undefined} data-side={zone === 'confinamento' || zone === 'sede' ? 'left' : 'right'}>
+      <div ref={scroller} className="fz-scroll">
       <div className="fz-canvas">
         <div
           ref={stage}
@@ -79,7 +91,7 @@ export function FazendaCerne() {
           onPointerLeave={() => farm.current?.hover(null)}
           {...(art ? { dangerouslySetInnerHTML: { __html: art.SVG } } : {})}
         />
-        {art && !(mobile && zone) && (
+        {art && (
           <div className="fz-labels" style={{ aspectRatio: RATIO }}>
             {ZONE_ORDER.map((z) => (
               <button
@@ -97,8 +109,9 @@ export function FazendaCerne() {
             ))}
           </div>
         )}
-        <p className="fz-hint" aria-live="polite">{readout || (mobile ? 'Toque num setor para ver o que o Cerne faz ali' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
       </div>
+      </div>
+      <p className="fz-hint" aria-live="polite">{readout || (mobile ? 'Arraste para os lados e toque num setor' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
 
       {zone && (
         <aside className="fz-card" aria-live="polite" role="region" aria-label={ZONES[zone].title}>

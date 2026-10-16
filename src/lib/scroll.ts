@@ -3,6 +3,8 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
+// vários trechos criam a animação antes de o elemento existir (cena do Hero, mídia adiada) e refazem depois; o aviso só gera ruído
+gsap.config({ nullTargetWarn: false })
 
 let lenis: Lenis | null = null
 

@@ -101,9 +101,8 @@ export function ProblemSection() {
             </header>
             <figure className="product-fig">
               <span className="product-pulse" aria-hidden="true" />
-              {media && (
-                <img className="product-img" src="/mocks/cerne-produtos-1400.webp" srcSet="/mocks/cerne-produtos-1400.webp 1400w, /mocks/cerne-produtos-2400.webp 2400w" sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" loading="lazy" decoding="async" />
-              )}
+              {/* o elemento existe desde o início (a animação precisa dele); só o arquivo espera o primeiro scroll */}
+              <img className="product-img" src={media ? '/mocks/cerne-produtos-1400.webp' : undefined} srcSet={media ? '/mocks/cerne-produtos-1400.webp 1400w, /mocks/cerne-produtos-2400.webp 2400w' : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
               <ul className="product-tags">
                 {PRODUTOS.map((p) => (
                   <li key={p.n} className={p.on ? 'on' : ''}><i aria-hidden="true" />{p.n}<small>{p.s}</small></li>
