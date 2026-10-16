@@ -172,7 +172,8 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .cell-f .cell-text { flex: 0 0 30%; align-self: center; padding-bottom: 26px; }
 .cell-f .shot { flex: 1; aspect-ratio: auto; min-height: 280px; margin-top: 0; }
 .cell-a .shot { aspect-ratio: 16 / 8; }
-.cell-b .shot { flex: 1; aspect-ratio: auto; min-height: 220px; margin-left: 0; border-top-right-radius: 0; }
+/* o mapa de talhões é 4:3 e os talhões ficam no meio: sem esticar a moldura, para não recortar só um canto */
+.cell-b .shot { aspect-ratio: 4 / 3; margin-left: 0; border-top-right-radius: 0; }
 .cell-b .shot img { object-position: center; }
 
 /* enriquecimento do bento: textura de fundo, numeração, selos, funcionalidades e a "espinha" do cadastro único */
