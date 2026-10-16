@@ -8,5 +8,5 @@ await p.goto('http://127.0.0.1:5210/', { waitUntil: 'networkidle0' }); await sle
 const total = await p.evaluate(() => document.documentElement.scrollHeight)
 for (let y = 0; y < total; y += 600) { await p.evaluate((y) => window.scrollTo(0, y), y); await sleep(100) }
 const pin = await p.evaluate(() => { const st = window.ST.getAll().find((t) => t.pin && t.trigger && t.trigger.id === 'problema'); return { s: st.start, e: st.end } })
-let i = 0; for (const f of [0.3, 0.36, 0.42, 0.48, 0.54, 0.6]) { await p.evaluate((y) => window.scrollTo(0, y), Math.round(pin.s + f * (pin.e - pin.s))); await sleep(1300); await p.screenshot({ path: `${OUT}/fly-${i++}.png` }) }
+let i = 0; for (const f of [0.36, 0.44, 0.52, 0.6, 0.66, 0.7, 0.76, 0.82]) { await p.evaluate((y) => window.scrollTo(0, y), Math.round(pin.s + f * (pin.e - pin.s))); await sleep(1300); await p.screenshot({ path: `${OUT}/fly-${i++}.png` }) }
 await b.close()

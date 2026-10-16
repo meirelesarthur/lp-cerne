@@ -356,3 +356,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .farm .fz-figure { padding-bottom: 28px; }
   .system { background: linear-gradient(180deg, transparent 0, var(--canvas) 80px); }
 }
+
+/* funil: esfera de luz (transformações em torno do próprio centro) */
+.funnel .orb-core, .funnel .orb-halo, .funnel .orb-bloom { opacity: 0; }
+.product-pulse { display: none !important; }
