@@ -320,3 +320,12 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .farm .fz-figure { padding-top: 0; min-height: 0; }
 }
 .farm .farm-head .sec-head { text-shadow: 0 0 14px rgba(245, 248, 244, .95), 0 0 34px rgba(245, 248, 244, .85); }
+/* rede de segurança: o rodapé da foto do chão sempre se desfaz em transparência (nunca uma borda seca) */
+.ground-bg img { -webkit-mask-image: linear-gradient(#000 82%, transparent 100%); mask-image: linear-gradient(#000 82%, transparent 100%); }
+@media (max-width: 719px) {
+  .farm::before { background:
+    linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, 0) 10%, rgba(245, 248, 244, 0) 90%, var(--canvas) 100%),
+    url('/frames/sistema-bg-mobile.webp') center / cover no-repeat; }
+  .farm .fz-figure { padding-bottom: 28px; }
+  .system { background: linear-gradient(180deg, transparent 0, var(--canvas) 80px); }
+}

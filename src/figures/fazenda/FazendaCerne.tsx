@@ -70,6 +70,18 @@ export function FazendaCerne() {
     el.scrollTo({ left, behavior: zone ? 'smooth' : 'auto' })
   }, [zone, mobile, art])
 
+  // clicar/tocar fora da maquete e do cartão volta ao estado inicial (nenhum setor)
+  useEffect(() => {
+    if (!zone) return
+    const off = (e: PointerEvent) => {
+      const t = e.target as Element | null
+      if (t?.closest('.fz-canvas, .fz-card, .fz-hint')) return
+      setZone(null)
+    }
+    document.addEventListener('pointerdown', off)
+    return () => document.removeEventListener('pointerdown', off)
+  }, [zone])
+
   const zoneAt = (t: EventTarget) => ((t as Element).closest?.('[data-hit]') as SVGElement | null)?.dataset.hit as Zone | undefined
   const pick = (z: Zone | null) => {
     farm.current?.hover(null)

@@ -45,3 +45,7 @@ Faixa rolável 150% mais larga que a tela (arrasta para os lados), etiquetas mai
 
 ## Console
 A imagem do mockup do Ponto de partida passa a existir desde o início (a animação não encontrava o alvo); avisos "GSAP target not found" dos demais trechos (Hero e mídia adiada) silenciados em `lib/scroll.ts`.
+
+## Rodada mobile 2 (2026-10-16)
+- **Escopo no celular:** a foto do chão cobria só 578 de 844 px da tela, então o fim aparecia. `ground_v5.py mobile` estica o rodapé da plantação de forma progressiva até a imagem ter ~4,1× a largura (4428 px), e a imagem ganhou máscara de transparência no rodapé (nunca uma borda seca).
+- **Sistema:** clicar/tocar fora da maquete e do cartão volta ao estado inicial (desktop e celular). Maquete menor no celular (128% da largura) e fundo 9:16 próprio (`public/frames/sistema-bg-mobile.webp`, 107 KB; geradas 2 opções, 200 créditos, escolhida a 2; originais em `workbench/assets/gen-v5/bgm-*.png`).

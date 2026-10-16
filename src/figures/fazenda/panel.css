@@ -88,7 +88,7 @@
 @media (max-width: 719px) {
   .fz-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
   .fz-scroll::-webkit-scrollbar { display: none; }
-  .fz-full .fz-canvas { width: 150%; min-width: 585px; margin: 0; }
+  .fz-full .fz-canvas { width: 128%; min-width: 500px; margin: 0; }
   .fz-full .fz-card { position: static; transform: none; width: auto; margin: 10px var(--gutter) 0; }
   .fz-hint { position: static; transform: none; display: block; width: max-content; max-width: calc(100% - 32px); margin: 6px auto 0; white-space: normal; text-align: center; }
   .fz-label { font-size: 13px; padding: 6px 12px 6px 24px; min-height: 36px; }
