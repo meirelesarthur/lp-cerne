@@ -121,3 +121,9 @@ Saldo 166.615 → 166.215 (400 créditos: 4 imagens a 100).
 - seedream-5-pro, 16:9, 2k (2560×1440), sem texto, a partir das referências de cartão enviadas pelo Arthur.
 - GB Agritech: amanhecer aéreo, sol no terço superior direito sobre a serra, neblina nos vales, lavoura em linhas e matas escuras. **Escolhida: variação 2** → `print/cartoes/assets/fundo-agritech.jpg`.
 - GB Consult: colinas verdes com neblina, serras azuladas ao fundo, árvores à direita, céu creme. **Escolhida: variação 1** → `print/cartoes/assets/fundo-consult.jpg`.
+
+## Rodada Perfis: homem pisando no cocho (2026-10-16)
+Problema: no começo do plano do Perfis (clip-1), o segundo homem ao fundo estava em cima do cocho (quebra o realismo).
+- Edição do quadro-chave A-a (Ideogram precise edit, 80 créditos cada): mover o homem para o chão não funcionou (a geometria o mantém no cocho em 3/3); **remover o homem** funcionou (`workbench/assets/gen-v5/Aa-rm-1..3.png`, escolhida a 1).
+- Regerar o clipe a partir do quadro novo (Seedance 2.5, 7.900 e 9.480 créditos): o homem sumiu, mas os dois clipes ganharam dupla exposição na transição (armazém fantasma no céu aos ~2 s; gado translúcido aos 3,4-6 s) → descartados (`clip-1-novo.mp4`, `clip-1-novo2.mp4`).
+- Caminho adotado: editar o clipe ORIGINAL (`clip-1-antigo.mp4`) com Runway Aleph 2 (video_modify, 5.850 créditos), removendo só o homem do cocho. Resultado pendente.
