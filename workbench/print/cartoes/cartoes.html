@@ -4,137 +4,138 @@
 <meta charset="utf-8">
 <title>Cartões de visita · GB Agritech e GB Consult</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /*
   Escala: 10 px CSS = 1 mm.
   Cartão final 90 × 50 mm + 3 mm de sangria em cada lado = 96 × 56 mm (960 × 560 px).
   Área segura: 3 mm para dentro do corte, ou seja, 60 px da borda do arquivo.
+  Linguagem: papel creme + verde-mata, caixa-alta espaçada, linhas finas, arcos concêntricos.
 */
 :root {
-  --verde: #047857;
-  --verde-claro: #4ADE80;
-  --verde-menta: #6EE7B7;
-  --mata: #062A1D;
-  --mata-2: #0B3D2A;
-  --sage: #81B89A;
-  --papel: #F4F8F5;
-  --tinta: #1E1E1E;
-  --cinza: #5B6B63;
+  --mata: #0E2E22;
+  --mata-2: #123A2B;
+  --verde: #3DDC84;
+  --verde-txt: #1FA45E;
+  --creme: #F4F1EA;
+  --tinta: #1C2420;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #d9dedb; font-family: 'Montserrat', sans-serif; padding: 40px; display: grid; gap: 40px; justify-content: center; }
 .par { display: flex; gap: 40px; }
 .card { width: 960px; height: 560px; position: relative; overflow: hidden; }
 .safe { position: absolute; inset: 60px; }
-body.guias .card::after { content: ''; position: absolute; inset: 30px; outline: 2px dashed rgba(255,0,0,.7); pointer-events: none; }
+body.guias .card::after { content: ''; position: absolute; inset: 30px; outline: 2px dashed rgba(255,0,0,.7); pointer-events: none; z-index: 9; }
 body.guias .safe { outline: 2px dashed rgba(0,160,255,.7); }
 
+/* Elementos comuns */
+.arcos { position: absolute; inset: 0; width: 960px; height: 560px; pointer-events: none; }
+.arcos circle { fill: none; stroke: var(--verde); stroke-width: 2.2; }
+.rule { width: 64px; height: 4px; border-radius: 2px; background: var(--verde); }
+.tagline { font-weight: 500; font-size: 19px; line-height: 1.55; letter-spacing: .24em; text-transform: uppercase; }
+.tagline b { font-weight: 700; color: var(--verde); }
+.contatos { position: absolute; left: 0; bottom: 0; display: grid; gap: 7px; font-size: 17px; font-weight: 500; letter-spacing: .02em; }
+.contatos .linha { display: flex; align-items: center; gap: 22px; white-space: nowrap; }
+.contatos span { display: inline-flex; align-items: center; gap: 9px; }
+.contatos b { font-weight: 700; }
+.contatos em { font-style: normal; opacity: .72; }
+.contatos svg { width: 20px; height: 20px; flex: none; stroke: var(--verde); }
+.qrbox { background: var(--creme); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--tinta); }
+.qrbox img { display: block; }
+.qrbox .rule { margin: 20px 0 12px; }
+.qrbox p { font-weight: 600; font-size: 15px; line-height: 1.5; letter-spacing: .22em; text-transform: uppercase; }
+
 /* ---------- GB AGRITECH · FRENTE ---------- */
-.ag-f { background: var(--mata) url(assets/fundo-agritech.jpg) 0% 30% / 150% auto; }
-.ag-f .ov { position: absolute; inset: 0;
-  background:
-    linear-gradient(90deg, rgba(4,34,24,.94) 0%, rgba(4,40,28,.78) 40%, rgba(4,46,32,.10) 66%, rgba(4,46,32,0) 100%),
-    linear-gradient(0deg, rgba(4,34,24,.85) 0%, rgba(4,34,24,0) 45%); }
-.ag-f .logo { position: absolute; left: 0; top: 70px; width: 440px; }
-.ag-f .tag { position: absolute; left: 6px; top: 228px; color: #fff; font-weight: 600; font-size: 19px; letter-spacing: .32em; }
-.ag-f .rule { position: absolute; left: 6px; top: 272px; width: 72px; height: 5px; border-radius: 3px; background: var(--verde-claro); }
-.ag-f .url { position: absolute; left: 6px; bottom: 0; color: rgba(255,255,255,.88); font-weight: 600; font-size: 22px; letter-spacing: .02em; }
-.arcos { position: absolute; right: -30px; bottom: -30px; width: 620px; }
+.ag-f { background: var(--mata); color: #fff; }
+.ag-f .foto { position: absolute; inset: 0 0 0 22%; background: url(assets/fundo-agritech.jpg) 0% 26% / 160% auto;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 42%); mask-image: linear-gradient(90deg, transparent 0%, #000 42%); }
+.ag-f .veu { position: absolute; inset: 0; background:
+  linear-gradient(90deg, rgba(14,46,34,1) 18%, rgba(14,46,34,.55) 48%, rgba(14,46,34,0) 75%),
+  linear-gradient(0deg, rgba(14,46,34,.75) 0%, rgba(14,46,34,0) 40%); }
+.ag-f .logo { position: absolute; left: 0; top: 104px; width: 420px; }
+.ag-f .rule { position: absolute; left: 4px; top: 264px; }
+.ag-f .tagline { position: absolute; left: 4px; top: 288px; }
 
 /* ---------- GB AGRITECH · VERSO ---------- */
-.ag-v { background: radial-gradient(120% 140% at 100% 0%, #0E4A33 0%, var(--mata-2) 40%, var(--mata) 100%); color: #fff; }
-.eyebrow { font-weight: 700; font-size: 17px; letter-spacing: .26em; text-transform: uppercase; }
-.ag-v .eyebrow { color: var(--verde-claro); }
-.ag-v h2 { margin-top: 14px; font-weight: 800; font-size: 38px; line-height: 1.12; text-transform: uppercase; letter-spacing: -.005em; }
-.ag-v h2 em { font-style: normal; color: var(--verde-claro); }
-.frentes { margin-top: 22px; display: grid; gap: 9px; }
-.frentes li { list-style: none; display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 500; color: rgba(255,255,255,.92); }
-.frentes li::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--verde-claro); flex: none; }
-.contatos { position: absolute; left: 0; bottom: 0; display: flex; gap: 26px; font-size: 21px; font-weight: 600; }
-.contatos span { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
-.contatos svg { width: 24px; height: 24px; flex: none; }
-.ag-v .contatos { color: #fff; }
-.ag-v .contatos svg { stroke: var(--verde-claro); }
-.qr { position: absolute; right: 0; top: 0; width: 236px; text-align: center; }
-.qr .tile { width: 236px; height: 236px; border-radius: 22px; background: #fff; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-.qr .tile img { width: 100%; height: 100%; display: block; }
-.qr p { margin-top: 14px; font-size: 18px; font-weight: 600; line-height: 1.3; }
-.ag-v .qr p { color: rgba(255,255,255,.85); }
-.ag-v .arcos { opacity: .35; width: 560px; }
+.ag-v { background: radial-gradient(130% 120% at 85% 100%, var(--mata-2) 0%, var(--mata) 60%); color: #fff; }
+.ag-v .logo { width: 330px; display: block; }
+.ag-v .rule { margin: 18px 0 0 3px; }
+.ag-v .tagline { margin: 16px 0 0 3px; font-size: 17px; }
+.ag-v .qrbox { position: absolute; right: 0; top: 0; width: 250px; height: 300px; }
+.ag-v .qrbox img { width: 172px; height: 172px; }
 
 /* ---------- GB CONSULT · FRENTE ---------- */
-.co-f { background: var(--papel); }
-.co-f .foto { position: absolute; inset: 0 0 0 30%; background: url(assets/fundo-consult.jpg) center 55% / cover;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 55%); mask-image: linear-gradient(90deg, transparent 0%, #000 55%); opacity: .9; }
-.co-f .veu { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(244,248,245,1) 30%, rgba(244,248,245,.55) 65%, rgba(244,248,245,.15) 100%); }
-.co-f .logo { position: absolute; left: 0; top: 64px; width: 430px; }
-.co-f .tag { position: absolute; left: 4px; top: 238px; color: #0B6B4B; font-weight: 700; font-size: 18px; letter-spacing: .28em; }
-.co-f .rule { position: absolute; left: 4px; top: 280px; width: 72px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #0B6B4B, var(--verde-menta)); }
-.grupo { position: absolute; left: 0; bottom: 0; display: flex; align-items: center; gap: 14px; font-size: 16px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
-.co-f .grupo { color: var(--cinza); }
-.grupo img { height: 44px; }
+.co-f { background: var(--creme); color: var(--tinta); }
+.co-f .foto { position: absolute; inset: 0 0 0 30%; background: url(assets/fundo-consult.jpg) center 40% / cover; filter: saturate(1.3) contrast(1.06);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%); mask-image: linear-gradient(90deg, transparent 0%, #000 45%); }
+.co-f .logo { position: absolute; left: 0; top: 46px; width: 410px; }
+.co-f .rule { position: absolute; left: 4px; top: 214px; background: var(--verde-txt); }
+.co-f .tagline { position: absolute; left: 4px; top: 238px; color: var(--tinta); }
+.co-f .tagline b { color: var(--verde-txt); }
+.co-f .arcos circle { stroke: #fff; stroke-opacity: .85; }
+.grupo { position: absolute; left: 0; bottom: 0; display: flex; align-items: center; gap: 16px; font-size: 14px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: #4A5650; }
+.grupo i { width: 1.5px; height: 40px; background: #9AA59F; }
+.grupo img { height: 46px; }
 
 /* ---------- GB CONSULT · VERSO ---------- */
-.co-v { background: radial-gradient(120% 140% at 100% 0%, #0E6B4C 0%, #0A5039 45%, #073826 100%); color: #fff; }
-.co-v .eyebrow { color: var(--verde-menta); }
-.co-v h2 { margin-top: 14px; font-weight: 800; font-size: 36px; line-height: 1.12; text-transform: uppercase; }
-.co-v h2 em { font-style: normal; color: var(--verde-menta); }
-.pilares { margin-top: 24px; display: flex; gap: 26px; }
-.pilar { display: flex; align-items: flex-start; gap: 12px; width: 272px; }
-.pilar img { width: 46px; height: 46px; flex: none; margin-top: -4px; }
-.pilar b { display: block; font-size: 19px; font-weight: 700; line-height: 1.2; text-transform: uppercase; color: #fff; }
-.pilar small { display: block; margin-top: 5px; font-size: 17px; line-height: 1.3; font-weight: 500; color: rgba(255,255,255,.80); }
-.co-v .contatos { color: #fff; }
-.co-v .contatos svg { stroke: var(--verde-menta); }
-.co-v .qr p { color: rgba(255,255,255,.85); }
-.co-v .grupo { position: absolute; left: auto; right: 0; bottom: 0; color: rgba(255,255,255,.75); font-size: 13px; flex-direction: column; align-items: center; gap: 6px; width: 236px; }
-.co-v .grupo img { height: 40px; }
-.co-v .arcos { opacity: .30; width: 560px; }
+.co-v { background: radial-gradient(130% 120% at 30% 100%, var(--mata-2) 0%, var(--mata) 60%); color: #fff; }
+.co-v .tagline { margin-top: 26px; font-size: 19px; }
+.co-v .tagline .v { color: var(--verde); }
+.co-v .rule { margin: 20px 0 0 2px; }
+.co-v .painel { position: absolute; right: 56px; top: 56px; bottom: 56px; width: 300px; border-radius: 22px; }
+.co-v .painel img { width: 178px; height: 178px; }
 </style>
 </head>
 <body>
 
-<!-- Ícones de contato reutilizados (traço arredondado, mesma família dos ícones do kit) -->
 <svg width="0" height="0" style="position:absolute">
   <symbol id="i-web" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.8 3.9 5.8 3.9 9s-1.3 6.2-3.9 9c-2.6-2.8-3.9-5.8-3.9-9S9.4 5.8 12 3z"/></symbol>
-  <symbol id="i-insta" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/></symbol>
+  <symbol id="i-whats" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5l1.4-4.3A8.6 8.6 0 1 1 8 19.2z"/><path d="M9 8.6c0 3.4 2.9 6.3 6.3 6.3l1.2-1.6-2-1-1 .8a4 4 0 0 1-2.6-2.6l.8-1-1-2z"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
-  <symbol id="arcos-verde" viewBox="0 0 800 440" fill="none"><g stroke="#10C98B" stroke-linecap="round"><path d="M302 458A458 458 0 0 1 760 0" stroke-width="4" stroke-opacity=".92"/><path d="M381 458A379 379 0 0 1 760 79" stroke-width="4" stroke-opacity=".65"/><path d="M460 458A300 300 0 0 1 760 158" stroke-width="4" stroke-opacity=".4"/></g></symbol>
-  <symbol id="arcos-sage" viewBox="0 0 800 440" fill="none"><g stroke="#81B89A" stroke-linecap="round"><path d="M284 458A476 476 0 0 1 760 -18" stroke-width="4" stroke-opacity=".78"/><path d="M365 458A395 395 0 0 1 760 63" stroke-width="4" stroke-opacity=".56"/><path d="M447 458A313 313 0 0 1 760 145" stroke-width="4" stroke-opacity=".38"/></g></symbol>
 </svg>
 
 <!-- ==================== GB AGRITECH ==================== -->
 <div class="par">
   <section class="card ag-f" id="agritech-frente">
-    <div class="ov"></div>
-    <svg class="arcos" viewBox="0 0 800 440"><use href="#arcos-verde"/></svg>
+    <div class="foto"></div>
+    <div class="veu"></div>
+    <svg class="arcos" viewBox="0 0 960 560">
+      <circle cx="1010" cy="640" r="250" stroke-opacity=".9"/>
+      <circle cx="1010" cy="640" r="320" stroke-opacity=".75"/>
+      <circle cx="1010" cy="640" r="390" stroke-opacity=".6"/>
+      <circle cx="1010" cy="640" r="460" stroke-opacity=".45"/>
+    </svg>
     <div class="safe">
       <img class="logo" src="assets/logo-agritech-branco.png" alt="GB Agritech">
-      <div class="tag">IMPULSIONANDO O AGRO</div>
       <div class="rule"></div>
-      <div class="url">gbagritech.com.br</div>
+      <div class="tagline">Tecnologia que transforma<br>dados em <b>decisão.</b></div>
     </div>
   </section>
 
   <section class="card ag-v" id="agritech-verso">
-    <svg class="arcos" viewBox="0 0 800 440"><use href="#arcos-verde"/></svg>
+    <svg class="arcos" viewBox="0 0 960 560">
+      <circle cx="960" cy="700" r="230" stroke-opacity=".8"/>
+      <circle cx="960" cy="700" r="300" stroke-opacity=".6"/>
+      <circle cx="960" cy="700" r="370" stroke-opacity=".42"/>
+      <circle cx="960" cy="700" r="440" stroke-opacity=".26"/>
+    </svg>
     <div class="safe">
-      <div class="eyebrow">Tecnologia para o agro</div>
-      <h2>Mais inteligência.<br>Melhores decisões<br><em>no agro.</em></h2>
-      <ul class="frentes">
-        <li>Sistema web de gestão</li>
-        <li>Aplicativo de campo</li>
-        <li>Mapeamento aéreo com drones</li>
-      </ul>
+      <img class="logo" src="assets/logo-agritech-branco.png" alt="GB Agritech">
+      <div class="rule"></div>
+      <div class="tagline">Mais visão <b>do campo.</b><br>Mais precisão <b>na gestão.</b></div>
       <div class="contatos">
-        <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
-        <span><svg><use href="#i-insta"/></svg>@gbagritech</span>
-        <span><svg><use href="#i-pin"/></svg>Vitória · ES</span>
+        <div class="linha"><span><svg><use href="#i-whats"/></svg><b>(27) 99928-2654</b> <em>Silvio Ventura</em></span></div>
+        <div class="linha"><span><svg><use href="#i-whats"/></svg><b>(27) 99934-0118</b> <em>Marcilio Riegert</em></span></div>
+        <div class="linha">
+          <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
+          <span><svg><use href="#i-insta"/></svg>@gbagritech</span>
+        </div>
       </div>
-      <div class="qr">
-        <div class="tile"><img src="assets/qr.svg" alt="QR code gbagritech.com.br"></div>
-        <p>Aponte a câmera<br>e fale com a gente</p>
+      <div class="qrbox">
+        <img src="assets/qr.svg" alt="QR code lp.greenbelt-ti.com">
+        <div class="rule"></div>
+        <p>Escaneie para<br>conhecer</p>
       </div>
     </div>
   </section>
@@ -144,34 +145,42 @@ body.guias .safe { outline: 2px dashed rgba(0,160,255,.7); }
 <div class="par">
   <section class="card co-f" id="consult-frente">
     <div class="foto"></div>
-    <div class="veu"></div>
-    <svg class="arcos" viewBox="0 0 800 440"><use href="#arcos-sage"/></svg>
+    <svg class="arcos" viewBox="0 0 960 560">
+      <circle cx="1020" cy="600" r="240" stroke-opacity=".9"/>
+      <circle cx="1020" cy="600" r="310" stroke-opacity=".75"/>
+      <circle cx="1020" cy="600" r="380" stroke-opacity=".6"/>
+      <circle cx="1020" cy="600" r="450" stroke-opacity=".45"/>
+    </svg>
     <div class="safe">
       <img class="logo" src="assets/logo-consult.png" alt="GB Consult">
-      <div class="tag">CONSULTORIA PARA O AGRO</div>
       <div class="rule"></div>
-      <div class="grupo">Uma empresa <img src="assets/logo-agritech-escuro.png" alt="GB Agritech"></div>
+      <div class="tagline">Estratégia clara para<br>negócios <b>do agro.</b></div>
+      <div class="grupo">Uma empresa <i></i><img src="assets/logo-agritech-escuro.png" alt="GB Agritech"></div>
     </div>
   </section>
 
   <section class="card co-v" id="consult-verso">
-    <svg class="arcos" viewBox="0 0 800 440"><use href="#arcos-sage"/></svg>
+    <svg class="arcos" viewBox="0 0 960 560">
+      <circle cx="660" cy="760" r="240" stroke-opacity=".8"/>
+      <circle cx="660" cy="760" r="310" stroke-opacity=".6"/>
+      <circle cx="660" cy="760" r="380" stroke-opacity=".42"/>
+      <circle cx="660" cy="760" r="450" stroke-opacity=".26"/>
+    </svg>
+    <div class="qrbox painel">
+      <img src="assets/qr.svg" alt="QR code lp.greenbelt-ti.com">
+      <div class="rule"></div>
+      <p>Agende uma<br>conversa</p>
+    </div>
     <div class="safe">
-      <div class="eyebrow">Estratégia para evoluir</div>
-      <h2>Seu negócio precisa<br>de direção. <em>Não apenas<br>de soluções.</em></h2>
-      <div class="pilares">
-        <div class="pilar"><img src="assets/icon-grafico.svg" alt=""><div><b>Gestão com estratégia</b><small>Decisões mais conscientes para crescer.</small></div></div>
-        <div class="pilar"><img src="assets/icon-documento.svg" alt=""><div><b>Contábil e fiscal</b><small>Segurança e organização para o negócio.</small></div></div>
-      </div>
+      <div class="tagline">Clareza para gerir.<br><span class="v">Estratégia para crescer.</span></div>
+      <div class="rule"></div>
       <div class="contatos">
-        <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
-        <span><svg><use href="#i-pin"/></svg>Vitória · ES</span>
+        <div class="linha"><span><svg><use href="#i-whats"/></svg><b>(27) 99891-4645</b> <em>Samuel Pereira</em></span></div>
+        <div class="linha">
+          <span><svg><use href="#i-web"/></svg>gbagritech.com.br</span>
+          <span><svg><use href="#i-pin"/></svg>Vitória · ES</span>
+        </div>
       </div>
-      <div class="qr">
-        <div class="tile"><img src="assets/qr.svg" alt="QR code gbagritech.com.br"></div>
-        <p>Saiba mais apontando<br>a câmera</p>
-      </div>
-      <div class="grupo">Uma empresa <img src="assets/logo-agritech-branco.png" alt="GB Agritech"></div>
     </div>
   </section>
 </div>
