@@ -52,3 +52,9 @@ A imagem do mockup do Ponto de partida passa a existir desde o início (a anima�
 
 ## Sistema: tamanho fixo e título permanente (2026-10-16)
 O título e o subtítulo ficam sempre visíveis (antes sumiam ao abrir um setor). No celular a seção tem altura fixa (`clamp(470px, 64svh, 640px)`) e o cartão é uma folha de vidro sobreposta à parte de baixo (sem entrar no fluxo da página, então nada pula); texto resumido (sem "onde acontece" e sem atalhos). No desktop o cartão abre embaixo, do lado oposto ao setor, para não cobrir o título. Limitação: no celular o cartão cobre parte da maquete (o setor Sede, que fica embaixo, fica parcialmente atrás dele).
+
+## Seção GB Twin (2026-10-16)
+Nova seção depois de Perfis, 50/50: foto fotorrealista de soja ao entardecer com um drone grande à esquerda e um tablet com o print real do Censo de copas (pivô 02); texto branco à direita sobre degradê verde escuro (eyebrow, título "Cada pé da lavoura, contado do alto.", lead, 4 funcionalidades, 3 números do print e CTA). No celular a imagem vem em cima e o texto embaixo.
+- Imagem: `seedream-5-pro` 16:9 2k (3 opções, 300 créditos; escolhida a 1, `workbench/assets/gen-v5/twin-1.png`), tela magenta substituída pelo print (`compose_key.py`) → `twin-composto-4000.png` → `public/frames/twin-bg.webp` (2200 px, no R2).
+- Pendências de conteúdo: disponibilidade do GB Twin (etiqueta "a validar"), copy revisada com o produto; os números são do protótipo ("dados de demonstração"). Opção "GB Twin" no formulário.
+- Script: `workbench/tools/patch_twin.py`.

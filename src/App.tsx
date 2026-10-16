@@ -4,7 +4,7 @@ import { Header } from './components/Header'
 import { Hero, type HeroGeometry } from './components/Hero'
 import {
   ContactSection, EditionsSection, FaqSection, Footer, ProblemSection,
-  ProfilesSection, SystemSection, TrailerSection, TrustSection,
+  ProfilesSection, SystemSection, TrailerSection, TrustSection, TwinSection,
 } from './components/Sections'
 import { initHeaderTone, initReveal } from './lib/reveal'
 import './styles/sections.css'
@@ -25,6 +25,7 @@ export default function App() {
         <SystemSection />
         <EditionsSection />
         <ProfilesSection />
+        <TwinSection />
         <TrustSection />
         <ContactSection />
         <FaqSection />

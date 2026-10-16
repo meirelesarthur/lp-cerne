@@ -577,6 +577,37 @@ export function ProfilesSection() {
   )
 }
 
+/* ───────────────────────── GB Twin ───────────────────────── */
+const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas']
+
+export function TwinSection() {
+  return (
+    <section className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
+      <div className="twin-bg" aria-hidden="true">
+        <img src={asset('/frames/twin-bg.webp')} alt="" width={2200} height={1238} loading="lazy" decoding="async" />
+      </div>
+      <div className="twin-grid">
+        <div className="twin-spacer" aria-hidden="true" />
+        <div className="twin-copy">
+          <span className="eyebrow" data-reveal>GB Twin</span>
+          <h2 id="twin-title" data-reveal>Cada pé da lavoura, contado do alto.</h2>
+          <p className="twin-lead" data-reveal>O drone sobrevoa o pivô e o GB Twin conta os pés no ortomosaico, confere por amostra e emite o laudo. Você vê a falha onde ela está, não na média.</p>
+          <ul className="twin-list" data-reveal>
+            {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
+          </ul>
+          <dl className="twin-stats" data-reveal>
+            <div><dt>Copas</dt><dd>120.855</dd></div>
+            <div><dt>Estande</dt><dd>3.568<small>/ha</small></dd></div>
+            <div><dt>Aproveitamento</dt><dd>86%</dd></div>
+          </dl>
+          <p className="twin-note" data-reveal>Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
+          <a className="btn btn-light" href="#contato" data-interest="todos" data-reveal>Quero conhecer o GB Twin</a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 /* ───────────────────────── 08 · Confiança ───────────────────────── */
 export function TrustSection() {
   return (
@@ -680,6 +711,7 @@ export function ContactSection() {
                   <option value="app-administracao">App Administração</option>
                   <option value="app-operacao">App Operação</option>
                   <option value="demonstracao">Demonstração</option>
+                  <option value="gb-twin">GB Twin</option>
                   <option value="todos">Todos</option>
                 </select>
               </div>
