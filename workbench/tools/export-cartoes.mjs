@@ -18,7 +18,7 @@ const guias = process.argv.includes('--guias')
 fs.mkdirSync(OUT, { recursive: true })
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'shell' })
 const page = await browser.newPage()
-await page.setViewport({ width: 2200, height: 1400, deviceScaleFactor: SCALE })
+await page.setViewport({ width: 3200, height: 1400, deviceScaleFactor: SCALE })
 await page.goto(URL, { waitUntil: 'networkidle0' })
 await page.evaluate(async g => { if (g) document.body.classList.add('guias'); await document.fonts.ready }, guias)
 

@@ -115,3 +115,9 @@ Saldo 174.962 → 173.212 (1.750 créditos: 4 imagens a 100 e 1 upscale 4x a 1.3
 Saldo 173.212 → 171.462 (1.750 créditos: 4 imagens a 100 e 1 upscale 4x a 1.350).
 - `assets/gen-mocks/duo-1..4.png` (seedream-5-pro, 16:9, "4k" = 2560×1440): estúdio, fundo branco, notebook de frente e um celular em pé ao lado, sem sobreposição, sem mãos, telas magenta. **Escolhida: duo-4** (aparelhos maiores e centralizados).
 - Upscale 4x (Magnific Precision sublime, balanced): `duo-4-up4x.jpg`, 10240×5760. Fundo levado a branco puro com `assets/mocks/whiten_bg.py` → `duo-4-up4x-branco.png`.
+
+### Rodada 8: fundos das frentes dos cartões de visita, 16:9 (2026-10-16)
+Saldo 166.615 → 166.215 (400 créditos: 4 imagens a 100).
+- seedream-5-pro, 16:9, 2k (2560×1440), sem texto, a partir das referências de cartão enviadas pelo Arthur.
+- GB Agritech: amanhecer aéreo, sol no terço superior direito sobre a serra, neblina nos vales, lavoura em linhas e matas escuras. **Escolhida: variação 2** → `print/cartoes/assets/fundo-agritech.jpg`.
+- GB Consult: colinas verdes com neblina, serras azuladas ao fundo, árvores à direita, céu creme. **Escolhida: variação 1** → `print/cartoes/assets/fundo-consult.jpg`.
