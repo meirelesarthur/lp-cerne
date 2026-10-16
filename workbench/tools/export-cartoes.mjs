@@ -1,5 +1,6 @@
 // Exporta os cartões de visita (workbench/print/cartoes/cartoes.html) para impressão.
 // PNG a 600 dpi (96 × 56 mm com sangria = 2268 × 1323 px) e PDF vetorial por cartão (frente + verso).
+// GB Agritech: mesma frente, um verso para Silvio e outro para Marcílio. GB Consult: um só.
 import puppeteer from 'puppeteer-core'
 import path from 'node:path'
 import os from 'node:os'
@@ -21,9 +22,10 @@ await page.setViewport({ width: 3200, height: 1400, deviceScaleFactor: SCALE })
 await page.goto(URL, { waitUntil: 'networkidle0' })
 await page.evaluate(async g => { if (g) document.body.classList.add('guias'); await document.fonts.ready }, guias)
 
-const faces = ['agritech-frente', 'agritech-verso', 'consult-frente', 'consult-verso']
+const faces = ['agritech-frente', 'agritech-verso-silvio', 'agritech-verso-marcilio', 'consult-frente', 'consult-verso']
 const pdfs = {
-  agritech: ['agritech-frente', 'agritech-verso'],
+  'agritech-silvio': ['agritech-frente', 'agritech-verso-silvio'],
+  'agritech-marcilio': ['agritech-frente', 'agritech-verso-marcilio'],
   consult: ['consult-frente', 'consult-verso'],
 }
 for (const id of faces) {
