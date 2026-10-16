@@ -4,11 +4,11 @@ import './materials.css'
 import './fazenda.css'
 import './panel.css'
 import { mountFarm, type Farm, type FarmData } from './live'
-import { OVERVIEW, ZONES, ZONE_ORDER, type Zone } from './model'
+import { ZONES, ZONE_ORDER, type Zone } from './model'
 
 const MOBILE = '(max-width: 719px)'
 // proporção fixa da arte (igual ao build) para reservar o espaço antes de ela chegar
-const RATIO = '760 / 430'
+const RATIO = '1160 / 600'
 type Art = { SVG: string; DATA: FarmData }
 
 export function FazendaCerne() {
@@ -65,82 +65,64 @@ export function FazendaCerne() {
     setZone((cur) => (cur === z ? null : z))
   }
   return (
-    <figure ref={root} className="fz-figure iso" data-theme="light">
-      <div className="fz-layout">
-        <div className="iso-plate fz-plate">
-          <div className="iso-plate-corners" aria-hidden="true">
-            <span className="iso-plate-corner" data-corner="fig">Fig. 05</span>
-            <span className="iso-plate-corner" data-corner="title">Fazenda no Cerne</span>
-            <span className="iso-plate-corner" data-corner="hint">{mobile ? 'Toque num setor' : 'Clique num setor'}</span>
-            <span className="iso-plate-corner" data-corner="readout">{readout}</span>
+    <figure ref={root} className="fz-figure iso fz-full" data-theme="light" data-open={zone ? 'true' : undefined} data-side={zone === 'confinamento' || zone === 'sede' ? 'left' : 'right'}>
+      <div className="fz-canvas">
+        <div
+          ref={stage}
+          className="fz-stage"
+          style={{ aspectRatio: RATIO }}
+          onClick={(e) => {
+            const z = zoneAt(e.target)
+            if (z) pick(z)
+          }}
+          onPointerMove={(e) => farm.current?.hover(zoneAt(e.target) ?? null)}
+          onPointerLeave={() => farm.current?.hover(null)}
+          {...(art ? { dangerouslySetInnerHTML: { __html: art.SVG } } : {})}
+        />
+        {art && !(mobile && zone) && (
+          <div className="fz-labels" style={{ aspectRatio: RATIO }}>
+            {ZONE_ORDER.map((z) => (
+              <button
+                key={z}
+                type="button"
+                className="fz-label"
+                data-on={zone === z || undefined}
+                style={{ left: `${art.DATA.labels[z][0]}%`, top: `${art.DATA.labels[z][1]}%` }}
+                onClick={() => pick(z)}
+                onPointerEnter={() => farm.current?.hover(z)}
+                onPointerLeave={() => farm.current?.hover(null)}
+              >
+                {ZONES[z].name}
+              </button>
+            ))}
           </div>
-          <div
-            ref={stage}
-            className="fz-stage"
-            style={{ aspectRatio: RATIO }}
-            onClick={(e) => {
-              const z = zoneAt(e.target)
-              if (z) pick(z)
-            }}
-            onPointerMove={(e) => farm.current?.hover(zoneAt(e.target) ?? null)}
-            onPointerLeave={() => farm.current?.hover(null)}
-            {...(art ? { dangerouslySetInnerHTML: { __html: art.SVG } } : {})}
-          />
-          {art && !(mobile && zone) && (
-            <div className="fz-labels" style={{ aspectRatio: RATIO }}>
-              {ZONE_ORDER.map((z) => (
-                <button
-                  key={z}
-                  type="button"
-                  className="fz-label"
-                  data-on={zone === z || undefined}
-                  style={{ left: `${art.DATA.labels[z][0]}%`, top: `${art.DATA.labels[z][1]}%` }}
-                  onClick={() => pick(z)}
-                  onPointerEnter={() => farm.current?.hover(z)}
-                  onPointerLeave={() => farm.current?.hover(null)}
-                >
-                  {ZONES[z].name}
-                </button>
+        )}
+        <p className="fz-hint" aria-live="polite">{readout || (mobile ? 'Toque num setor para ver o que o Cerne faz ali' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
+      </div>
+
+      {zone && (
+        <aside className="fz-card" aria-live="polite" role="region" aria-label={ZONES[zone].title}>
+          <div className="fz-card-body" key={zone}>
+            <div className="fz-card-top">
+              <span className="fz-kicker">{ZONES[zone].name}</span>
+              <button type="button" className="fz-close" onClick={() => setZone(null)} aria-label="Fechar">×</button>
+            </div>
+            <h3>{ZONES[zone].title}</h3>
+            <p>{ZONES[zone].text}</p>
+            <ul className="fz-chips">
+              {ZONES[zone].chips.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+            <p className="fz-where">{ZONES[zone].where}</p>
+            <div className="fz-nav" role="group" aria-label="Outros setores">
+              {ZONE_ORDER.filter((z) => z !== zone).map((z) => (
+                <button key={z} type="button" onClick={() => pick(z)}>{ZONES[z].name}</button>
               ))}
             </div>
-          )}
-        </div>
-
-        <aside className="fz-card" aria-live="polite">
-          {zone ? (
-            <div className="fz-card-body" key={zone}>
-              <span className="fz-kicker">{ZONES[zone].name}</span>
-              <h3>{ZONES[zone].title}</h3>
-              <p>{ZONES[zone].text}</p>
-              <ul className="fz-chips">
-                {ZONES[zone].chips.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ul>
-              <p className="fz-where">{ZONES[zone].where}</p>
-              <button type="button" className="fz-back" onClick={() => setZone(null)}>
-                ← Ver a fazenda inteira
-              </button>
-            </div>
-          ) : (
-            <div className="fz-card-body" key="overview">
-              <span className="fz-kicker">Visão geral</span>
-              <h3>{OVERVIEW.title}</h3>
-              <p>{OVERVIEW.text}</p>
-              <ul className="fz-points">
-                {ZONE_ORDER.map((z) => (
-                  <li key={z}>
-                    <button type="button" onClick={() => pick(z)} onPointerEnter={() => farm.current?.hover(z)} onPointerLeave={() => farm.current?.hover(null)}>
-                      <strong>{ZONES[z].name}</strong>
-                      <span>{ZONES[z].text}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          </div>
         </aside>
-      </div>
+      )}
     </figure>
   )
 }

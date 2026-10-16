@@ -33,16 +33,16 @@ export function HeroForm({ emailId }: { emailId: string }) {
   if (status === 'success') {
     return (
       <div className="form" role="status">
-        <h2>Você está na lista.</h2>
-        <p className="sub" style={{ display: 'block', margin: 0 }}>Entraremos em contato pelo e-mail ou WhatsApp informado.</p>
+        <h2>Seu acesso está reservado.</h2>
+        <p className="sub" style={{ display: 'block', margin: 0 }}>Você será avisado pelo e-mail ou WhatsApp informado na primeira hora do lançamento.</p>
       </div>
     )
   }
 
   return (
     <form className="form" onSubmit={onSubmit} noValidate aria-labelledby={`${uid}-t`}>
-      <h2 id={`${uid}-t`}>Entre na lista de espera</h2>
-      <p className="sub">Receba o acesso ao Cerne assim que abrirmos novas vagas.</p>
+      <h2 id={`${uid}-t`}>Seja um dos primeiros a usar o Cerne</h2>
+      <p className="sub">Receba acesso na primeira hora do lançamento.</p>
 
       <div className="field" data-invalid={Boolean(errors.email)}>
         <label htmlFor={emailId}>E-mail</label>
@@ -68,7 +68,7 @@ export function HeroForm({ emailId }: { emailId: string }) {
       {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
 
       <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Enviando…' : 'Entrar na lista de espera'}
+        {status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}
       </button>
       {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
     </form>

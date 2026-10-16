@@ -8,7 +8,7 @@ export function Header() {
         <img className="logo-on-scene" src="/logo-white.svg" alt="" aria-hidden="true" height={28} />
       </a>
       <button type="button" className="btn btn-primary" onClick={focusHeroForm}>
-        Entrar na lista de espera
+        Quero acesso antecipado
       </button>
     </header>
   )

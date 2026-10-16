@@ -204,7 +204,6 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
 
         <div className="hero-content">
           <div className="hero-copy">
-            <span className="chip">Cerne Web disponível · Apps em breve</span>
             <h1>Do campo ao financeiro, <em>num só sistema.</em></h1>
             <p className="lead">O Cerne reúne rebanho, confinamento, suprimentos e financeiro da sua fazenda em um ERP web feito para o agro.</p>
           </div>

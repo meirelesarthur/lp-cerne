@@ -25,19 +25,35 @@ export function ProblemSection() {
   useLayoutEffect(() => {
     const mm = gsap.matchMedia()
     mm.add(PROBLEM_PIN, () => {
+      const rootEl = root.current!
+      // posição relativa à seção (que fica fixa), medida sem transformações: offsets do layout, não do que já está animado
+      const rel = (el: Element) => { const r = el.getBoundingClientRect(), q = rootEl.getBoundingClientRect(); return { x: r.left - q.left, y: r.top - q.top, w: r.width, h: r.height } }
+      // onde o sistema "nasce": a tela do notebook no mockup
+      const target = () => { const f = rel(rootEl.querySelector('.product-fig')!); return { x: f.x + f.w * 0.4, y: f.y + f.h * 0.3 } }
+      const toTarget = (axis: 'x' | 'y') => (_i: number, el: Element) => {
+        const lay = rootEl.querySelector('.layers') as HTMLElement
+        const L = rel(lay), e = el as HTMLElement
+        const cx = L.x + e.offsetLeft + e.offsetWidth / 2, cy = L.y + e.offsetTop + e.offsetHeight / 2
+        return axis === 'x' ? target().x - cx : target().y - cy
+      }
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: root.current, start: 'top top', end: '+=240%', pin: true, scrub: 0.6, refreshPriority: 6 },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=260%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true },
       })
       // 0 → 1 = toda a duração
-      tl.fromTo('.layer-a', { x: -70, y: -40, rotate: -7 }, { x: 18, y: 26, rotate: -2, duration: 0.3 }, 0)
-        .fromTo('.layer-b', { x: 60, y: 6, rotate: 6 }, { x: -22, y: 0, rotate: 1.5, duration: 0.3 }, 0)
-        .fromTo('.layer-c', { x: -36, y: 64, rotate: -4 }, { x: 22, y: -64, rotate: -1, duration: 0.3 }, 0)
-        .to('.stage-a', { autoAlpha: 0, y: -40, duration: 0.14 }, 0.36)
-        .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.5)
-        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.14 }, 0.5)
-        .fromTo('.product-img', { autoAlpha: 0, scale: 0.86, y: 70, rotateX: 10, transformPerspective: 1200 }, { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, duration: 0.28 }, 0.54)
-        .fromTo('.product-tags li', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.1 }, 0.8)
+      tl.fromTo('.layer-a', { x: -70, y: -40, rotate: -7 }, { x: 18, y: 26, rotate: -2, duration: 0.22 }, 0)
+        .fromTo('.layer-b', { x: 60, y: 6, rotate: 6 }, { x: -22, y: 0, rotate: 1.5, duration: 0.22 }, 0)
+        .fromTo('.layer-c', { x: -36, y: 64, rotate: -4 }, { x: 22, y: -64, rotate: -1, duration: 0.22 }, 0)
+        // o mockup surge desfocado ao fundo enquanto as três coisas voam para dentro da tela do notebook
+        .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.32)
+        .fromTo('.product-img', { autoAlpha: 0, scale: 0.8, y: 50, rotateX: 8, transformPerspective: 1200, filter: 'blur(16px)' }, { autoAlpha: 0.5, scale: 0.94, y: 12, rotateX: 3, filter: 'blur(8px)', ease: 'power2.out', duration: 0.2 }, 0.32)
+        .to('.stage-a .problem-copy', { autoAlpha: 0, y: -30, duration: 0.1 }, 0.2)
+        .to('.layer', { x: toTarget('x'), y: toTarget('y'), rotate: 0, scale: 0.18, ease: 'power2.inOut', duration: 0.22 }, 0.34)
+        .to('.layer', { autoAlpha: 0, duration: 0.04, ease: 'none' }, 0.54)
+        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.54)
+        .fromTo('.product-pulse', { autoAlpha: 0.7, scale: 0.1 }, { autoAlpha: 0, scale: 9, ease: 'power2.out', duration: 0.24 }, 0.56)
+        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.14 }, 0.62)
+        .fromTo('.product-tags li', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, stagger: 0.05, duration: 0.1 }, 0.84)
     })
     return () => mm.revert()
   }, [])
@@ -84,6 +100,7 @@ export function ProblemSection() {
               <p className="sec-lead">Um sistema no navegador hoje, com os apps de escritório e de campo a caminho.</p>
             </header>
             <figure className="product-fig">
+              <span className="product-pulse" aria-hidden="true" />
               {media && (
                 <img className="product-img" src="/mocks/cerne-produtos-1400.webp" srcSet="/mocks/cerne-produtos-1400.webp 1400w, /mocks/cerne-produtos-2400.webp 2400w" sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" loading="lazy" decoding="async" />
               )}
@@ -223,14 +240,24 @@ export function SystemSection() {
   }, [media])
 
   return (
-    <section ref={root} className="sec sec-light system" id="sistema" aria-labelledby="sistema-title">
+    <>
+      <section className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title">
+        <div className="wrap farm-head">
+          <header className="sec-head" data-reveal>
+            <span className="eyebrow">O sistema</span>
+            <h2 id="sistema-title">A fazenda inteira, num só cadastro.</h2>
+            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Escolha um setor.</p>
+          </header>
+        </div>
+        <FazendaCerne />
+      </section>
+    <section ref={root} className="sec sec-light system" id="modulos" aria-labelledby="modulos-title">
       <div className="wrap">
         <header className="sec-head" data-reveal>
-          <span className="eyebrow">O sistema</span>
-          <h2 id="sistema-title">Seis frentes. Um só cadastro.</h2>
+          <span className="eyebrow">Os módulos</span>
+          <h2 id="modulos-title">Seis frentes. Um só cadastro.</h2>
           <p className="sec-lead">Os módulos que já estão no menu do Cerne Web.</p>
         </header>
-        <FazendaCerne />
         <div className="bento">
           {MODULOS.map((m) => (
             <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
@@ -257,6 +284,7 @@ export function SystemSection() {
         </div>
       </div>
     </section>
+    </>
   )
 }
 
@@ -485,16 +513,16 @@ export function ContactSection() {
     <section className="sec sec-light contact" id="contato" aria-labelledby="contato-title">
       <div className="wrap contact-grid">
         <header className="sec-head" data-reveal>
-          <span className="eyebrow">Lista de espera</span>
-          <h2 id="contato-title">Entre na lista e fale com a gente.</h2>
-          <p className="sec-lead">Receba o acesso ao Cerne Web, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
+          <span className="eyebrow">Acesso antecipado</span>
+          <h2 id="contato-title">Esteja entre os primeiros a usar o Cerne.</h2>
+          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
           <a className="btn btn-ghost whats" aria-disabled="true" href="#contato" onClick={(e) => e.preventDefault()}>Falar agora no WhatsApp <Tbd>número a definir</Tbd></a>
         </header>
 
         {status === 'success' ? (
           <div className="form big" role="status" data-reveal>
-            <h3>Pronto, você está na lista.</h3>
-            <p className="sub" style={{ display: 'block' }}>Nossa equipe vai falar com você pelo e-mail ou WhatsApp informado.</p>
+            <h3>Pronto, seu acesso está reservado.</h3>
+            <p className="sub" style={{ display: 'block' }}>Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
           </div>
         ) : (
           <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
@@ -532,7 +560,7 @@ export function ContactSection() {
             </label>
             {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
             <div className="actions">
-              <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Entrar na lista'}</button>
+              <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}</button>
               <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Prefiro agendar demonstração</button>
             </div>
             {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
@@ -546,7 +574,7 @@ export function ContactSection() {
 /* ───────────────────────── 10 · Dúvidas ───────────────────────── */
 const FAQ = [
   { q: 'O Cerne já está disponível?', a: 'O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste.', tbd: true },
-  { q: 'Como funciona o teste?', a: 'Entre na lista de espera ou agende uma demonstração com a nossa equipe.', tbd: true },
+  { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
   { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte, confinamento e agricultura.', tbd: true },
 ]
