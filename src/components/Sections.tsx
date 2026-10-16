@@ -589,19 +589,19 @@ export function TwinSection() {
       <div className="twin-grid">
         <div className="twin-spacer" aria-hidden="true" />
         <div className="twin-copy">
-          <span className="eyebrow" data-reveal>GB Twin</span>
-          <h2 id="twin-title" data-reveal>Cada pé da lavoura, contado do alto.</h2>
-          <p className="twin-lead" data-reveal>O drone sobrevoa o pivô e o GB Twin conta os pés no ortomosaico, confere por amostra e emite o laudo. Você vê a falha onde ela está, não na média.</p>
-          <ul className="twin-list" data-reveal>
+          <span className="eyebrow">GB Twin</span>
+          <h2 id="twin-title">Cada pé da lavoura, contado do alto.</h2>
+          <p className="twin-lead">O drone sobrevoa o pivô e o GB Twin conta os pés no ortomosaico, confere por amostra e emite o laudo. Você vê a falha onde ela está, não na média.</p>
+          <ul className="twin-list">
             {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
           </ul>
-          <dl className="twin-stats" data-reveal>
+          <dl className="twin-stats">
             <div><dt>Copas</dt><dd>120.855</dd></div>
             <div><dt>Estande</dt><dd>3.568<small>/ha</small></dd></div>
             <div><dt>Aproveitamento</dt><dd>86%</dd></div>
           </dl>
-          <p className="twin-note" data-reveal>Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <a className="btn btn-light" href="#contato" data-interest="todos" data-reveal>Quero conhecer o GB Twin</a>
+          <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
+          <a className="btn btn-light" href="#contato" data-interest="todos">Quero conhecer o GB Twin</a>
         </div>
       </div>
     </section>
