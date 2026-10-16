@@ -76,8 +76,7 @@ cv2.imwrite(f'{OUT}/ground.webp', G, [cv2.IMWRITE_WEBP_QUALITY, 78])
 mf = json.load(open(f'{OUT}/manifest.json'))
 mf['ground'] = {'src': f'/frames/hero/{variant}/ground.webp', 'w': G.shape[1], 'h': G.shape[0], 'frame': {'x': 0, 'y': 0, 'w': 1, 'h': (SH * GW / SW) / G.shape[0]}}
 json.dump(mf, open(f'{OUT}/manifest.json', 'w'))
-if variant == 'desktop':   # a versão HD usa o mesmo chão: mantém o manifesto dela em sincronia
-    hp = f'{ROOT}/../public/frames/hero/desktop-hd/manifest.json'
-    if os.path.exists(hp):
-        hm = json.load(open(hp)); hm['ground'] = mf['ground']; json.dump(hm, open(hp, 'w'))
+hp = f'{OUT}-hd/manifest.json'   # a versão HD usa o mesmo chão: mantém o manifesto dela em sincronia
+if os.path.exists(hp):
+    hm = json.load(open(hp)); hm['ground'] = mf['ground']; json.dump(hm, open(hp, 'w'))
 print('ok', G.shape)

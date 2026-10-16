@@ -28,7 +28,9 @@ GEN = f'{ROOT}/assets/gen-v2'
 CFG = {
     'desktop': dict(clip='clip-v2.mp4', still='K3-b.png', ground='P2-plantacao-9x16.png', count=160, width=1280, still_w=2560, q=66,
                     hd=dict(count=128, width=1920, q=50)),  # versão HD em AVIF (desktop grande + boa conexão)
-    'mobile': dict(clip='clip-mobile-v2.mp4', still='K3-9x16.png', ground='P2-plantacao-9x16.png', count=150, width=608, still_w=1080, q=70),
+    # clip ampliado no Magnific (608 -> 1080 px de largura); a versão leve continua em 608 px e a HD (AVIF) usa os 1080 px
+    'mobile': dict(clip='clip-mobile-v2-1080.mp4', still='K3-9x16.png', ground='P2-plantacao-9x16.png', count=150, width=608, still_w=1080, q=70,
+                   hd=dict(count=112, width=1080, q=52)),
 }
 SCREEN_ASPECT = 1.45            # tela do tablet (largura/altura); a base fica escondida pelos morros
 HAND_SCREEN = f'{ROOT}/assets/capture/light/visao-geral.png'
