@@ -57,7 +57,9 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
   const [geo, setGeo] = useState<{ box: Box; zoom: Zoom; zoomApp: Zoom; vw: number; vh: number } | null>(null)
 
   const [hd] = useState(() => prefersHd())
-  const variant = mobile ? 'mobile' : hd ? 'desktop-hd' : 'desktop'
+  // celular: quadros HD (AVIF 1080 px) quando a tela tem pixels de sobra (≥ 700 px reais) e a rede aguenta
+  const [hdMobile] = useState(() => prefersHd(700))
+  const variant = mobile ? (hdMobile ? 'mobile-hd' : 'mobile') : hd ? 'desktop-hd' : 'desktop'
   const dir = `/frames/hero/${variant}`
   const m = manifest?.variant === variant ? manifest.data : null
 

@@ -33,3 +33,15 @@ Capturas em desktop (1440×900) e celular (390×844); `npm run build` ok; lint s
 
 ## Fundo da maquete (2026-10-15, rodada 3)
 Foto trocada por uma ilustração gerada no Magnific no estilo da própria maquete (seedream-5-pro, 16:9 2k, referência de estilo = render da maquete). 3 opções (300 créditos); escolhida a 1 (`workbench/assets/gen-v5/bg-1.png`, as outras em bg-2 e bg-3). Servida em `public/frames/sistema-bg.webp` (162 KB), sem desfoque e com véu só nas pontas para fundir com a página; título com halo claro para manter a leitura.
+
+## Hero mobile em HD (2026-10-16)
+- O clipe mobile tinha só 608×1080 (o do desktop, 1920×1080). Ampliado no Magnific (Precision, 1k, 1080 px de largura; 4.297 créditos) → `workbench/assets/gen-v2/clip-mobile-v2-1080.mp4` (1080×1918, 241 quadros).
+- `build_v2.py mobile` agora usa esse clipe e gera também `public/frames/hero/mobile-hd/` (AVIF 1080 px, 112 quadros, 7,3 MB). A versão leve (`mobile`, 608 px, 5,2 MB) continua para rede fraca/sem AVIF e fornece o poster.
+- `Hero.tsx`: no celular usa `mobile-hd` quando a tela tem ≥ 700 px reais (largura × densidade, limitada a 2×), sem economia de dados, rede 4G e suporte a AVIF; senão `mobile`. O chão (`ground.webp`) é o mesmo nas duas e `ground_v5.py` mantém os manifestos em sincronia.
+- Backup do mobile anterior: `workbench/assets/backup/hero-mobile-v3/`.
+
+## Maquete isométrica no celular
+Faixa rolável 150% mais larga que a tela (arrasta para os lados), etiquetas maiores e sempre visíveis; tocar num setor centraliza nele e abre o cartão embaixo. Sem o zoom de câmera que cortava o setor.
+
+## Console
+A imagem do mockup do Ponto de partida passa a existir desde o início (a animação não encontrava o alvo); avisos "GSAP target not found" dos demais trechos (Hero e mídia adiada) silenciados em `lib/scroll.ts`.
