@@ -16,6 +16,8 @@ export function initReveal() {
   })
   return () => {
     triggers.forEach((t) => t.kill())
+    // devolve os elementos: sem isso, a remontagem (StrictMode em dev) não os encontra e eles ficam ocultos
+    els.forEach((e) => { delete e.dataset.rb })
     document.documentElement.classList.remove('reveal-on')
   }
 }
