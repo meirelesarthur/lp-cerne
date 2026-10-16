@@ -158,25 +158,39 @@ export function FazendaCerne() {
 
 // setor de cada operação → cor do ponto no letreiro
 const TILE: Record<string, string> = { 'Plantação': 'lavoura', Estoque: 'estoque', Confinamento: 'confinamento' }
-const SPEED = 0.07 // fração da parede percorrida por segundo
+const SPEED = 0.06 // fração da parede da esquerda percorrida por segundo
 const GAP = 28 // px entre uma operação e a seguinte
 
 /**
- * Letreiro "ao vivo" pintado na parede de terra da frente da maquete: cada operação emitida pela parte viva
- * entra pelo canto do estoque e desliza até a quina da sede. Fila curta: se chegar mais rápido do que passa, as mais antigas caem.
+ * Letreiro "ao vivo" pintado nas duas paredes de terra da frente da maquete, como uma fita só: cada operação emitida
+ * pela parte viva entra pelo canto do estoque, desce a parede da esquerda, dobra a quina da sede e sobe a da direita
+ * até a ponta do confinamento. Cada operação existe nas duas paredes; a da direita é a mesma deslocada pela largura
+ * da esquerda, e cada parede recorta a sua parte, então o texto dobra a quina sem emenda.
+ * Fila curta: se chegar mais rápido do que passa, as mais antigas caem.
  */
 function WallTicker({ feed }: { feed: React.MutableRefObject<((text: string) => void) | null> }) {
-  const track = useRef<HTMLDivElement>(null)
+  const left = useRef<HTMLDivElement>(null)
+  const right = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const el = track.current
-    if (!el) return
-    const fig = el.closest('figure')
+    const L = left.current
+    const R = right.current
+    if (!L || !R) return
+    const fig = L.closest('figure')
     const queue: string[] = []
-    const items: { el: HTMLElement; x: number; w: number }[] = []
+    const items: { a: HTMLElement; b: HTMLElement; x: number }[] = []
     feed.current = (text) => {
       if (!text.includes(' · ')) return
       queue.push(text)
       if (queue.length > 3) queue.shift()
+    }
+    const make = (zone: string, rest: string) => {
+      const it = document.createElement('span')
+      it.className = 'fz-tk-item'
+      it.dataset.tile = TILE[zone] ?? 'sede'
+      it.innerHTML = '<i></i><b></b><span></span>'
+      it.children[1].textContent = zone
+      it.children[2].textContent = rest
+      return it
     }
     let raf = 0
     let last = performance.now()
@@ -184,25 +198,27 @@ function WallTicker({ feed }: { feed: React.MutableRefObject<((text: string) => 
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
       if (!fig?.hasAttribute('data-paused')) {
-        const W = el.clientWidth
+        const WL = L.clientWidth
+        const WR = R.clientWidth
         const tail = items[items.length - 1]
         if (queue.length && (!tail || tail.x >= GAP)) {
           const [zone, ...rest] = queue.shift()!.split(' · ')
-          const it = document.createElement('span')
-          it.className = 'fz-tk-item'
-          it.dataset.tile = TILE[zone] ?? 'sede'
-          it.innerHTML = '<i></i><b></b><span></span>'
-          it.children[1].textContent = zone
-          it.children[2].textContent = rest.join(' · ')
-          el.appendChild(it)
-          const w = it.offsetWidth
-          items.push({ el: it, x: -w, w })
+          const a = make(zone, rest.join(' · '))
+          const b = a.cloneNode(true) as HTMLElement
+          L.appendChild(a)
+          R.appendChild(b)
+          items.push({ a, b, x: -a.offsetWidth })
         }
         for (const it of items) {
-          it.x += W * SPEED * dt
-          it.el.style.transform = `translate3d(${it.x.toFixed(1)}px,0,0)`
+          it.x += WL * SPEED * dt
+          it.a.style.transform = `translate3d(${it.x.toFixed(1)}px,0,0)`
+          it.b.style.transform = `translate3d(${(it.x - WL).toFixed(1)}px,0,0)`
         }
-        while (items.length && items[0].x > W) items.shift()!.el.remove()
+        while (items.length && items[0].x > WL + WR) {
+          const it = items.shift()!
+          it.a.remove()
+          it.b.remove()
+        }
       }
       raf = requestAnimationFrame(tick)
     }
@@ -210,14 +226,17 @@ function WallTicker({ feed }: { feed: React.MutableRefObject<((text: string) => 
     return () => {
       cancelAnimationFrame(raf)
       feed.current = null
-      items.forEach((it) => it.el.remove())
+      items.forEach((it) => { it.a.remove(); it.b.remove() })
     }
   }, [feed])
   return (
     <div className="fz-wall" style={{ aspectRatio: RATIO }} aria-hidden="true">
-      <div className="fz-tk">
+      <div className="fz-tk fz-tk-l">
+        <div ref={left} className="fz-tk-track" />
         <span className="fz-tk-live">Ao vivo</span>
-        <div ref={track} className="fz-tk-track" />
+      </div>
+      <div className="fz-tk fz-tk-r">
+        <div ref={right} className="fz-tk-track" />
       </div>
     </div>
   )
