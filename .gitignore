@@ -27,6 +27,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+!.env.production
+!.env.development
 
 # Claude Code local settings
 .claude/settings.local.json
@@ -45,3 +47,10 @@ workbench/tools/iso/cerne/out/
 workbench/tools/iso/cerne/shots/
 workbench/tools/iso/fazenda/out/
 workbench/tools/iso/fazenda/shots/
+
+# arquivos pesados do site: ficam no Cloudflare R2 (bucket lp-cerne-assets); a cópia local é só para regerar/enviar
+/public/frames/
+/public/video/
+/public/app/
+/public/screens/
+/public/mocks/

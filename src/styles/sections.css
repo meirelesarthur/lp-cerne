@@ -308,7 +308,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .farm { position: relative; padding: 0; background: var(--canvas); overflow: hidden; isolation: isolate; }
 .farm::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
   linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, 0) 16%, rgba(245, 248, 244, 0) 80%, var(--canvas) 100%),
-  url('/frames/sistema-bg.webp') center / cover no-repeat; }
+  var(--farm-bg, url('/frames/sistema-bg.webp')) center / cover no-repeat; }
 .farm .fz-figure { margin: 0; padding-top: 120px; display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
 .farm .farm-head { position: absolute; left: 0; right: 0; top: clamp(88px, 12vh, 130px); z-index: 4; pointer-events: none; transition: opacity .35s; }
 .farm .farm-head .sec-head { margin: 0; max-width: 460px; pointer-events: auto; }
@@ -324,7 +324,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 @media (max-width: 719px) {
   .farm::before { background:
     linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, 0) 10%, rgba(245, 248, 244, 0) 90%, var(--canvas) 100%),
-    url('/frames/sistema-bg-mobile.webp') center / cover no-repeat; }
+    var(--farm-bg-m, url('/frames/sistema-bg-mobile.webp')) center / cover no-repeat; }
   .farm .fz-figure { padding-bottom: 28px; }
   .system { background: linear-gradient(180deg, transparent 0, var(--canvas) 80px); }
 }

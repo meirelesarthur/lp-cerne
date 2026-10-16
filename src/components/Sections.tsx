@@ -1,3 +1,4 @@
+import { asset } from '../lib/assets'
 import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { FazendaCerne } from '../figures/fazenda/FazendaCerne'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
@@ -102,7 +103,7 @@ export function ProblemSection() {
             <figure className="product-fig">
               <span className="product-pulse" aria-hidden="true" />
               {/* o elemento existe desde o início (a animação precisa dele); só o arquivo espera o primeiro scroll */}
-              <img className="product-img" src={media ? '/mocks/cerne-produtos-1400.webp' : undefined} srcSet={media ? '/mocks/cerne-produtos-1400.webp 1400w, /mocks/cerne-produtos-2400.webp 2400w' : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
+              <img className="product-img" src={media ? asset('/mocks/cerne-produtos-1400.webp') : undefined} srcSet={media ? `${asset('/mocks/cerne-produtos-1400.webp')} 1400w, ${asset('/mocks/cerne-produtos-2400.webp')} 2400w` : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
               <ul className="product-tags">
                 {PRODUTOS.map((p) => (
                   <li key={p.n} className={p.on ? 'on' : ''}><i aria-hidden="true" />{p.n}<small>{p.s}</small></li>
@@ -191,9 +192,9 @@ export function TrailerSection() {
         <div className="trailer-grid">
           <figure className="browser" data-reveal>
             <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            <video ref={video} muted loop playsInline preload="none" poster={media ? '/video/system-loop-poster.webp' : undefined} aria-label="Demonstração das telas do Cerne Web">
-              <source src="/video/system-loop.webm" type="video/webm" />
-              <source src="/video/system-loop.mp4" type="video/mp4" />
+            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web">
+              <source src={asset('/video/system-loop.webm')} type="video/webm" />
+              <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
             </video>
           </figure>
           <ol className="chapters">
@@ -240,7 +241,7 @@ export function SystemSection() {
 
   return (
     <>
-      <section className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title">
+      <section className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={{ '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } as React.CSSProperties}>
         <div className="wrap farm-head">
           <header className="sec-head" data-reveal>
             <span className="eyebrow">O sistema</span>
@@ -267,7 +268,7 @@ export function SystemSection() {
                 {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
               </div>
               {m.img ? (
-                <div className="shot">{media && <img src={`/screens/${m.img}.webp`} alt="" loading="lazy" decoding="async" />}</div>
+                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" loading="lazy" decoding="async" />}</div>
               ) : (
                 <div className="base">
                   <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
@@ -302,7 +303,7 @@ export function EditionsSection() {
             <span className="badge on">Disponível · navegador</span>
             <h3>Cerne Web</h3>
             <p>O ERP completo: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p>
-            {media && <img src="/screens/visao-geral.webp" alt="Cerne Web: painel Visão Geral" loading="lazy" />}
+            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" loading="lazy" />}
             <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
           </article>
           <article className="edition app" data-reveal>
@@ -359,7 +360,7 @@ export function ProfilesSection() {
   const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
   const [ext] = useState(() => (supportsAvif() ? 'avif' : 'webp') as 'avif' | 'webp')
   const [m, setM] = useState<PerfisManifest | null>(null)
-  const dir = `/frames/perfis/${variant}`
+  const dir = asset(`/frames/perfis/${variant}`)
 
   useEffect(() => {
     if (!near || still) return

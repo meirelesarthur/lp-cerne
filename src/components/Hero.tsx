@@ -1,3 +1,4 @@
+import { asset } from '../lib/assets'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
 import { coverBox, finalZoom, prefersHd, type Box, type Manifest, type Zoom } from '../lib/stage'
@@ -20,6 +21,16 @@ const P = {
 const FALLBACK: Manifest = { count: 120, width: 1280, height: 720 }
 
 /** Geometria do estado final, compartilhada com a 2ª seção (emenda da plantação). */
+/** Os caminhos do manifesto são absolutos no site (/frames/...): aponta-os para a base dos arquivos pesados. */
+function absolutize(m: Manifest): Manifest {
+  return {
+    ...m,
+    poster: m.poster && asset(m.poster),
+    final: m.final && { ...m.final, src: asset(m.final.src), fg: asset(m.final.fg) },
+    ground: m.ground && { ...m.ground, src: asset(m.ground.src) },
+  }
+}
+
 export interface HeroGeometry { box: Box; zoom: Zoom; vw: number; vh: number; manifest: Manifest; ready: boolean }
 
 /** Zoom para rolar a aplicação (perto) e zoom do estado final (título à esquerda, form à direita). */
@@ -60,7 +71,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
   // celular: quadros HD (AVIF 1080 px) quando a tela tem pixels de sobra (≥ 700 px reais) e a rede aguenta
   const [hdMobile] = useState(() => prefersHd(700))
   const variant = mobile ? (hdMobile ? 'mobile-hd' : 'mobile') : hd ? 'desktop-hd' : 'desktop'
-  const dir = `/frames/hero/${variant}`
+  const dir = asset(`/frames/hero/${variant}`)
   const m = manifest?.variant === variant ? manifest.data : null
 
   useEffect(() => {
@@ -83,7 +94,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
     fetch(`${dir}/manifest.json`)
       .then((r) => (r.ok ? (r.json() as Promise<Manifest>) : FALLBACK))
       .catch(() => FALLBACK)
-      .then((data) => alive && setManifest({ variant, data }))
+      .then((data) => alive && setManifest({ variant, data: absolutize(data) }))
     return () => { alive = false }
   }, [dir, variant])
 
@@ -192,10 +203,10 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             >
               <img className="final-still" src={m.final.src} alt="" decoding="async" />
               <div className="tablet-screen" style={{ left: `${t.x * 100}%`, top: `${t.y * 100}%`, width: `${t.w * 100}%`, height: `${t.h * 100}%` }}>
-                <img ref={appImg} className="tablet-app" src="/app/visao-geral-full.webp" alt="" decoding="async" />
-                <video ref={video} className="tablet-video" muted loop playsInline preload="none" poster="/video/system-loop-poster.webp" aria-hidden="true">
-                  <source src="/video/system-loop.webm" type="video/webm" />
-                  <source src="/video/system-loop.mp4" type="video/mp4" />
+                <img ref={appImg} className="tablet-app" src={asset('/app/visao-geral-full.webp')} alt="" decoding="async" />
+                <video ref={video} className="tablet-video" muted loop playsInline preload="none" poster={asset('/video/system-loop-poster.webp')} aria-hidden="true">
+                  <source src={asset('/video/system-loop.webm')} type="video/webm" />
+                  <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
                 </video>
               </div>
               <img className="final-fg" src={m.final.fg} alt="" decoding="async" />
