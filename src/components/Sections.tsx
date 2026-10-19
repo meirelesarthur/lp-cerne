@@ -879,23 +879,16 @@ export function PlansSection() {
   return (
     <section className="sec sec-light planos" id="planos" aria-labelledby="planos-title">
       <div className="wrap">
-        <header className="sec-head" data-reveal>
-          <span className="eyebrow">Planos <Tbd /></span>
-          <h2 id="planos-title">Escolha pelo tamanho da sua gestão.</h2>
-          <p className="sec-lead">Três planos sobre o mesmo cadastro. Comece pelo essencial e some módulos quando a operação pedir, sem trocar de sistema.</p>
-        </header>
-        <div className="pl-legend" data-reveal>
-          <span><CelPlano c="i" /> Incluído</span>
-          <span><CelPlano c="o" /> Contratado à parte</span>
-          <span><CelPlano c="n" /> Não incluso</span>
-        </div>
         <p className="pl-swipe" aria-hidden="true">Arraste a tabela para o lado para ver os três planos →</p>
         <div ref={scroller} className={`pl-scroll${shadow ? ' is-scrolled' : ''}`} tabIndex={0} role="region" aria-label="Comparativo de funcionalidades por plano"
           onScroll={(e) => setShadow(e.currentTarget.scrollLeft > 2)} data-reveal>
           <table className="pl-table" id="planos-tabela">
             <thead>
               <tr>
-                <th className="pl-fix" scope="col">Módulos e funcionalidades</th>
+                <th className="pl-fix pl-title" scope="col">
+                  <h2 id="planos-title">Compare os planos, módulo a módulo</h2>
+                  <p>Comece pelo essencial e some módulos quando a operação pedir.</p>
+                </th>
                 {PLANOS.map((p) => (
                   <th key={p.k} className={`pl-head ${p.k}`} scope="col">
                     <b>{p.t}</b><span>{p.d}</span>
@@ -936,6 +929,15 @@ export function PlansSection() {
               <tr className="pl-cta">
                 <th className="pl-fix" scope="row" />
                 {PLANOS.map((p) => <td key={p.k}><a className="btn btn-ghost" href="#contato" data-interest="demonstracao">Falar sobre o {p.t}</a></td>)}
+              </tr>
+              <tr className="pl-keyrow">
+                <td colSpan={4}>
+                  <div className="pl-legend">
+                    <span><CelPlano c="i" /> Incluído</span>
+                    <span><CelPlano c="o" /> Contratado à parte</span>
+                    <span><CelPlano c="n" /> Não incluso</span>
+                  </div>
+                </td>
               </tr>
             </tfoot>
           </table>
