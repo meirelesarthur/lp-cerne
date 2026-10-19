@@ -136,3 +136,9 @@
 /* celular: com um setor aberto a câmera voa até ele e a parede sai do lugar */
 @media (max-width: 719px) { .fz-figure[data-open] .fz-wall { display: none; } }
 .fz-figure[data-paused] .fz-tk-live::before { animation-play-state: paused; }
+
+/* Estoque abre o card à esquerda, onde fica o armazém: em telas médias a maquete se afasta do card para não ficar por baixo dele */
+@media (min-width: 720px) {
+  .fz-full .fz-stage { transition: transform .5s var(--anatomy-ease, ease); }
+  .fz-figure[data-zone='estoque'] .fz-stage { transform: translateX(clamp(0px, calc((1900px - 100vw) * .45), 190px)); }
+}

@@ -91,7 +91,7 @@ export function FazendaCerne() {
     setZone((cur) => (cur === z ? null : z))
   }
   return (
-    <figure ref={root} className="fz-figure iso fz-full" data-theme="light" data-open={zone ? 'true' : undefined} data-side={zone === 'confinamento' || zone === 'sede' ? 'left' : 'right'}>
+    <figure ref={root} className="fz-figure iso fz-full" data-theme="light" data-open={zone ? 'true' : undefined} data-zone={zone ?? undefined} data-side={zone === 'confinamento' || zone === 'sede' || zone === 'estoque' ? 'left' : 'right'}>
       <div ref={scroller} className="fz-scroll">
       <div className="fz-canvas">
         <div
