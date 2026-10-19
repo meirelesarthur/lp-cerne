@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
+import { StickyCta } from './components/StickyCta'
 import { GroundSection } from './components/GroundSection'
 import { Header } from './components/Header'
 import { Hero, type HeroGeometry } from './components/Hero'
@@ -11,7 +12,8 @@ const Footer = lazy(() => import('./components/Below').then((m) => ({ default: m
 
 export default function App() {
   const [geo, setGeo] = useState<HeroGeometry | null>(null)
-  const [below, setBelow] = useState(false)
+  // link com âncora (/#contato) precisa da seção montada já na carga
+  const [below, setBelow] = useState(() => Boolean(window.location.hash))
   const onGeometry = useCallback((g: HeroGeometry) => setGeo(g), [])
   useEffect(() => initReveal(), [])
   useEffect(() => initHeaderTone(), [])
@@ -19,8 +21,9 @@ export default function App() {
   useEffect(() => onFirstInteraction(() => setBelow(true), 6000), [])
   return (
     <>
+      <a className="skip-link" href="#main">Pular para o conteúdo</a>
       <Header />
-      <main>
+      <main id="main" tabIndex={-1}>
         <Hero onGeometry={onGeometry} />
         <GroundSection geo={geo} />
         {below && (
@@ -34,6 +37,7 @@ export default function App() {
           <Footer />
         </Suspense>
       )}
+      <StickyCta />
     </>
   )
 }

@@ -284,3 +284,30 @@ Decisão do usuário: criar uma nova branch para a auditoria e aplicar nela os a
 - `curl`/`read` do HTML servido: meta, JSON-LD, canonical e `noscript` presentes; `/#contato` aberto direto rola até o form.
 - `workbench/tools/perf-check.mjs` e `page.mjs` para regressão de carga e QA visual; Lighthouse local mobile ≥ 95 mantido.
 - Resultado e pendências registrados em `workbench/docs/18-...md`; commits com a atribuição padrão.
+
+---
+
+## 14. Resultado da execução (branch `audit/ux-seo-a11y-perf`)
+
+### Aplicado
+| Tema | O que mudou | Arquivos |
+|---|---|---|
+| Primeira tela | H1, lead e CTA visíveis no quadro 0 (`hero-intro`, véu escuro, some nos primeiros pixels de rolagem); o título final vira `<p aria-hidden>` e o H1 real fica no intro. Em modo estático (movimento reduzido/saveData) o H1 fica no bloco final. Lead reescrito sem o jargão "cadastro". | `Hero.tsx`, `app.css` |
+| Foco | Copy e form do hero com `visibility:hidden` até a fase (GSAP `autoAlpha`): nada invisível recebe Tab. | `Hero.tsx`, `app.css` |
+| Âncoras | `Below` monta já na carga se houver `#hash` e rola até o alvo após o refresh do ScrollTrigger (testado: `/#contato` abre no form). | `App.tsx`, `Below.tsx` |
+| CTA | CTA sticky "Agendar demonstração" depois do hero (some sobre o form); rótulos unificados ("Quero acesso antecipado" principal, "Agendar demonstração" atalho, "Entrar na lista de testes" nos apps). | `StickyCta.tsx`, `Sections.tsx` |
+| A11y | Skip link e `main#main`; vídeo do Trailer com botão Pausar/Reproduzir, sem autoplay em movimento reduzido e com descrição para leitor de tela; erro do consentimento ligado por `aria-describedby`; foco no 1º campo inválido (hero e form completo); WhatsApp como `<button disabled>`; eyebrow `<h3>` virou "Diferenciais" de verdade; h2 do form do hero virou `<p>`; alvos do rodapé ≥24 px; inputs/selects a 16 px; placeholder `#5f7166`; borda do `btn-ghost` ≥3:1; vidro de Perfis mais firme; chip no "Role para conhecer". | `app.css`, `sections.css`, `HeroForm.tsx`, `Sections.tsx`, `tokens.css` |
+| Leads | Sem `VITE_FORM_ENDPOINT` em produção o envio falha com erro visível (nunca finge sucesso) e o build avisa; UTM, referrer e página vão no payload. | `form.ts`, `vite.config.ts` |
+| SEO | canonical/og:url/og:image absolutos via `VITE_SITE_URL` (tags saem se vazio), `og-cerne.jpg` 1200×630, `twitter:*`, `apple-touch-icon`, JSON-LD (Organization, SoftwareApplication, WebSite), `noscript`, `robots.txt` e `sitemap.xml` no build. | `index.html`, `vite.config.ts`, `public/` |
+| Performance | Maquete (`art`, 447 KB) em `lazy` só perto da tela (fora do `Below`, que caiu de 52 para 45 KB); `width/height` nas telas; `preconnect` ao R2; `_headers` com nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options e HTML sem cache longo. | `Sections.tsx`, `index.html`, `public/_headers` |
+| Estrutura | Ordem nova: Problema → Sistema (maquete + módulos + Diferenciais + Controle e segurança) → Trailer → Edições → Perfis → GB Twin → FAQ → Contato. Seção "Confiança" fundida em Sistema; "espinha" removida; FAQ agrupado em 4 temas (3 abertas); Trailer sem pin; pins de Problema (320→220%) e Perfis (480→280%) menores; Twin mais baixo. Rolagem fixada: de ~13.400 para ~11.000 px; página de 22.799 para 21.858 px (1440×900). | `Sections.tsx`, `Below.tsx`, `sections.css` |
+
+### Não aplicado (decisão ou conteúdo do negócio)
+- Etiquetas "a validar" (7), número do WhatsApp, URL da Política de Privacidade, preço e fluxo de teste, promessa do "lançamento".
+- Prova social (sem material), seções novas de "Como começar", "Segurança/LGPD" e "Para quem é" (exigem conteúdo que não existe).
+- Fusão do Escopo no bento (arrisca a emenda com o Hero), pré-render/SSG completo (exige reestruturar a hidratação; ficam `noscript` + JSON-LD), páginas de SEO por tema, domínio/CDN do R2 (infra), CSP completo (depende do domínio final do form), analytics e eventos (depende da ferramenta escolhida).
+- Cobertura de produto (pastagem, compra/venda, orçamento, planejamento, nascimentos): fica para uma rodada de copy com validação do produto.
+- Pausa do vídeo do tablet dentro do Hero (só aparece no fim do pin, mudo, sem áudio).
+
+### Verificação feita
+`tsc -b` e `vite build` sem erro (com e sem `VITE_SITE_URL`); no preview: H1/CTA visíveis no quadro 0 (desktop e 390 px), copy/form do hero em `visibility:hidden` antes da fase, skip link e `main#main`, ordem das seções, FAQ com 3 abertas, `/#contato` abrindo no form, Trailer sem pin com botão de vídeo e sticky CTA. Não rodados: Lighthouse no domínio final, axe/NVDA, validador W3C no HTML pré-renderizado.

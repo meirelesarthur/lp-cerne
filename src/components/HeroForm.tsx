@@ -19,8 +19,12 @@ export function HeroForm({ emailId }: { emailId: string }) {
 
   const onSubmit = async (ev: FormEvent) => {
     ev.preventDefault()
-    const ok = [check('email', email), check('whatsapp', whatsapp), check('consent', consent)].every(Boolean)
-    if (!ok) return
+    const results = [check('email', email), check('whatsapp', whatsapp), check('consent', consent)]
+    if (!results.every(Boolean)) {
+      // foco no primeiro campo com erro (leitor de tela anuncia a mensagem ligada por aria-describedby)
+      document.getElementById([emailId, `${uid}-w`, `${uid}-c`][results.indexOf(false)])?.focus()
+      return
+    }
     setStatus('loading')
     try {
       await submitLead({ origem: 'hero', email: email.trim(), whatsapp, consent })
@@ -33,7 +37,7 @@ export function HeroForm({ emailId }: { emailId: string }) {
   if (status === 'success') {
     return (
       <div className="form" role="status">
-        <h2>Seu acesso está reservado.</h2>
+        <p className="form-title">Seu acesso está reservado.</p>
         <p className="sub" style={{ display: 'block', margin: 0 }}>Você será avisado pelo e-mail ou WhatsApp informado na primeira hora do lançamento.</p>
       </div>
     )
@@ -41,7 +45,7 @@ export function HeroForm({ emailId }: { emailId: string }) {
 
   return (
     <form className="form" onSubmit={onSubmit} noValidate aria-labelledby={`${uid}-t`}>
-      <h2 id={`${uid}-t`}>Seja um dos primeiros a usar o Cerne</h2>
+      <p className="form-title" id={`${uid}-t`}>Seja um dos primeiros a usar o Cerne</p>
       <p className="sub">Receba acesso na primeira hora do lançamento.</p>
 
       <div className="field" data-invalid={Boolean(errors.email)}>
@@ -61,11 +65,11 @@ export function HeroForm({ emailId }: { emailId: string }) {
       </div>
 
       <label className="consent">
-        <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); check('consent', e.target.checked) }}
-          aria-invalid={Boolean(errors.consent)} />
+        <input id={`${uid}-c`} type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); check('consent', e.target.checked) }}
+          aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${uid}-e3` : undefined} />
         <span>Concordo em receber contato da GB Agritech sobre o Cerne, conforme a LGPD.</span>
       </label>
-      {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
+      {errors.consent && <span className="err err-consent" id={`${uid}-e3`}>{errors.consent}</span>}
 
       <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>
         {status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}

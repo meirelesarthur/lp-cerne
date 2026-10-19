@@ -1,11 +1,13 @@
 import { asset } from '../lib/assets'
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { FazendaCerne } from '../figures/fazenda/FazendaCerne'
+import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
+
+// a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
+const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -99,7 +101,7 @@ export function ProblemSection() {
 
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=320%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=220%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
       })
       // 0 → 1 = toda a duração
       gsap.set('.orb-core, .orb-halo, .orb-bloom', { transformOrigin: '50% 50%', svgOrigin: undefined })
@@ -256,32 +258,41 @@ const CAPITULOS = [
   { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas, atrasados e orçado × realizado.' },
 ]
 
-const DESKTOP_PIN = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
-
 export function TrailerSection() {
   const root = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
+  const bar = useRef<HTMLElement>(null)
   const capRef = useRef(0)
+  const userPaused = useRef(false)
   const media = useAfterFirstScroll()
   const [cap, setCap] = useState(0)
+  const [paused, setPaused] = useState(true)
+  const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
     const v = video.current
     if (!v) return
+    // movimento reduzido: o vídeo só toca se a pessoa pedir; senão toca ao entrar na tela e pausa ao sair
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; void v.play().catch(() => {}) } else v.pause()
+      if (e.isIntersecting) {
+        if (v.preload === 'none') v.preload = 'auto'
+        if (!reduced && !userPaused.current) void v.play().catch(() => {})
+      } else v.pause()
     }, { threshold: 0.35 })
     io.observe(v)
     const onTime = () => {
       const t = v.currentTime % 15
       let i = 0
       CAPITULOS.forEach((c, k) => { if (t >= c.t) i = k })
-      capRef.current = i
-      setCap(i)
+      if (i !== capRef.current) { capRef.current = i; setCap(i) }
+      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(1, v.currentTime / (v.duration || 15))})`
     }
+    const onState = () => setPaused(v.paused)
     v.addEventListener('timeupdate', onTime)
-    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime) }
-  }, [])
+    v.addEventListener('play', onState)
+    v.addEventListener('pause', onState)
+    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime); v.removeEventListener('play', onState); v.removeEventListener('pause', onState) }
+  }, [reduced])
 
   const goTo = (i: number) => {
     const v = video.current
@@ -289,27 +300,14 @@ export function TrailerSection() {
     setCap(i)
     if (!v) return
     v.currentTime = CAPITULOS[i].t + 0.05
+    userPaused.current = false
     void v.play().catch(() => {})
   }
-
-  // desktop: a seção fica fixa e cada trecho do scroll abre um capítulo
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia()
-    mm.add(DESKTOP_PIN, () => {
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=240%', pin: true, scrub: true, refreshPriority: 5,
-          onUpdate: (self) => {
-            const i = Math.min(CAPITULOS.length - 1, Math.floor(self.progress * CAPITULOS.length))
-            if (i !== capRef.current) goTo(i)
-          },
-        },
-      }).fromTo('.trailer .browser', { scale: 0.94 }, { scale: 1, ease: 'none', duration: 0.25 })
-        .fromTo('.trailer .scrub-bar i', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
-    })
-    return () => mm.revert()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const toggle = () => {
+    const v = video.current
+    if (!v) return
+    if (v.paused) { userPaused.current = false; void v.play().catch(() => {}) } else { userPaused.current = true; v.pause() }
+  }
 
   return (
     <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
@@ -322,13 +320,15 @@ export function TrailerSection() {
         <div className="trailer-grid">
           <figure className="browser" data-reveal>
             <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web">
+            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web" aria-describedby="trailer-desc">
               <source src={asset('/video/system-loop.webm')} type="video/webm" />
               <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
             </video>
+            <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
+            <button type="button" className="video-toggle" onClick={toggle}>{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
           </figure>
           <ol className="chapters">
-            <li className="scrub-bar" aria-hidden="true"><i /></li>
+            <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
             {CAPITULOS.map((c, i) => (
               <li key={c.n} data-reveal>
                 <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
@@ -434,10 +434,12 @@ export function SystemSection() {
           <header className="sec-head" data-reveal>
             <span className="eyebrow">O sistema</span>
             <h2 id="sistema-title">A fazenda inteira, num só cadastro.</h2>
-            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Escolha um setor.</p>
+            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Clique em um setor para ver o que o Cerne faz ali.</p>
           </header>
         </div>
-        <FazendaCerne />
+        {farmNear ? (
+          <Suspense fallback={<div className="fz-placeholder" />}><FazendaCerne /></Suspense>
+        ) : <div className="fz-placeholder" />}
       </section>
     <section ref={root} className="sec sec-light system" id="modulos" aria-labelledby="modulos-title">
       <div className="wrap">
@@ -456,7 +458,7 @@ export function SystemSection() {
                 {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
               </div>
               {m.img ? (
-                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" loading="lazy" decoding="async" />}</div>
+                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" width={m.img === 'talhoes' ? 960 : 1280} height={m.img === 'talhoes' ? 720 : 800} loading="lazy" decoding="async" />}</div>
               ) : (
                 <div className="base">
                   <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
@@ -466,13 +468,14 @@ export function SystemSection() {
             </article>
           ))}
         </div>
-        <div className="spine" data-reveal aria-hidden="true">
-          <span>Um só sistema</span>
-          <ol>{MODULOS.map((m) => <li key={m.k}><i />{m.t}</li>)}</ol>
-        </div>
         <div className="diferenciais">
-          <h3 className="eyebrow" data-reveal>O que pouca gente tem</h3>
+          <h3 className="dif-title" data-reveal>Diferenciais</h3>
           <Conquistas items={DIFERENCIAIS} />
+        </div>
+        <div className="diferenciais seguranca">
+          <h3 className="dif-title" data-reveal>Controle e segurança</h3>
+          <p className="sec-lead" data-reveal>Desenvolvido pela GB Agritech para operações com várias fazendas, equipes e aprovações.</p>
+          <Conquistas items={CONFIANCA} />
         </div>
       </div>
     </section>
@@ -495,22 +498,22 @@ export function EditionsSection() {
             <span className="badge on">Disponível · navegador</span>
             <h3>Cerne Web</h3>
             <p>Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.</p>
-            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" loading="lazy" />}
+            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" width={1280} height={800} loading="lazy" decoding="async" />}
             <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
           </article>
           <article className="edition app" data-reveal>
             <span className="badge">Em construção · em teste</span>
             <h3>Cerne Administração</h3>
             <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Quero testar</a>
+            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Entrar na lista de testes</a>
           </article>
           <article className="edition app" data-reveal>
             <span className="badge">Em construção · em teste</span>
             <h3>Cerne Operação</h3>
             <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Quero testar</a>
+            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Entrar na lista de testes</a>
           </article>
         </div>
         <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
@@ -569,7 +572,7 @@ export function ProfilesSection() {
       const tl = gsap.timeline({
         defaults: { ease: 'power1.out' },
         scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=480%', pin: true, scrub: 0.5, refreshPriority: 4,
+          trigger: root.current, start: 'top top', end: '+=280%', pin: true, scrub: 0.5, refreshPriority: 4,
           onUpdate: (st) => {
             const p = st.progress
             scrub.current?.setFrame(Math.min(1, p / PLANO_FIM) * frames.current)
@@ -606,8 +609,8 @@ export function ProfilesSection() {
             <h2 id="perfis-title">Quem decide e quem executa, no mesmo fluxo.</h2>
           </header>
           <article className="pf-glass pf-card">
-            <span className="pf-kicker">No curral</span>
-            <h3>Campo</h3>
+            <span className="pf-kicker">Campo</span>
+            <h3>Quem está no curral</h3>
             <ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul>
             <p className="note">Pelo app Operação, em construção.</p>
           </article>
@@ -623,8 +626,8 @@ export function ProfilesSection() {
 
         <div className="pf-phase pf-gestor">
           <article className="pf-glass pf-card">
-            <span className="pf-kicker">No escritório</span>
-            <h3>Gestor</h3>
+            <span className="pf-kicker">Escritório</span>
+            <h3>Quem decide no escritório</h3>
             <ul><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos</li></ul>
           </article>
         </div>
@@ -673,26 +676,13 @@ export function TwinSection() {
   )
 }
 
-/* ───────────────────────── 08 · Confiança ───────────────────────── */
+/* ───────────────────────── Controle e segurança (dentro do Sistema) ───────────────────────── */
 const CONFIANCA: Conquista[] = [
   { t: 'Multifazenda e multiempresa', d: 'Cada fazenda com seus dados, todas na mesma visão.', i: 'fazendas' },
   { t: 'Permissões por ação', d: 'Perfis de acesso e autorizadores para cada compra.', i: 'permissao' },
   { t: 'Histórico de alterações', d: 'Logs do sistema e atividades recentes por fazenda.', i: 'historico' },
   { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.', i: 'contador' },
 ]
-export function TrustSection() {
-  return (
-    <section className="sec sec-light trust" aria-labelledby="confianca-title">
-      <div className="wrap trust-inner" data-reveal>
-        <span className="eyebrow">Controle e segurança</span>
-        <h2 id="confianca-title">Quem faz o quê, em cada fazenda.</h2>
-        <p className="sec-lead">Desenvolvido pela GB Agritech para operações com várias fazendas, equipes e aprovações.</p>
-        <Conquistas items={CONFIANCA} className="trust-list" />
-      </div>
-    </section>
-  )
-}
-
 /* ───────────────────────── 09 · Form completo ───────────────────────── */
 type CErr = Partial<Record<'name' | 'email' | 'whatsapp' | 'consent', string>>
 
@@ -721,7 +711,11 @@ export function ContactSection() {
 
   const onSubmit = async (ev: FormEvent, intent: 'lista' | 'demonstracao') => {
     ev.preventDefault()
-    if (![check('name'), check('email'), check('whatsapp'), check('consent')].every(Boolean)) return
+    const results = [check('name'), check('email'), check('whatsapp'), check('consent')]
+    if (!results.every(Boolean)) {
+      document.getElementById([`${uid}-name`, `${uid}-email`, `${uid}-whatsapp`, `${uid}-consent`][results.indexOf(false)])?.focus()
+      return
+    }
     setStatus('loading')
     try {
       await submitLead({ origem: 'form-completo', intencao: intent, nome: v.name.trim(), email: v.email.trim(), whatsapp: v.whatsapp, tamanho: v.size, interesse: v.interest, consent: v.consent })
@@ -748,13 +742,13 @@ export function ContactSection() {
           <span className="eyebrow">Acesso antecipado</span>
           <h2 id="contato-title">Esteja entre os primeiros a usar o Cerne.</h2>
           <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
-          <a className="btn btn-ghost whats" aria-disabled="true" href="#contato" onClick={(e) => e.preventDefault()}>Falar agora no WhatsApp <Tbd>número a definir</Tbd></a>
+          <button type="button" className="btn btn-ghost whats" disabled>Falar agora no WhatsApp <Tbd>número a definir</Tbd></button>
         </header>
 
         {status === 'success' ? (
           <div className="form big" role="status" data-reveal>
             <h3>Pronto, seu acesso está reservado.</h3>
-            <p className="sub" style={{ display: 'block' }}>Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
+            <p className="sub show">Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
           </div>
         ) : (
           <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
@@ -788,13 +782,13 @@ export function ContactSection() {
               </div>
             </div>
             <label className="consent">
-              <input type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} />
+              <input id={`${uid}-consent`} type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${uid}-consent-e` : undefined} />
               <span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span>
             </label>
-            {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
+            {errors.consent && <span className="err err-consent" id={`${uid}-consent-e`}>{errors.consent}</span>}
             <div className="actions">
               <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}</button>
-              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Prefiro agendar demonstração</button>
+              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Agendar demonstração</button>
             </div>
             {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
           </form>
@@ -826,6 +820,15 @@ const FAQ = [
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
 ]
 
+// perguntas agrupadas por tema (as respostas ficam em FAQ acima); as três primeiras abrem sozinhas
+const FAQ_GRUPOS = [
+  { t: 'Produto', qs: ['O Cerne já está disponível?', 'Serve para a minha operação?', 'Funciona no celular?', 'Quais relatórios já vêm prontos?', 'Mostra o custo e a margem de cada lote?'] },
+  { t: 'Fiscal e financeiro', qs: ['O Cerne emite nota fiscal?', 'Meu contador usa o Domínio. Integra?', 'Concilia o extrato do banco?'] },
+  { t: 'Operação da fazenda', qs: ['Controla compras e estoque?', 'Tem integração com balança?', 'Cobre reprodução e sanitário?', 'Dá para rastrear o produto até o comprador?', 'E frota, equipe e ordens de serviço?'] },
+  { t: 'Controle e contratação', qs: ['Tenho mais de uma fazenda ou CNPJ. Funciona?', 'Consigo controlar quem faz o quê?', 'Consigo começar com os dados que já tenho?', 'Como funciona o teste?', 'Quanto custa?'] },
+]
+const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
+
 export function FaqSection() {
   return (
     <section className="sec sec-light faq" id="duvidas" aria-labelledby="duvidas-title">
@@ -835,11 +838,19 @@ export function FaqSection() {
           <h2 id="duvidas-title">O que mais perguntam.</h2>
         </header>
         <div className="faq-list">
-          {FAQ.map((f) => (
-            <details key={f.q} data-reveal>
-              <summary>{f.q}</summary>
-              <p>{f.a} {f.tbd && <Tbd />}</p>
-            </details>
+          {FAQ_GRUPOS.map((g) => (
+            <div className="faq-group" key={g.t}>
+              <h3 className="faq-group-title" data-reveal>{g.t}</h3>
+              {g.qs.map((q) => {
+                const f = FAQ.find((x) => x.q === q)!
+                return (
+                  <details key={f.q} data-reveal open={FAQ_ABERTAS.has(f.q) || undefined}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a} {f.tbd && <Tbd />}</p>
+                  </details>
+                )
+              })}
+            </div>
           ))}
         </div>
       </div>
@@ -857,7 +868,7 @@ export function Footer() {
           <p>uma solução GB Agritech</p>
         </div>
         <nav aria-label="Rodapé">
-          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#duvidas">Dúvidas</a>
+          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
