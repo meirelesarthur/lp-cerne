@@ -470,12 +470,7 @@ export function SystemSection() {
         </div>
         <div className="diferenciais">
           <h3 className="dif-title" data-reveal>Diferenciais</h3>
-          <Conquistas items={DIFERENCIAIS} />
-        </div>
-        <div className="diferenciais seguranca">
-          <h3 className="dif-title" data-reveal>Controle e segurança</h3>
-          <p className="sec-lead" data-reveal>Desenvolvido pela GB Agritech para operações com várias fazendas, equipes e aprovações.</p>
-          <Conquistas items={CONFIANCA} />
+          <Conquistas items={[...DIFERENCIAIS, ...CONFIANCA]} />
         </div>
       </div>
     </section>
