@@ -127,7 +127,8 @@ export function FazendaCerne() {
         {art && !still && <WallTicker feed={feed} />}
       </div>
       </div>
-      <p className="fz-hint" aria-live="polite">{(still && readout) || (mobile ? 'Arraste para os lados e toque num setor' : 'Clique num setor para ver o que o Cerne faz ali')}</p>
+      {/* sem a pill de instrução; só com movimento reduzido (sem letreiro) a última operação continua como aviso */}
+      {still && readout && <p className="fz-hint" aria-live="polite">{readout}</p>}
 
       {zone && (
         <aside className="fz-card" aria-live="polite" role="region" aria-label={ZONES[zone].title}>
