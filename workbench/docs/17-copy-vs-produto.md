@@ -15,7 +15,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 | Afirmação na LP | Onde | Situação no frontend | Ação |
 |---|---|---|---|
 | "Trato diário e leitura de cocho" no Cerne Web | bento 01 (Trato e cocho), maquete Confinamento, `GroundSection` card 2 | **Não existe no web.** Foi removido de propósito por decisão de produto (`RecentActivities/recent-activity-type.ts`) | Atribuir só ao app Operação (em teste), se for o caso. No web, trocar por "Mapa de confinamento, dietas, batidas e fases de alimentação" |
-| Bento 06: "Custos do confinamento", "Desempenho de lotes" | `Sections.tsx` bento | Estão no menu, mas sem página dedicada (placeholder) | Trocar por dashboards reais: Pecuária de Corte, Programa ABC, Financeiro, Suprimentos, Pluviômetro |
+| Bento 06: "Custos do confinamento", "Desempenho de lotes" | `Sections.tsx` bento | Estão no menu, mas sem página dedicada (placeholder) | Trocar por dashboards reais: Pecuária de Corte, Financeiro, Suprimentos, Pluviômetro |
 | Trailer cap. 04 "Custos do confinamento" | `Sections.tsx` Trailer | Mesmo caso | Usar "Custo de produção COE × COT" (Visão geral) ou "Custeio por lote" (relatório) |
 | "O ERP completo" | Edições | Ok em amplitude, mas genérico | Trocar por prova numérica (ver §3) |
 | Nota interna "Depoimentos… só entram com material real…" aparece publicada | Confiança | Vazamento de nota interna | Remover |
@@ -43,7 +43,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 4. **Pecuária de ciclo completo:**
    - reprodução com IATF, FIV e monta natural, estação de monta, receptoras e registro genealógico;
    - GMD e @/mês;
-   - **Programa ABC Corte** (@ PV/ha, UA/ha);
+   - ~~Programa ABC Corte~~ (fora da v1: funcionalidade imatura, não citar na LP);
    - relatórios SISBOV.
 5. **Suprimentos com governança:**
    - solicitação → cotação → autorização → compra → recebimento;
@@ -92,7 +92,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 
 **04 Trailer**
 - Capítulo 04 → **"Custo de produção: COE × COT e margem operacional da safra."**
-- Avaliar trocar o capítulo 05 por **"Programa ABC Corte: @/ha e lotação"**, que diferencia.
+- ~~Capítulo 05 com o Programa ABC Corte~~: descartado, o ABC Corte não sai na v1.
 
 **05 Bento: "Seis frentes" → "Oito frentes. Um só cadastro."**
 - Adicionar **Fiscal** (NF-e · CT-e · MDF-e · LCDPR · Domínio).
@@ -111,7 +111,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 1. Rastreio público do produto.
 2. Balança → NF-e.
 3. Cotação pelo fornecedor via WhatsApp.
-4. Programa ABC Corte.
+4. Custo e margem por lote (COE, COT e margem operacional por lote e talhão). Substitui o Programa ABC Corte, que não sai na v1.
 
 **Edições**
 - Cerne Web: "O ERP completo…" → **"Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app."**
@@ -134,7 +134,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 ## 4. Decisões para validar com produto/comercial antes de editar
 1. O trato diário e a leitura de cocho existem no **app Operação**? Se não, sai de toda a LP.
 2. O que é "lançamento" se o Web já está disponível (CTA "acesso antecipado" vs "agendar demonstração")?
-3. Os números 115 relatórios, 11 painéis e 3 idiomas podem ser publicados? Confirmar os itens com placeholder.
+3. Os números 115 relatórios, 11 painéis e 3 idiomas podem ser publicados? Confirmar os itens com placeholder. Atenção: o painel do Programa ABC Corte entrava na conta dos 11; sem ele na v1, o número pode ser 10.
 4. A emissão fiscal está em produção para clientes (certificado A1, SEFAZ)?
 5. O rastreio público e a balança estão liberados comercialmente?
 
