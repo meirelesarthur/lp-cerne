@@ -5,6 +5,10 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
+import {
+  ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
+  SecurityLockIcon, Tick02Icon, WeightScale01Icon,
+} from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
 const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
@@ -325,7 +329,7 @@ export function TrailerSection() {
               <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
             </video>
             <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
-            <button type="button" className="video-toggle" onClick={toggle}>{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
+            <button type="button" className="video-toggle" onClick={toggle}><Icon icon={paused ? PlayIcon : PauseIcon} size={16} strokeWidth={2} />{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
           </figure>
           <ol className="chapters">
             <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
@@ -358,16 +362,16 @@ const MODULOS: Modulo[] = [
   { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
 ]
 
-// ícones das conquistas (traço 24px, herdam a cor do medalhão)
+// ícones das conquistas (Hugeicons, herdam a cor do medalhão)
 const ICONES = {
-  rastreio: <><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" /><path d="m9.5 10.5 1.8 1.8 3.2-3.3" /></>,
-  balanca: <><path d="M3 17V8h10v9" /><path d="M13 11h4l3 3v3h-7" /><circle cx="7" cy="18" r="1.6" /><circle cx="16.5" cy="18" r="1.6" /><path d="M6 11.5h4" /></>,
-  link: <><path d="M5 18.5V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H9.5L5 18.5Z" /><path d="M9 9.5h6M9 12h3.5" /></>,
-  custo: <><path d="M4 20h16" /><path d="M7 16v-3M12 16V9M17 16V6" /><path d="m14.5 6 2.5-2.5L19.5 6" /></>,
-  fazendas: <><path d="M3 20h18" /><path d="M5 20v-8l4-3 4 3v8" /><path d="M13 20v-6l3.5-2.5L20 14v6" /><path d="M8 20v-3h2v3" /></>,
-  permissao: <><path d="M12 3 5 6v5c0 4.4 3 8.2 7 10 4-1.8 7-5.6 7-10V6l-7-3Z" /><circle cx="12" cy="11" r="2" /><path d="M12 13v3" /></>,
-  historico: <><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v3.5h3.5" /><path d="M12 8v4l2.5 2" /></>,
-  contador: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /><path d="M9 14h6M12 11v6" /></>,
+  rastreio: QrCodeIcon,
+  balanca: WeightScale01Icon,
+  link: Chat01Icon,
+  custo: Chart01Icon,
+  fazendas: Building02Icon,
+  permissao: SecurityLockIcon,
+  historico: HistoryIcon,
+  contador: Calculator01Icon,
 }
 type Conquista = { t: string; d: string; i: keyof typeof ICONES }
 
@@ -400,7 +404,7 @@ function Conquistas({ items, className }: { items: Conquista[]; className?: stri
         <li key={d.t} className="conq" style={{ '--n': n } as React.CSSProperties}>
           <span className="medal" aria-hidden="true">
             <svg className="medal-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" pathLength="1" /></svg>
-            <svg className="medal-icon" viewBox="0 0 24 24">{ICONES[d.i]}</svg>
+            <Icon icon={ICONES[d.i]} size={26} className="medal-icon" />
             <i className="medal-check" />
           </span>
           <strong>{d.t}</strong>
@@ -855,7 +859,7 @@ const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
 // zebra: módulos alternam o tom do fundo (as funcionalidades abertas herdam o do módulo)
 const ZEBRA = new Map(COMPARATIVO.flatMap((g) => g.mods).map((x, i) => [x.m, i % 2]))
 const CelPlano = ({ c }: { c: PlCel }) =>
-  c === 'i' ? <span className="pl-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg><span className="sr-only">Incluído</span></span>
+  c === 'i' ? <span className="pl-yes"><Icon icon={Tick02Icon} size={14} strokeWidth={2.6} /><span className="sr-only">Incluído</span></span>
   : c === 'o' ? <span className="pl-opt">Opcional</span>
   : c === 'n' ? <span className="pl-no" aria-label="Não incluso">—</span>
   : <span className="pl-txt">{c}</span>
@@ -909,7 +913,7 @@ export function PlansSection() {
                     <tr key={mod.m} className={`pl-mod z${ZEBRA.get(mod.m)}${open ? ' is-open' : ''}`}>
                       <th className="pl-fix" scope="row">
                         <button type="button" aria-expanded={open} onClick={() => alterna(mod.m)}>
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>{mod.m}
+                          <Icon icon={ArrowRight01Icon} size={16} strokeWidth={2.2} />{mod.m}
                         </button>
                       </th>
                       {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
@@ -958,7 +962,7 @@ export function FaqSection() {
                 const f = FAQ.find((x) => x.q === q)!
                 return (
                   <details key={f.q} data-reveal open={FAQ_ABERTAS.has(f.q) || undefined}>
-                    <summary>{f.q}</summary>
+                    <summary>{f.q}<Icon icon={PlusIcon} size={22} className="faq-plus" /></summary>
                     <p>{f.a} {f.tbd && <Tbd />}</p>
                   </details>
                 )

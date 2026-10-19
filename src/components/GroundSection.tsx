@@ -1,4 +1,6 @@
+import type { IconSvgElement } from '@hugeicons/react'
 import type { HeroGeometry } from './Hero'
+import { Analytics01Icon, BarnsIcon, Building02Icon, Icon, Invoice01Icon, SmartPhone01Icon, TractorIcon, WarehouseIcon } from '../lib/icons'
 
 /**
  * 02 · Escopo. Fundo: o resto da fazenda, continuando pixel a pixel o último quadro do Hero (mesma escala e
@@ -6,15 +8,15 @@ import type { HeroGeometry } from './Hero'
  * foto até o fundo claro, que rola junto com ela.
  */
 const FRENTES = [
-  { t: 'Rebanho e confinamento', d: 'Do nascimento à venda: reprodução (IATF e FIV), pesagens, sanitário e mapa de confinamento.' },
-  { t: 'Lavoura', d: 'Safra, talhões no mapa, apontamentos, romaneio e balança rodoviária integrada.' },
-  { t: 'Suprimentos e estoque', d: 'Da solicitação ao recebimento, com aprovação, SLA de compras e fábrica de ração.' },
-  { t: 'Financeiro e fiscal', d: 'Custo, DRE e conciliação bancária, com NF-e, CT-e, MDF-e e LCDPR emitidos no sistema.' },
+  { i: BarnsIcon, t: 'Rebanho e confinamento', d: 'Do nascimento à venda: reprodução (IATF e FIV), pesagens, sanitário e mapa de confinamento.' },
+  { i: TractorIcon, t: 'Lavoura', d: 'Safra, talhões no mapa, apontamentos, romaneio e balança rodoviária integrada.' },
+  { i: WarehouseIcon, t: 'Suprimentos e estoque', d: 'Da solicitação ao recebimento, com aprovação, SLA de compras e fábrica de ração.' },
+  { i: Invoice01Icon, t: 'Financeiro e fiscal', d: 'Custo, DRE e conciliação bancária, com NF-e, CT-e, MDF-e e LCDPR emitidos no sistema.' },
 ]
-const FATOS: { t: string; d: string; tbd?: boolean }[] = [
-  { t: 'Multifazenda e multiempresa', d: 'Várias propriedades e CNPJs na mesma visão, com dados e permissões separados por fazenda.' },
-  { t: '115 relatórios e 10 painéis', d: 'Em PDF e Excel, prontos para o gestor, o banco e o contador.' },
-  { t: 'Acesse de onde estiver', d: 'No navegador hoje, instalável como app. Os apps de campo estão em teste.' },
+const FATOS: { i: IconSvgElement; t: string; d: string; tbd?: boolean }[] = [
+  { i: Building02Icon, t: 'Multifazenda e multiempresa', d: 'Várias propriedades e CNPJs na mesma visão, com dados e permissões separados por fazenda.' },
+  { i: Analytics01Icon, t: '115 relatórios e 10 painéis', d: 'Em PDF e Excel, prontos para o gestor, o banco e o contador.' },
+  { i: SmartPhone01Icon, t: 'Acesse de onde estiver', d: 'No navegador hoje, instalável como app. Os apps de campo estão em teste.' },
 ]
 
 export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
@@ -47,6 +49,7 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
         <ul className="frentes">
           {FRENTES.map((f) => (
             <li key={f.t} className="glass-card" data-reveal>
+              <span className="gc-ico"><Icon icon={f.i} size={26} /></span>
               <h3>{f.t}</h3>
               <p>{f.d}</p>
             </li>
@@ -56,8 +59,11 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
         <ul className="fatos">
           {FATOS.map((f) => (
             <li key={f.t} data-reveal>
-              <h3>{f.t} {f.tbd && <span className="tbd">a validar</span>}</h3>
-              <p>{f.d}</p>
+              <span className="gc-ico gc-ico-sm"><Icon icon={f.i} size={22} /></span>
+              <div>
+                <h3>{f.t} {f.tbd && <span className="tbd">a validar</span>}</h3>
+                <p>{f.d}</p>
+              </div>
             </li>
           ))}
         </ul>
