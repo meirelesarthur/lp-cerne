@@ -197,7 +197,7 @@ export function ProblemSection() {
             <header className="product-head">
               <span className="eyebrow">A virada</span>
               <h2>O Cerne junta tudo em um lugar.</h2>
-              <p className="sec-lead">Um sistema no navegador hoje, com os apps de escritório e de campo a caminho.</p>
+              <p className="sec-lead">Cada nota, pesagem e compra entra uma vez e já aparece no custo, no estoque e no DRE. No navegador hoje, com os apps de escritório e de campo a caminho.</p>
             </header>
             <figure className="product-fig">
               <span className="product-pulse" aria-hidden="true" />
@@ -252,8 +252,8 @@ const CAPITULOS = [
   { t: 0, n: 'Visão geral', d: 'Indicadores da fazenda num painel só.' },
   { t: 3.6, n: 'Pecuária de corte', d: 'Rebanho, composição e manejos do período.' },
   { t: 6.4, n: 'Lotação de currais', d: 'Quem está onde e o que precisa de atenção.' },
-  { t: 9.2, n: 'Custos do confinamento', d: 'Quanto custa cada fase, sem esperar o fechamento.' },
-  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas e orçamento do período.' },
+  { t: 9.2, n: 'Custos do confinamento', d: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.' },
+  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas, atrasados e orçado × realizado.' },
 ]
 
 const DESKTOP_PIN = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
@@ -346,14 +346,64 @@ export function TrailerSection() {
 
 /* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
 // grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
-const MODULOS = [
-  { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', feats: ['Mapa de currais', 'Dieta e batelada', 'Trato e cocho', 'Manejo e reprodução'], img: 'lotacao-currais' },
-  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões, planejamento de safra, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Pesagem rodoviária'], img: 'talhoes' },
-  { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', feats: ['Cotações', 'Recebimentos', 'Fábrica de ração'], img: 'suprimentos' },
-  { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', feats: ['Livro caixa', 'Depreciações', 'Ativos'], img: 'financeiros' },
-  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
-  { k: 'f', n: '06', tag: 'Gestão', t: 'Dashboards e relatórios', d: 'Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Lotação de currais', 'Desempenho de lotes', 'Pluviometria'], img: 'custos-confinamento' },
+type Modulo = { k: string; n: string; tag: string; t: string; d: string; feats?: string[]; img?: string; chips?: string[]; note?: string }
+const MODULOS: Modulo[] = [
+  { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Do nascimento à venda: reprodução, pesagens, sanitário, nutrição e o mapa de confinamento com currais, dietas e batidas.', feats: ['Mapa de confinamento', 'Reprodução: IATF, FIV e monta', 'Pesagem e GMD', 'Relatórios SISBOV'], img: 'lotacao-currais' },
+  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões no mapa, planejamento de safra, apontamentos, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Balança rodoviária'], img: 'talhoes' },
+  { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Solicitação, cotação, aprovação, compra e recebimento, com SLA e fábrica de ração.', feats: ['Cotação via link', 'Aprovação de compras', 'Fábrica de ração'], img: 'suprimentos' },
+  { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Contas a pagar e receber, conciliação OFX, DRE e depreciação.', feats: ['Conciliação bancária', 'DRE', 'Orçado × realizado'], img: 'financeiros' },
+  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
+  { k: 'g', n: '06', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
+  { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
+  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 11 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Programa ABC Corte', 'Pluviometria'], img: 'custos-confinamento' },
 ]
+
+// ícones das conquistas (traço 24px, herdam a cor do medalhão)
+const ICONES = {
+  rastreio: <><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" /><path d="m9.5 10.5 1.8 1.8 3.2-3.3" /></>,
+  balanca: <><path d="M3 17V8h10v9" /><path d="M13 11h4l3 3v3h-7" /><circle cx="7" cy="18" r="1.6" /><circle cx="16.5" cy="18" r="1.6" /><path d="M6 11.5h4" /></>,
+  link: <><path d="M5 18.5V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H9.5L5 18.5Z" /><path d="M9 9.5h6M9 12h3.5" /></>,
+  abc: <><path d="M4 20h16" /><path d="M7 16v-3M12 16V9M17 16V6" /><path d="m14.5 6 2.5-2.5L19.5 6" /></>,
+}
+
+const DIFERENCIAIS: { t: string; d: string; i: keyof typeof ICONES }[] = [
+  { t: 'Rastreio aberto ao comprador', d: 'Uma página pública mostra a origem do produto, a fazenda e o produtor.', i: 'rastreio' },
+  { t: 'Da balança à nota', d: 'O peso do caminhão entra direto no sistema e vira romaneio e NF-e.', i: 'balanca' },
+  { t: 'Cotação respondida por link', d: 'O fornecedor recebe pelo WhatsApp e preenche o preço sem precisar de login.', i: 'link' },
+  { t: 'Programa ABC Corte', d: 'Arroba por hectare, lotação e ganho de peso num painel próprio.', i: 'abc' },
+]
+
+/** Cada diferencial é "conquistado" ao entrar na tela: o anel do medalhão se desenha, o selo aparece e um brilho passa pelo card. */
+function Diferenciais() {
+  const ref = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    const items = Array.from(ref.current?.children ?? [])
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return
+        e.target.classList.add('is-earned')
+        io.unobserve(e.target)
+      })
+    }, { rootMargin: '0px 0px -12% 0px' })
+    items.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+  return (
+    <ul ref={ref}>
+      {DIFERENCIAIS.map((d, n) => (
+        <li key={d.t} className="conq" style={{ '--n': n } as React.CSSProperties}>
+          <span className="medal" aria-hidden="true">
+            <svg className="medal-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" pathLength="1" /></svg>
+            <svg className="medal-icon" viewBox="0 0 24 24">{ICONES[d.i]}</svg>
+            <i className="medal-check" />
+          </span>
+          <strong>{d.t}</strong>
+          <span className="conq-d">{d.d}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 export function SystemSection() {
   const root = useRef<HTMLElement>(null)
@@ -387,8 +437,8 @@ export function SystemSection() {
       <div className="wrap">
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Os módulos</span>
-          <h2 id="modulos-title">Seis frentes. Um só cadastro.</h2>
-          <p className="sec-lead">Os módulos que já estão no menu do Cerne Web.</p>
+          <h2 id="modulos-title">Oito frentes. Um só cadastro.</h2>
+          <p className="sec-lead">Os módulos que já estão no menu do Cerne Web, da porteira ao contador.</p>
         </header>
         <div className="bento">
           {MODULOS.map((m) => (
@@ -404,15 +454,19 @@ export function SystemSection() {
               ) : (
                 <div className="base">
                   <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
-                  <p className="base-note"><i aria-hidden="true" />Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.</p>
+                  {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
                 </div>
               )}
             </article>
           ))}
         </div>
         <div className="spine" data-reveal aria-hidden="true">
-          <span>Um só cadastro</span>
+          <span>Um só sistema</span>
           <ol>{MODULOS.map((m) => <li key={m.k}><i />{m.t}</li>)}</ol>
+        </div>
+        <div className="diferenciais">
+          <h3 className="eyebrow" data-reveal>O que pouca gente tem</h3>
+          <Diferenciais />
         </div>
       </div>
     </section>
@@ -434,7 +488,7 @@ export function EditionsSection() {
           <article className="edition web" data-reveal>
             <span className="badge on">Disponível · navegador</span>
             <h3>Cerne Web</h3>
-            <p>O ERP completo: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p>
+            <p>Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.</p>
             {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" loading="lazy" />}
             <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
           </article>
@@ -603,7 +657,7 @@ export function TwinSection() {
             <div><dt>Aproveitamento</dt><dd>86%</dd></div>
           </dl>
           <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <a className="btn btn-light" href="#contato" data-interest="todos">Quero conhecer o GB Twin</a>
+          <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
         </div>
       </div>
     </section>
@@ -611,14 +665,22 @@ export function TwinSection() {
 }
 
 /* ───────────────────────── 08 · Confiança ───────────────────────── */
+const CONFIANCA = [
+  { t: 'Multifazenda e multiempresa', d: 'Cada fazenda com seus dados, todas na mesma visão.' },
+  { t: 'Permissões por ação', d: 'Perfis de acesso e autorizadores para cada compra.' },
+  { t: 'Histórico de alterações', d: 'Logs do sistema e atividades recentes por fazenda.' },
+  { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.' },
+]
 export function TrustSection() {
   return (
     <section className="sec sec-light trust" aria-labelledby="confianca-title">
       <div className="wrap trust-inner" data-reveal>
-        <span className="eyebrow">Quem constrói</span>
-        <h2 id="confianca-title">Feito por quem conhece o campo.</h2>
-        <p className="sec-lead">Desenvolvido pela GB Agritech. <Tbd>redação e prova a validar</Tbd></p>
-        <p className="fineprint">Depoimentos, parcerias e selos só entram com material real validado para o Cerne.</p>
+        <span className="eyebrow">Controle e segurança</span>
+        <h2 id="confianca-title">Quem faz o quê, em cada fazenda.</h2>
+        <p className="sec-lead">Desenvolvido pela GB Agritech para operações com várias fazendas, equipes e aprovações.</p>
+        <ul className="trust-list">
+          {CONFIANCA.map((c) => <li key={c.t}><strong>{c.t}</strong><span>{c.d}</span></li>)}
+        </ul>
       </div>
     </section>
   )
@@ -738,9 +800,13 @@ export function ContactSection() {
 /* ───────────────────────── 10 · Dúvidas ───────────────────────── */
 const FAQ = [
   { q: 'O Cerne já está disponível?', a: 'O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste.', tbd: true },
+  { q: 'O Cerne emite nota fiscal?', a: 'Sim. NF-e, CT-e e MDF-e, com consulta e manifestação de DF-e e o LCDPR (Livro Caixa Digital do Produtor Rural).' },
+  { q: 'Meu contador usa o Domínio. Integra?', a: 'Sim. O Cerne exporta movimento bancário, folha, contas a pagar e receber e NFS-e para o Domínio.' },
+  { q: 'Tenho mais de uma fazenda ou CNPJ. Funciona?', a: 'Sim. O Cerne é multifazenda e multiempresa: dados separados por fazenda, com visão consolidada e transferências entre elas.' },
+  { q: 'Funciona no celular?', a: 'O Cerne Web roda no navegador e pode ser instalado como app. Os apps de campo e de gestão estão em teste.' },
   { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
-  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte, confinamento e agricultura.', tbd: true },
+  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte (cria, recria e engorda), confinamento e agricultura, inclusive com o Programa ABC Corte.' },
 ]
 
 export function FaqSection() {
