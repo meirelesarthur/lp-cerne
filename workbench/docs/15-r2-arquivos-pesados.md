@@ -8,3 +8,5 @@
 - **Reenviar:** `cd public && bash ../workbench/tools/r2-upload.sh` (precisa de `npx wrangler login`). Sempre que regerar frames, reenviar.
 - **Verificação:** build de produção servido localmente: 170 requisições (desktop) e 164 (celular) ao R2, nenhuma falha, nenhuma local, sem erro de CORS.
 - **Atenção:** a URL `r2.dev` é de desenvolvimento (limite de taxa, sem cache da Cloudflare). Para produção, ligar um domínio próprio ao bucket (a conta ainda não tem domínio) e trocar `VITE_ASSET_BASE`.
+- **Plano novo = pasta nova (2026-10-19):** como os objetos vão com `immutable` (1 ano), sobrescrever a mesma chave deixa quem já visitou vendo os quadros antigos. O Perfis v3 foi para `frames/perfis-v3/` (código em `Sections.tsx`, saída em `build_perfis_v3.py`); a pasta antiga `frames/perfis/` fica no bucket sem uso. Envio só da pasta nova: o mesmo comando do `r2-upload.sh` com `find frames/perfis-v3 -type f`.
+- **Testar arquivos locais em dev:** o Vite dá prioridade ao `.env.development` sobre o `.env.local`, então o arquivo certo é `.env.development.local` com `VITE_ASSET_BASE=` (vazio).
