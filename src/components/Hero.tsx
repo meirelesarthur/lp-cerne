@@ -14,9 +14,8 @@ const MOBILE_MQ = '(max-width: 820px) and (orientation: portrait)'
 
 /** Fases do scroll (fração do pin). */
 const P = {
-  seqEnd: 0.55, // fim da sequência de quadros (tablet gigante já no lugar)
-  zoomEnd: 0.64, // zoom centralizado no tablet
-  appEnd: 0.86, // a aplicação rola dentro do tablet
+  seqEnd: 0.66, // fim da sequência de quadros (tablet gigante já no lugar)
+  zoomEnd: 0.8, // enquadramento final (título à esquerda, form à direita) e vídeo do sistema em loop
 } as const
 
 const FALLBACK: Manifest = { count: 120, width: 1280, height: 720 }
@@ -133,7 +132,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=420%', pin: pin.current, scrub: 0.5, anticipatePin: 1, refreshPriority: 10,
+          trigger: root.current, start: 'top top', end: '+=320%', pin: pin.current, scrub: 0.5, anticipatePin: 1, refreshPriority: 10,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             // header: compõe com a cena durante toda a animação; vidro só ao sair do Hero.
@@ -143,31 +142,29 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             html.toggleAttribute('data-scene-dark', self.progress < 0.035)
             const v = video.current
             if (!v) return
-            if (self.progress >= P.appEnd) { if (v.paused) void v.play().catch(() => {}) } else if (!v.paused) v.pause()
+            if (self.progress >= P.seqEnd + 0.06) { if (v.paused) void v.play().catch(() => {}) } else if (!v.paused) v.pause()
           },
         },
       })
       tl.to(state, { frame: m.count - 1, duration: P.seqEnd, onUpdate: () => scrub.current?.setFrame(state.frame) }, 0)
         .to('.hero-hint', { opacity: 0, duration: 0.04 }, 0)
         .to('.hero-intro', { autoAlpha: 0, y: -28, ease: 'power2.in', duration: 0.06 }, 0)
-        .to('.hero-progress i', { scaleX: 1, duration: P.appEnd }, 0)
-        .to('.hero-progress', { autoAlpha: 0, duration: 0.03 }, P.appEnd)
+        .to('.hero-progress i', { scaleX: 1, duration: P.zoomEnd }, 0)
+        .to('.hero-progress', { autoAlpha: 0, duration: 0.03 }, P.zoomEnd)
       if (m.final && geo) {
-        const { zoom, zoomApp } = geo
-        // o still em alta assume no último quadro e faz o zoom centralizado no tablet
+        const { zoom } = geo
+        // o still em alta assume no último quadro e já faz o zoom direto para o enquadramento final (sem rolar a aplicação
+        // dentro do tablet); o vídeo do sistema entra em loop atrás do título e do form
         tl.fromTo('.final-layer', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.012 }, P.seqEnd - 0.012)
-          .fromTo('.frame-box', { x: 0, y: 0, scale: 1 }, { x: zoomApp.tx, y: zoomApp.ty, scale: zoomApp.s, duration: P.zoomEnd - P.seqEnd, ease: 'power2.inOut' }, P.seqEnd)
+          .fromTo('.frame-box', { x: 0, y: 0, scale: 1 }, { x: zoom.tx, y: zoom.ty, scale: zoom.s, duration: P.zoomEnd - P.seqEnd, ease: 'power2.inOut' }, P.seqEnd)
           .to('.tablet-screen', { autoAlpha: 1, duration: 0.03 }, P.seqEnd)
-          // a aplicação rola dentro do tablet
-          .fromTo('.tablet-app', { yPercent: 0 }, { yPercent: () => -100 * appScrollFraction(), duration: P.appEnd - P.zoomEnd - 0.02, ease: 'power1.inOut' }, P.zoomEnd + 0.01)
-          // vídeo do sistema em loop + título e form
-          // recua para o enquadramento final (fazenda no rodapé) e o vídeo do sistema entra em loop
-          .to('.frame-box', { x: zoom.tx, y: zoom.ty, scale: zoom.s, duration: 0.08, ease: 'power2.inOut' }, P.appEnd)
-          .to('.tablet-video', { autoAlpha: 1, duration: 0.04 }, P.appEnd)
-          .to('.hero-shade', { opacity: 1, duration: 0.08 }, P.appEnd)
+          .to('.tablet-video', { autoAlpha: 1, duration: 0.05 }, P.seqEnd + 0.06)
+          .to('.hero-shade', { opacity: 1, duration: 0.08 }, P.zoomEnd - 0.06)
           // autoAlpha: fora da fase o bloco fica com visibility:hidden (não recebe foco nem é lido)
-          .fromTo('.hero-copy', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.02)
-          .fromTo('.hero-form-wrap', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.05)
+          .fromTo('.hero-copy', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.zoomEnd - 0.04)
+          .fromTo('.hero-form-wrap', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.zoomEnd - 0.01)
+          // segura o enquadramento final no resto do scroll
+          .set({}, {}, 1)
       }
       heroTrigger = tl.scrollTrigger ?? null
     }, root)
@@ -177,16 +174,6 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
     return () => { heroTrigger = null; ctx.revert(); stopScroll() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStatic, m, geo?.vw, geo?.vh, stageReady])
-
-  /** Quanto da imagem alta da aplicação precisa subir para chegar ao fim dela. */
-  function appScrollFraction() {
-    const img = appImg.current
-    if (!img || !img.naturalHeight || !m?.final || !geo) return 0.6
-    const t = m.final.tablet
-    const sw = t.w * geo.box.width, sh = t.h * geo.box.height
-    const ih = sw * (img.naturalHeight / img.naturalWidth)
-    return Math.max(0, 1 - sh / ih)
-  }
 
   const t = m?.final?.tablet
   const staticZoom = isStatic && geo ? `translate(${geo.zoom.tx}px, ${geo.zoom.ty}px) scale(${geo.zoom.s})` : undefined
