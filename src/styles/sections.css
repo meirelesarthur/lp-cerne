@@ -358,7 +358,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .farm::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
   linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, 0) 16%, rgba(245, 248, 244, 0) 80%, var(--canvas) 100%),
   var(--farm-bg, none) center / cover no-repeat; }
-.farm .fz-figure { margin: 0; padding-top: 120px; display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
+.farm .fz-figure { margin: 0; padding-top: clamp(340px, 40vh, 400px); display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
 .farm .farm-head { position: absolute; left: 0; right: 0; top: clamp(88px, 12vh, 130px); z-index: 4; pointer-events: none; transition: opacity .35s; }
 .farm .farm-head .sec-head { margin: 0; max-width: 460px; pointer-events: auto; }
 .farm .farm-head h2 { font-size: clamp(28px, 3vw, 44px); }

@@ -113,9 +113,9 @@
   font-size: 1.05cqw; line-height: 1; color: #e2f0e8; white-space: nowrap;
 }
 /* esquerda: do canto do estoque (x 15) à quina da sede (x 445), descendo 2:1 */
-.fz-tk-l { left: calc(15 / 760 * 100%); width: calc(430 / 760 * 100%); top: calc(181 / 430 * 100%); transform: skewY(26.565deg); border-radius: .35cqw 0 0 .35cqw; }
+.fz-tk-l { left: calc(15 / 760 * 100%); width: calc(430 / 760 * 100%); top: calc(181 / 430 * 100%); transform: skewY(26.565deg); border-radius: .85cqw; }
 /* direita: da quina da sede (x 445, mesma altura em que a esquerda termina) à ponta do confinamento (x 745), subindo 2:1 */
-.fz-tk-r { left: calc(445 / 760 * 100%); width: calc(300 / 760 * 100%); top: calc(396 / 430 * 100%); transform: skewY(-26.565deg); border-radius: 0 .35cqw .35cqw 0; }
+.fz-tk-r { left: calc(445 / 760 * 100%); width: calc(300 / 760 * 100%); top: calc(396 / 430 * 100%); transform: skewY(-26.565deg); border-radius: .85cqw; }
 .fz-tk-live {
   position: absolute; left: 0; top: 0; bottom: 0; z-index: 2; display: flex; align-items: center; gap: .5cqw; padding: 0 .9cqw 0 .8cqw;
   background: linear-gradient(90deg, #0b2418 80%, rgba(11, 36, 24, 0)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .82cqw; color: #6ee7b7;
@@ -123,8 +123,9 @@
 .fz-tk-live::before { content: ''; width: .55cqw; height: .55cqw; border-radius: 50%; background: #34d399; box-shadow: 0 0 .6cqw #34d399; animation: fz-live 1.4s ease-in-out infinite; }
 @keyframes fz-live { 50% { opacity: .25; } }
 .fz-tk-track { position: absolute; inset: 0; }
-.fz-tk-l .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 12%); mask-image: linear-gradient(90deg, transparent 4%, #000 12%); }
-.fz-tk-r .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 99%); mask-image: linear-gradient(90deg, #000 85%, transparent 99%); }
+/* na quina da sede o texto some em 3cqw numa parede e reaparece na outra (cruzamento igual dos dois lados): a fita faz a curva em vez de levar um corte reto */
+.fz-tk-l .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 12%, #000 calc(100% - 3cqw), transparent); mask-image: linear-gradient(90deg, transparent 4%, #000 12%, #000 calc(100% - 3cqw), transparent); }
+.fz-tk-r .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent, #000 3cqw, #000 85%, transparent 99%); mask-image: linear-gradient(90deg, transparent, #000 3cqw, #000 85%, transparent 99%); }
 .fz-tk-item { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; gap: .45cqw; will-change: transform; }
 .fz-tk-item i { width: .5cqw; height: .5cqw; border-radius: 50%; background: #34d399; box-shadow: 0 0 .5cqw currentColor; color: #34d399; }
 .fz-tk-item[data-tile='lavoura'] i { background: #fbbf24; color: #fbbf24; }
