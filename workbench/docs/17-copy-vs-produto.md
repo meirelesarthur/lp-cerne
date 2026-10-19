@@ -134,7 +134,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 ## 4. Decisões para validar com produto/comercial antes de editar
 1. O trato diário e a leitura de cocho existem no **app Operação**? Se não, sai de toda a LP.
 2. O que é "lançamento" se o Web já está disponível (CTA "acesso antecipado" vs "agendar demonstração")?
-3. Os números 115 relatórios, 11 painéis e 3 idiomas podem ser publicados? Confirmar os itens com placeholder. Atenção: o painel do Programa ABC Corte entrava na conta dos 11; sem ele na v1, o número pode ser 10.
+3. Os números 115 relatórios, 10 painéis e 3 idiomas podem ser publicados? Confirmar os itens com placeholder. (Eram 11 painéis; caiu para 10 porque o painel do Programa ABC Corte não sai na v1.)
 4. A emissão fiscal está em produção para clientes (certificado A1, SEFAZ)?
 5. O rastreio público e a balança estão liberados comercialmente?
 

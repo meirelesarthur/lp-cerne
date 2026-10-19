@@ -221,7 +221,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
           <div className="hero-copy">
             <h1>Do campo ao financeiro, <em>num só sistema.</em></h1>
             <p className="lead">Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda no mesmo cadastro, com custo por lote e por talhão.</p>
-            <p className="hero-proof">115 relatórios · 11 painéis · NF-e, MDF-e e LCDPR</p>
+            <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">
             <HeroForm emailId={EMAIL_ID} />

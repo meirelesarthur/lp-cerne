@@ -15,7 +15,7 @@ const FRENTES = [
 ]
 const FATOS: { t: string; d: string; tbd?: boolean }[] = [
   { t: 'Multifazenda e multiempresa', d: 'Várias propriedades e CNPJs na mesma visão, com dados e permissões separados por fazenda.' },
-  { t: '115 relatórios e 11 painéis', d: 'Em PDF e Excel, prontos para o gestor, o banco e o contador.' },
+  { t: '115 relatórios e 10 painéis', d: 'Em PDF e Excel, prontos para o gestor, o banco e o contador.' },
   { t: 'Acesse de onde estiver', d: 'No navegador hoje, instalável como app. Os apps de campo estão em teste.' },
 ]
 

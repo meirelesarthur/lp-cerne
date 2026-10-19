@@ -355,7 +355,7 @@ const MODULOS: Modulo[] = [
   { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
   { k: 'g', n: '06', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
   { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
-  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 11 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
+  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
 ]
 
 // ícones das conquistas (traço 24px, herdam a cor do medalhão)
