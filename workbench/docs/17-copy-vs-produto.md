@@ -158,3 +158,9 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
    - `preview_start` da LP e leitura das seções com `read_page`;
    - screenshots desktop e mobile (390) para checar se os textos maiores quebram layout (bento de 8 cards, linha de prova do Hero);
    - QA com `workbench/tools/page.mjs`.
+
+## FAQ ampliado com front e banco (2026-10-19)
+Cruzamento do frontend (`init_db.zip`: 415 tabelas no schema `gbcerne`, e o front) com o FAQ. Entraram 10 perguntas de decisão de compra: compras e estoque, balança, conciliação OFX, custo e margem por lote, relatórios e painéis, reprodução e sanitário, rastreio público, permissões e logs, frota e equipe, migração de dados. "Serve para a minha operação?", fiscal e multifazenda ganharam detalhes.
+- Só entrou o que tem tela ou importação no front (o banco sozinho não prova funcionalidade entregue).
+- Mantidas as regras de "Não afirmar" do §1 (IA, chat, integração SISBOV, Open Finance, offline, ABC Corte).
+- Sem confirmação comercial ainda: "NF-e a partir da pesagem" e "3 idiomas" dependem do §4 (itens 3 e 5).

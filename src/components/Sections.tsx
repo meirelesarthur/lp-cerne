@@ -364,17 +364,23 @@ const ICONES = {
   balanca: <><path d="M3 17V8h10v9" /><path d="M13 11h4l3 3v3h-7" /><circle cx="7" cy="18" r="1.6" /><circle cx="16.5" cy="18" r="1.6" /><path d="M6 11.5h4" /></>,
   link: <><path d="M5 18.5V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H9.5L5 18.5Z" /><path d="M9 9.5h6M9 12h3.5" /></>,
   custo: <><path d="M4 20h16" /><path d="M7 16v-3M12 16V9M17 16V6" /><path d="m14.5 6 2.5-2.5L19.5 6" /></>,
+  fazendas: <><path d="M3 20h18" /><path d="M5 20v-8l4-3 4 3v8" /><path d="M13 20v-6l3.5-2.5L20 14v6" /><path d="M8 20v-3h2v3" /></>,
+  permissao: <><path d="M12 3 5 6v5c0 4.4 3 8.2 7 10 4-1.8 7-5.6 7-10V6l-7-3Z" /><circle cx="12" cy="11" r="2" /><path d="M12 13v3" /></>,
+  historico: <><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v3.5h3.5" /><path d="M12 8v4l2.5 2" /></>,
+  contador: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /><path d="M9 14h6M12 11v6" /></>,
 }
+type Conquista = { t: string; d: string; i: keyof typeof ICONES }
 
-const DIFERENCIAIS: { t: string; d: string; i: keyof typeof ICONES }[] = [
+const DIFERENCIAIS: Conquista[] = [
   { t: 'Rastreio aberto ao comprador', d: 'Uma página pública mostra a origem do produto, a fazenda e o produtor.', i: 'rastreio' },
   { t: 'Da balança à nota', d: 'O peso do caminhão entra direto no sistema e vira romaneio e NF-e.', i: 'balanca' },
   { t: 'Cotação respondida por link', d: 'O fornecedor recebe pelo WhatsApp e preenche o preço sem precisar de login.', i: 'link' },
   { t: 'Custo e margem por lote', d: 'COE, COT e margem operacional de cada lote e talhão, fechados sem planilha paralela.', i: 'custo' },
 ]
 
-/** Cada diferencial é "conquistado" ao entrar na tela: o anel do medalhão se desenha, o selo aparece e um brilho passa pelo card. */
-function Diferenciais() {
+/** Cada item é "conquistado" ao entrar na tela: o anel do medalhão se desenha, o selo aparece e um brilho passa pelo card.
+ * Usado nos diferenciais (Sistema) e em Controle e segurança. */
+function Conquistas({ items, className }: { items: Conquista[]; className?: string }) {
   const ref = useRef<HTMLUListElement>(null)
   useEffect(() => {
     const items = Array.from(ref.current?.children ?? [])
@@ -389,8 +395,8 @@ function Diferenciais() {
     return () => io.disconnect()
   }, [])
   return (
-    <ul ref={ref}>
-      {DIFERENCIAIS.map((d, n) => (
+    <ul ref={ref} className={className}>
+      {items.map((d, n) => (
         <li key={d.t} className="conq" style={{ '--n': n } as React.CSSProperties}>
           <span className="medal" aria-hidden="true">
             <svg className="medal-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" pathLength="1" /></svg>
@@ -466,7 +472,7 @@ export function SystemSection() {
         </div>
         <div className="diferenciais">
           <h3 className="eyebrow" data-reveal>O que pouca gente tem</h3>
-          <Diferenciais />
+          <Conquistas items={DIFERENCIAIS} />
         </div>
       </div>
     </section>
@@ -520,7 +526,7 @@ const PASSOS = [
   { t: 'Apontamento', d: 'Registrado em etapas.' },
   { t: 'Gestor', d: 'Avalia e vê o resultado.' },
 ]
-/** Onde cada passo acende (fração do scroll): OS já no celular, leitura de cocho, subida até a vista da fazenda, escritório. */
+/** Onde cada passo acende (fração do scroll): OS já no celular, leitura de cocho, subida sobre o corredor, escritório. */
 const PASSO_EM = [0, 0.05, 0.27, 0.74]
 /** O plano termina aqui; o resto do scroll segura o escritório com o cartão do gestor. */
 const PLANO_FIM = 0.9
@@ -529,8 +535,9 @@ const PIN_MQ = '(prefers-reduced-motion: no-preference)'
 type PerfisManifest = { count: number; width: number; height: number }
 
 /**
- * Plano contínuo em tela cheia: leitura de cocho com a OS no celular -> a câmera sobe e mostra a fazenda inteira
- * (confinamento, armazém, silos, caminhão carregando) -> desce e entra no escritório do gestor. Textos em vidro
+ * Plano contínuo em tela cheia: leitura de cocho com a OS no celular -> a câmera sobe acima do corredor de trato
+ * (confinamento, escritório, silos, caminhão carregando) -> voa por ele, entra pela fachada de vidro e chega ao
+ * gestor. Desktop e mobile têm planos próprios (16:9 e 9:16), com o mesmo percurso. Textos em vidro
  * por cima, em três momentos (campo, fazenda, gestor), e os 4 passos da OS acendendo no rodapé.
  */
 export function ProfilesSection() {
@@ -541,12 +548,14 @@ export function ProfilesSection() {
   const [step, setStep] = useState(0)
   const [mobile] = useState(() => window.matchMedia('(max-width: 820px) and (orientation: portrait)').matches)
   const [still] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  // celular: recorte vertical; desktop a partir de 1200 px reais com boa rede: HD 1920 px (a seção ocupa a tela
-  // inteira, então o 1280 px já perde nitidez em ~1400 px); demais: 1280 px. AVIF sempre que houver suporte
-  const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
+  // celular: plano 9:16 próprio; desktop a partir de 1200 px reais com boa rede: HD 1920 px (a seção ocupa a tela
+  // inteira, então o 1280 px já perde nitidez em ~1400 px); a partir de 2200 px reais: 2k (2560 px), para ler o app
+  // e o painel em monitor grande; demais: 1280 px. AVIF sempre que houver suporte
+  const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(2200) ? 'desktop-2k' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
   const [ext] = useState(() => (supportsAvif() ? 'avif' : 'webp') as 'avif' | 'webp')
   const [m, setM] = useState<PerfisManifest | null>(null)
-  const dir = asset(`/frames/perfis/${variant}`)
+  // pasta versionada: o R2 serve os quadros como immutable (1 ano), então um plano novo vai para uma pasta nova
+  const dir = asset(`/frames/perfis-v4/${variant}`)
 
   useEffect(() => {
     if (!near || still) return
@@ -665,11 +674,11 @@ export function TwinSection() {
 }
 
 /* ───────────────────────── 08 · Confiança ───────────────────────── */
-const CONFIANCA = [
-  { t: 'Multifazenda e multiempresa', d: 'Cada fazenda com seus dados, todas na mesma visão.' },
-  { t: 'Permissões por ação', d: 'Perfis de acesso e autorizadores para cada compra.' },
-  { t: 'Histórico de alterações', d: 'Logs do sistema e atividades recentes por fazenda.' },
-  { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.' },
+const CONFIANCA: Conquista[] = [
+  { t: 'Multifazenda e multiempresa', d: 'Cada fazenda com seus dados, todas na mesma visão.', i: 'fazendas' },
+  { t: 'Permissões por ação', d: 'Perfis de acesso e autorizadores para cada compra.', i: 'permissao' },
+  { t: 'Histórico de alterações', d: 'Logs do sistema e atividades recentes por fazenda.', i: 'historico' },
+  { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.', i: 'contador' },
 ]
 export function TrustSection() {
   return (
@@ -678,9 +687,7 @@ export function TrustSection() {
         <span className="eyebrow">Controle e segurança</span>
         <h2 id="confianca-title">Quem faz o quê, em cada fazenda.</h2>
         <p className="sec-lead">Desenvolvido pela GB Agritech para operações com várias fazendas, equipes e aprovações.</p>
-        <ul className="trust-list">
-          {CONFIANCA.map((c) => <li key={c.t}><strong>{c.t}</strong><span>{c.d}</span></li>)}
-        </ul>
+        <Conquistas items={CONFIANCA} className="trust-list" />
       </div>
     </section>
   )
@@ -800,13 +807,23 @@ export function ContactSection() {
 /* ───────────────────────── 10 · Dúvidas ───────────────────────── */
 const FAQ = [
   { q: 'O Cerne já está disponível?', a: 'O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste.', tbd: true },
-  { q: 'O Cerne emite nota fiscal?', a: 'Sim. NF-e, CT-e e MDF-e, com consulta e manifestação de DF-e e o LCDPR (Livro Caixa Digital do Produtor Rural).' },
+  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte (cria, recria e engorda), confinamento e agricultura, com custo e margem por lote e por talhão. Na lavoura há safra, talhões no mapa, planejamento, apontamentos de máquina, colheita, romaneio e rentabilidade por cultura.' },
+  { q: 'O Cerne emite nota fiscal?', a: 'Sim. NF-e, CT-e e MDF-e, com consulta e manifestação de DF-e, NFS-e recebidas e o LCDPR (Livro Caixa Digital do Produtor Rural). Também tem partida dobrada, para o fiscal e o contábil fecharem com o mesmo lançamento.' },
   { q: 'Meu contador usa o Domínio. Integra?', a: 'Sim. O Cerne exporta movimento bancário, folha, contas a pagar e receber e NFS-e para o Domínio.' },
-  { q: 'Tenho mais de uma fazenda ou CNPJ. Funciona?', a: 'Sim. O Cerne é multifazenda e multiempresa: dados separados por fazenda, com visão consolidada e transferências entre elas.' },
+  { q: 'Tenho mais de uma fazenda ou CNPJ. Funciona?', a: 'Sim. O Cerne é multifazenda e multiempresa: dados separados por fazenda, com visão consolidada e transferências de animais, lotes e estoque entre elas.' },
+  { q: 'Controla compras e estoque?', a: 'Sim. A compra segue o caminho solicitação, cotação, autorização, compra e recebimento, com prazo (SLA) e ranking de fornecedores. O fornecedor responde a cotação por um link, inclusive pelo WhatsApp. A nota de entrada alimenta o estoque, com saldo por armazém e transferência entre armazéns e fazendas.' },
+  { q: 'Tem integração com balança?', a: 'Sim. A pesagem rodoviária registra o caminhão no sistema e a NF-e pode ser emitida a partir da pesagem. Há romaneio, contratos de venda e tabelas de desconto e classificação.' },
+  { q: 'Concilia o extrato do banco?', a: 'Sim. O Cerne importa o extrato em OFX, concilia mês a mês e permite congelar os meses já fechados. Junto vêm contas a pagar e a receber, DRE, fluxo de caixa e previsto × realizado.' },
+  { q: 'Mostra o custo e a margem de cada lote?', a: 'Sim. COE × COT e margem operacional, com custeio por lote, animal, área e módulo, DRE e rateio por centro de custo. Cada nota, pesagem e compra entra uma vez e já aparece no custo.' },
+  { q: 'Quais relatórios já vêm prontos?', a: '115 relatórios em PDF e Excel e 10 painéis, entre eles pecuária de corte, financeiro, suprimentos, confinamento, pluviômetro, ativos e depreciação.' },
+  { q: 'Cobre reprodução e sanitário?', a: 'Sim. IATF, FIV e monta natural, estação de monta, diagnóstico de gestação, desmama, vacinas e sanitário por animal ou lote, ficha e histórico de cada animal e relatórios para o SISBOV.' },
+  { q: 'Dá para rastrear o produto até o comprador?', a: 'Sim. Cada produto rastreado ganha uma página pública, aberta por código, e a fazenda pode ter o seu próprio site.' },
+  { q: 'Consigo controlar quem faz o quê?', a: 'Sim. Há perfis e permissões por ação, autorizadores de compra, histórico de cada alteração (logs) e atividades recentes. O sistema tem português, inglês e espanhol.' },
+  { q: 'E frota, equipe e ordens de serviço?', a: 'Estão no mesmo cadastro: manutenção preventiva, abastecimento e transferência de máquinas; faltas, adiantamentos e apuração mensal da equipe; e ordens de serviço com monitoramento e avaliação.' },
+  { q: 'Consigo começar com os dados que já tenho?', a: 'Sim. Dá para lançar saldos iniciais e importar extratos OFX e planilhas, como orçamento e correção de estoque.' },
   { q: 'Funciona no celular?', a: 'O Cerne Web roda no navegador e pode ser instalado como app. Os apps de campo e de gestão estão em teste.' },
   { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
-  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte (cria, recria e engorda), confinamento e agricultura, com custo e margem por lote e por talhão.' },
 ]
 
 export function FaqSection() {
