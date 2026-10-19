@@ -3,6 +3,7 @@ import { onFirstInteraction } from '../lib/defer'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
 import { coverBox, finalZoom, prefersHd, supportsAvif, type Box, type Manifest, type Zoom } from '../lib/stage'
+import { ArrowDown01Icon, Icon } from '../lib/icons'
 import { HeroForm } from './HeroForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
@@ -228,7 +229,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
           </div>
         </div>
 
-        <div className="hero-hint" aria-hidden="true">Role para conhecer</div>
+        <div className="hero-hint" aria-hidden="true">Role para conhecer<Icon icon={ArrowDown01Icon} size={18} strokeWidth={2.2} /></div>
         <div className="hero-progress" aria-hidden="true"><i /></div>
       </div>
     </section>

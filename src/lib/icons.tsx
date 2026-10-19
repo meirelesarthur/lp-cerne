@@ -1,7 +1,7 @@
 import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 
 export {
-  Analytics01Icon, ArrowRight01Icon, BarnsIcon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Invoice01Icon,
+  Analytics01Icon, ArrowDown01Icon, ArrowRight01Icon, BarnsIcon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Invoice01Icon,
   PauseIcon, PlayIcon, PlusIcon, QrCodeIcon, SecurityLockIcon, SmartPhone01Icon, Tick02Icon, TractorIcon, WarehouseIcon, WeightScale01Icon,
 } from '@hugeicons/core-free-icons'
 

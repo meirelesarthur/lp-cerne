@@ -92,9 +92,9 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
 
 .hero-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(23, 40, 30, .12); z-index: 5; }
 .hero-progress i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
-.hero-hint { position: absolute; left: 50%; bottom: 28px; padding: 8px 16px 6px; border-radius: 999px; background: rgba(5, 16, 8, .5); backdrop-filter: blur(6px); transform: translateX(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 14px rgba(0, 0, 0, .55); }
-.hero-hint::after { content: ''; width: 1px; height: 28px; background: linear-gradient(#fff, transparent); animation: hint 1.8s ease-in-out infinite; }
-@keyframes hint { 0%, 100% { transform: scaleY(.4); transform-origin: top; opacity: .5; } 50% { transform: scaleY(1); opacity: 1; } }
+.hero-hint { position: absolute; left: 50%; bottom: 28px; padding: 9px 18px; border-radius: 999px; background: rgba(5, 16, 8, .5); backdrop-filter: blur(6px); transform: translateX(-50%); z-index: 5; display: flex; flex-direction: row; align-items: center; gap: 10px; white-space: nowrap; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 14px rgba(0, 0, 0, .55); }
+.hero-hint svg { flex: none; animation: hint 1.8s ease-in-out infinite; }
+@keyframes hint { 0%, 100% { transform: translateY(-3px); opacity: .5; } 50% { transform: translateY(4px); opacity: 1; } }
 
 /* Sem scrub: poster final e conteúdo visível */
 .hero.static .hero-pin { height: auto; min-height: 100svh; }
@@ -129,4 +129,4 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
     linear-gradient(0deg, rgba(var(--veil), .9) 0%, rgba(var(--veil), .6) 24%, rgba(var(--veil), 0) 34%),
     linear-gradient(180deg, rgba(var(--veil), .9) 0%, rgba(var(--veil), .6) 22%, rgba(var(--veil), 0) 32%); }
 }
-@media (prefers-reduced-motion: reduce) { .hero-hint::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-hint svg { animation: none; } }
