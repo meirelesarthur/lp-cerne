@@ -460,13 +460,15 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-mod button[aria-expanded='false'] svg { transform: none; }
 .pl-mod button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 /* módulo aberto: linha e funcionalidades num tom só, para ler como um bloco */
-.pl-mod.is-open > *, .pl-mod.is-open + .pl-feat > *, .pl-mod.is-open ~ .pl-feat > * { background: #f3f8f4; }
+/* linhas alternadas (zebra) para o olho acompanhar o módulo até as colunas; aberto e hover ficam mais marcados */
+.pl-table tbody tr.z1 > * { background: #eef4ef; }
+.pl-mod.is-open > *, .pl-mod.is-open ~ .pl-feat > * { background: #e3efe7; }
 .pl-mod.is-open button { color: var(--accent-hover); }
 .pl-feat th { padding-left: 40px; font-size: 14px; color: var(--text-soft); }
 .pl-feat th, .pl-feat td { padding-block: 7px; border-bottom-color: transparent; }
 .pl-feat td { opacity: .55; }
 .pl-table tbody tr.pl-mod + tr.pl-feat th, .pl-table tbody tr.pl-feat + tr.pl-feat th { border-bottom-color: transparent; }
-.pl-table tbody tr:not(.pl-grp):hover > * { background: #f3f8f4; }
+.pl-table tbody tr:not(.pl-grp):hover > * { background: #e6f0e9; }
 .pl-yes { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dcefe3; color: var(--accent-hover); vertical-align: middle; }
 .pl-yes svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .pl-opt { display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px dashed #b98aa6; background: #f7ebf2; color: #8a3b6b; font-size: 12px; font-weight: 600; white-space: nowrap; }
@@ -489,3 +491,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .pl-head em i + i::before { content: none; }
   .pl-cta .btn { font-size: 12.5px; padding-inline: 10px; }
 }
+
+/* três divisórias verticais, uma à esquerda de cada plano */
+.pl-table thead th.pl-head, .pl-table tbody td, .pl-table tfoot td { border-left: 1px solid var(--border); }
+.pl-table .pl-grp td { border-left: 0; }

@@ -25,8 +25,8 @@ export default function Below() {
       <SystemSection />
       <TrailerSection />
       <ProfilesSection />
-      <EditionsSection />
       <TwinSection />
+      <EditionsSection />
       <PlansSection />
       <FaqSection />
       <ContactSection />

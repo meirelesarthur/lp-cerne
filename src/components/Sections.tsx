@@ -832,37 +832,28 @@ const PLANOS = [
 ]
 const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
   { g: 'Base de todos os planos', mods: [
-    { m: 'Financeiro', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber', 'Caixa e bancos', 'Fluxo bancário'] },
-    { m: 'Estoque e entradas', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e', 'Baixas, correções e transferências', 'Saldo por armazém'] },
-    { m: 'Fiscal', p: ['i', 'i', 'i'], f: ['Emissão de NF-e', 'XML e LCDPR', 'Regras fiscais e acesso do contador'] },
-    { m: 'Frota e bens', p: ['i', 'i', 'i'], f: ['Manutenções e revisões', 'Abastecimentos', 'Inventário de bens'] },
-    { m: 'Cadastros', p: ['i', 'i', 'i'], f: ['Fazendas e safras', 'Produtos e armazéns', 'Fornecedores, clientes e funcionários'] },
+    { m: 'Financeiro e fiscal', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber, caixa e bancos', 'Emissão de NF-e, XML e LCDPR', 'Regras fiscais e acesso do contador'] },
+    { m: 'Estoque, frota e bens', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e, baixas e transferências', 'Saldo por armazém', 'Manutenções, abastecimentos e inventário de bens'] },
+    { m: 'Cadastros, relatórios e painéis', p: ['i', 'i', 'i'], f: ['Fazendas, safras, produtos e pessoas', 'Relatórios em PDF e Excel', 'Painéis de acompanhamento e pluviometria'] },
     { m: 'Atividades', p: ['1 à escolha', '2 à escolha', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
-    { m: 'Relatórios e painéis', p: ['i', 'i', 'i'], f: ['Relatórios em PDF e Excel', 'Painéis de acompanhamento', 'Pluviometria'] },
   ] },
   { g: 'Gestão e custos', mods: [
-    { m: 'Gestão gerencial', p: ['n', 'i', 'i'], f: ['DRE', 'Previsto × realizado', 'Centro de custo e rateios', 'Contratos e financiamentos'] },
-    { m: 'Contabilidade', p: ['n', 'i', 'i'], f: ['Depreciação mensal e prevista', 'Partida dobrada e plano de contas'] },
-    { m: 'Conciliação bancária', p: ['o', 'i', 'i'], f: ['Importação de OFX e extratos', 'Meses conciliados'] },
-    { m: 'CT-e e MDF-e', p: ['o', 'i', 'i'], f: ['Emissão e manifestação de CT-e', 'Emissão de MDF-e'] },
-    { m: 'Integração Domínio', p: ['o', 'i', 'i'], f: ['Exportação de movimentos e títulos', 'NFS-e e CSV para a contabilidade'] },
+    { m: 'Gestão gerencial e contabilidade', p: ['n', 'i', 'i'], f: ['DRE e previsto × realizado', 'Centro de custo, rateios e contratos', 'Depreciação, partida dobrada e plano de contas'] },
+    { m: 'Conciliação, CT-e/MDF-e e Domínio', p: ['o', 'i', 'i'], f: ['Importação de OFX e conciliação por mês', 'Emissão e manifestação de CT-e, emissão de MDF-e', 'Exportação para o Domínio, NFS-e e CSV'] },
     { m: 'Planejamento e orçamento', p: ['o', 'i', 'i'], f: ['Planejamento agrícola e pecuário', 'Previsão orçamentária'] },
-    { m: 'Reprodução', p: ['o', 'i', 'i'], f: ['Estação de monta e protocolos', 'Acasalamento e diagnóstico de gestação', 'Genealogia'] },
-    { m: 'Confinamento', p: ['o', 'i', 'i'], f: ['Dietas e batidas', 'Pátios, currais e mapa', 'Fases de alimentação'] },
-    { m: 'Fábrica de ração', p: ['o', 'i', 'i'], f: ['Formulação e batidas', 'Custo de produção da ração'] },
-    { m: 'Balança e contratos de grãos', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária', 'Descontos e classificação', 'Contratos de venda de grãos'] },
-    { m: 'Carregamento de frutas', p: ['o', 'i', 'i'], f: ['Cargas', 'Fechamento semanal e títulos'] },
+    { m: 'Pecuária avançada', p: ['o', 'i', 'i'], f: ['Reprodução: estação de monta, protocolos, genealogia', 'Confinamento: dietas, batidas, pátios e currais', 'Fábrica de ração: formulação e custo'] },
+    { m: 'Balança, grãos e frutas', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária, descontos e classificação', 'Contratos de venda de grãos', 'Carregamento de frutas e fechamento semanal'] },
   ] },
   { g: 'Operação corporativa', mods: [
-    { m: 'Compras', p: ['o', 'o', 'i'], f: ['Solicitação e cotação com fornecedores', 'Autorização por alçada', 'Compra e recebimento', 'SLA e savings'] },
+    { m: 'Compras', p: ['o', 'o', 'i'], f: ['Solicitação e cotação com fornecedores', 'Autorização por alçada', 'Compra, recebimento, SLA e savings'] },
     { m: 'Vendas e pedidos', p: ['o', 'o', 'i'], f: ['Orçamentos e pedidos', 'Vendas e relatórios por cliente e produto'] },
-    { m: 'Ordens de serviço', p: ['o', 'o', 'i'], f: ['Abertura e acompanhamento', 'Monitoramento e avaliações'] },
-    { m: 'Gestão de pessoal', p: ['o', 'o', 'i'], f: ['Faltas e adiantamentos', 'Apuração mensal', 'Folha para o Domínio'] },
-    { m: 'Gestão documental', p: ['o', 'o', 'i'], f: ['Repositório de documentos com vencimentos'] },
+    { m: 'Ordens de serviço, pessoal e documentos', p: ['o', 'o', 'i'], f: ['Ordens de serviço com monitoramento e avaliações', 'Faltas, adiantamentos, apuração e folha para o Domínio', 'Repositório de documentos com vencimentos'] },
     { m: 'Rastreabilidade', p: ['o', 'o', 'i'], f: ['Rastreio por lote', 'Página pública da fazenda'] },
     { m: 'Implantação e suporte', p: ['n', 'n', 'i'], f: ['Implantação dedicada', 'Atendimento prioritário com SLA'] },
   ] },
 ]
+// zebra: módulos alternam o tom do fundo (as funcionalidades abertas herdam o do módulo)
+const ZEBRA = new Map(COMPARATIVO.flatMap((g) => g.mods).map((x, i) => [x.m, i % 2]))
 const CelPlano = ({ c }: { c: PlCel }) =>
   c === 'i' ? <span className="pl-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg><span className="sr-only">Incluído</span></span>
   : c === 'o' ? <span className="pl-opt">Opcional</span>
@@ -915,7 +906,7 @@ export function PlansSection() {
                 {g.mods.flatMap((mod) => {
                   const open = aberto === mod.m
                   return [
-                    <tr key={mod.m} className={`pl-mod${open ? ' is-open' : ''}`}>
+                    <tr key={mod.m} className={`pl-mod z${ZEBRA.get(mod.m)}${open ? ' is-open' : ''}`}>
                       <th className="pl-fix" scope="row">
                         <button type="button" aria-expanded={open} onClick={() => alterna(mod.m)}>
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>{mod.m}
@@ -924,7 +915,7 @@ export function PlansSection() {
                       {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
                     </tr>,
                     ...(open ? mod.f.map((f) => (
-                      <tr key={mod.m + f} className="pl-feat">
+                      <tr key={mod.m + f} className={`pl-feat z${ZEBRA.get(mod.m)}`}>
                         <th className="pl-fix" scope="row">{f}</th>
                         {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
                       </tr>
