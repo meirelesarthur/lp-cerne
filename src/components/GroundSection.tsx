@@ -1,26 +1,23 @@
-import { useLayoutEffect, useRef } from 'react'
-import { gsap } from '../lib/scroll'
 import type { HeroGeometry } from './Hero'
 
 /**
  * 02 · Escopo. Fundo: o resto da fazenda, continuando pixel a pixel o último quadro do Hero (mesma escala e
- * posição do zoom final) e fixo (`sticky`) enquanto o conteúdo passa. No fim da seção a própria foto se
- * esmaece, de baixo para cima, até o fundo claro do resto da página.
+ * posição do zoom final) e fixo (`sticky`) enquanto o conteúdo passa. O fim da seção é um degradê por cima da
+ * foto até o fundo claro, que rola junto com ela.
  */
 const FRENTES = [
-  { t: 'Multifazendas', d: 'Várias propriedades na mesma visão, com dados separados por fazenda.' },
-  { t: 'Rebanho e confinamento', d: 'Lotes, currais, dieta, trato e leitura de cocho.' },
-  { t: 'Suprimentos e estoque', d: 'Da solicitação ao recebimento, com fábrica de ração.' },
-  { t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação sem planilha paralela.' },
+  { t: 'Rebanho e confinamento', d: 'Do nascimento à venda: reprodução (IATF e FIV), pesagens, sanitário e mapa de confinamento.' },
+  { t: 'Lavoura', d: 'Safra, talhões no mapa, apontamentos, romaneio e balança rodoviária integrada.' },
+  { t: 'Suprimentos e estoque', d: 'Da solicitação ao recebimento, com aprovação, SLA de compras e fábrica de ração.' },
+  { t: 'Financeiro e fiscal', d: 'Custo, DRE e conciliação bancária, com NF-e, CT-e, MDF-e e LCDPR emitidos no sistema.' },
 ]
-const FATOS = [
-  { t: 'Feito para', d: 'Pecuária de corte, confinamento e agricultura.', tbd: true },
-  { t: 'Acesse de onde estiver', d: 'No computador hoje. Celular e tablet com os apps em breve.' },
-  { t: 'Fiscal', d: 'Emissão e obrigações fiscais integradas ao dia a dia.', tbd: true },
+const FATOS: { t: string; d: string; tbd?: boolean }[] = [
+  { t: 'Multifazenda e multiempresa', d: 'Várias propriedades e CNPJs na mesma visão, com dados e permissões separados por fazenda.' },
+  { t: '115 relatórios e 10 painéis', d: 'Em PDF e Excel, prontos para o gestor, o banco e o contador.' },
+  { t: 'Acesse de onde estiver', d: 'No navegador hoje, instalável como app. Os apps de campo estão em teste.' },
 ]
 
 export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
-  const root = useRef<HTMLElement>(null)
   const g = geo?.ready ? geo.manifest.ground : undefined
   let style: React.CSSProperties | undefined
   if (geo && g) {
@@ -33,33 +30,18 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
     style = { width, height, left, top }
   }
 
-  // o véu claro sobe enquanto o conteúdo sai e a próxima seção entra; a borda de baixo do véu já é o fundo
-  // claro, então a foto pode continuar se esmaecendo depois de soltar o sticky sem marcar emenda
-  useLayoutEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const ctx = gsap.context(() => {
-      // o véu começa abaixo da tela (foto limpa atrás dos cards) e só sobe quando os cards já estão saindo
-      gsap.fromTo('.ground-veil', { yPercent: 52 }, {
-        yPercent: -36, ease: 'none',
-        scrollTrigger: { trigger: '.fatos', start: 'top 42%', endTrigger: root.current, end: 'bottom 92%', scrub: true },
-      })
-    }, root)
-    return () => ctx.revert()
-  }, [])
-
   return (
-    <section ref={root} className="ground" id="escopo" aria-labelledby="escopo-title">
+    <section className="ground" id="escopo" aria-labelledby="escopo-title">
       <div className="ground-bg" aria-hidden="true">
         {g && style && <img src={g.src} alt="" style={style} decoding="async" />}
         <div className="ground-shade" />
-        <div className="ground-veil" />
       </div>
 
       <div className="ground-content">
         <header className="sec-head on-photo" data-reveal>
           <span className="eyebrow">O que o Cerne cobre</span>
-          <h2 id="escopo-title">Tudo da fazenda em uma visão só.</h2>
-          <p className="sec-lead">Do curral ao caixa: o Cerne Web organiza a rotina de quem decide. Os apps de campo estão em construção.</p>
+          <h2 id="escopo-title">Uma fazenda, um cadastro, nenhuma planilha paralela.</h2>
+          <p className="sec-lead">Do curral ao caixa e da lavoura à nota fiscal: o Cerne Web organiza a rotina de quem decide.</p>
         </header>
 
         <ul className="frentes">

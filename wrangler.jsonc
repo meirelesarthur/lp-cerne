@@ -5,5 +5,7 @@
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  // as builds de branch (PRs) rodam `wrangler preview`, que exige este bloco (pode ficar vazio)
+  "previews": {}
 }

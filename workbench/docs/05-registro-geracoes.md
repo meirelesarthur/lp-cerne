@@ -128,3 +128,35 @@ Problema: no começo do plano do Perfis (clip-1), o segundo homem ao fundo estav
 - Regerar o clipe a partir do quadro novo (Seedance 2.5, 7.900 e 9.480 créditos): o homem sumiu, mas os dois clipes ganharam dupla exposição na transição (armazém fantasma no céu aos ~2 s; gado translúcido aos 3,4-6 s) → descartados (`clip-1-novo.mp4`, `clip-1-novo2.mp4`).
 - Caminho adotado: editar o clipe ORIGINAL (`clip-1-antigo.mp4`) com Runway Aleph 2 (video_modify, 5.850 créditos), removendo só o homem do cocho. Resultado pendente.
 - **Resultado:** `clip-1-editado.mp4` (Aleph 2) aprovado e usado como `assets/gen-v4/clip-1.mp4` (original em `clip-1-antigo.mp4`). Quadros do Perfis regerados (desktop-hd 11,5 MB, desktop 5,0 MB, mobile 3,9 MB) e reenviados ao R2. Backup dos quadros anteriores em `workbench/assets/backup/perfis-v3/`. A dissolução em ~3,4-4,4 s (gado translúcido, armazém no céu) já existia no clipe original e permanece.
+
+# Perfis v3 (2026-10-19): celular → corredor de trato → escritório, 16:9 e 9:16 nativos
+
+Pedido: regerar o plano do Perfis (homem dentro do cocho quebrava a realidade), Nelores reais e algumas comendo, humanos de polo verde de manga curta, zoom out e "andar até o gestor" consistentes, mais resolução para ler o app e o painel, e versão 9:16 própria para o mobile. Teto combinado: 45 mil, depois elevado a 55 mil pelo Arthur. **Gasto real: 52.870 créditos** (saldo 142.025 → 89.155). Originais em `assets/gen-v6/`. Modelos: Seedream 5 Pro 4k (2560×1440 / 1440×2560) para quadros, Ideogram 4.5 precise edit para edições, Seedance 2.5 para vídeo.
+
+| Arquivo | Tipo | Créditos | Resultado |
+|---|---|---|---|
+| A-a / A-b.png | imagem 16:9 (seed 8100) | 200 | A-b era a melhor (A-a com logo na polo); substituída pela Ae-2 |
+| B-a / B-b.png | imagem 16:9 aérea (seed 8200, ref A-b) | 200 | B-b usada só na 1ª tentativa |
+| C-a / C-b.png | imagem 16:9 escritório (seed 8300, ref A-b) | 200 | **C-a usada (fim)**: gestor de polo verde, notebook ~2,5× maior que na v2, vaqueiro visível pela janela |
+| Am-a/b, Bm-a/b, Cm-a/b.png | imagens 9:16 (seeds 8400-8600) | 600 | **Cm-a usada (fim do mobile)**; Am-b virou a Ame-2 |
+| clip-1.mp4 | vídeo 16:9 10 s 1080p, A-b → B-b | 7.900 | descartado: fusão do corredor nos currais aos 5,3-6 s |
+| clip-2.mp4 | vídeo 16:9 10 s 1080p, B-b → C-a | 7.900 | bom, mas descartado ao trocar o percurso |
+| clip-1m / clip-2m.mp4 | vídeos 9:16 10 s 720p | 8.800 | 1m descartado (silos fantasma no céu aos 3,6-4,8 s); 2m bom, descartado ao trocar o percurso |
+| M-a / M-b.png | imagem 16:9 ponte (seed 8700, refs B-b + A-b) | 200 | **M-a usada (meio)**: drone a ~15 m sobre o corredor, escritório e silos no fim |
+| clip-1a / clip-1b.mp4 | vídeos 16:9 5 s, A-b → M-a → B-b | 7.900 | descartados: prédios surgem no horizonte (1a) e fusão na aérea (1b) |
+| Mm-a / Mm-b.png | imagem 9:16 ponte (seed 8800) | 200 | **Mm-a usada (meio do mobile)** |
+| Ae-1/2, Ame-1/2.png | precise edit (escritório e silos no fim do corredor) | 320 | **Ae-2 e Ame-2 usadas (início)** |
+| **c16-1.mp4** | vídeo 16:9 5 s 1080p, Ae-2 → M-a | 3.950 | **usado** |
+| **c16-2.mp4** | vídeo 16:9 10 s 1080p, M-a → C-a | 7.900 | **usado** |
+| **c916-1.mp4** | vídeo 9:16 5 s 720p, Ame-2 → Mm-a | 2.200 | **usado**; pendência: aos ~1,45-1,8 s os silos ao longe viram a fachada do escritório (faixa fina do horizonte); refazer estouraria o teto |
+| **c916-2.mp4** | vídeo 9:16 10 s 720p, Mm-a → Cm-a | 4.400 | **usado** |
+
+**Lição:** o Seedance resolve com fusão (crossfade) quando o quadro final não tem a geometria do inicial (o corredor do início não existia no layout da vista aérea). A correção foi um percurso que existe nos dois quadros: o mesmo corredor de trato do celular até a fachada, com um quadro ponte (M) e o horizonte do quadro inicial editado para já conter o escritório e os silos.
+
+Montagem: `video/hero-a/build_perfis_v3.py` (15 s, emenda sem quadro repetido). Variantes: desktop 1280, desktop-hd 1920, **desktop-2k 2560** (fundo ampliado com Lanczos e telas reais compostas já em 2560; usada a partir de 2200 px reais) e mobile 608×1080 a partir do 9:16. Backup da v2 em `assets/backup/perfis-v4/`.
+
+### Perfis v3, ajuste do início no desktop (2026-10-19)
+Pedido: o vaqueiro com o celular "descia" no scroll (a câmera subia e ele saía por baixo); ele deve ficar parado e a câmera seguir para o escritório, saindo ele pela direita. Só o desktop (o mobile ficou como estava). Gasto: **7.900 créditos** (2 × 3.950; Ae-2 → M-a, 5 s, 1080p).
+- `c16-1b.mp4`: descartado; a partir de ~1,9 s o corpo some e fica só a mão com o celular, como câmera em primeira pessoa.
+- **`c16-1c.mp4` (usado)**: a câmera desliza para a esquerda e avança; ombro e braço saem juntos pela borda direita até ~3,5 s e o plano segue sobre o corredor até o quadro M-a (emenda com o c16-2).
+Quadros: pasta nova `frames/perfis-v4/` (desktop, desktop-hd, desktop-2k remontados; mobile copiado da v3), por causa do cache immutable do R2.

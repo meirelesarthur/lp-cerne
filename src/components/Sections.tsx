@@ -1,11 +1,13 @@
 import { asset } from '../lib/assets'
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { FazendaCerne } from '../figures/fazenda/FazendaCerne'
+import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
+
+// a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
+const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -99,7 +101,7 @@ export function ProblemSection() {
 
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=320%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=220%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
       })
       // 0 → 1 = toda a duração
       gsap.set('.orb-core, .orb-halo, .orb-bloom', { transformOrigin: '50% 50%', svgOrigin: undefined })
@@ -197,7 +199,7 @@ export function ProblemSection() {
             <header className="product-head">
               <span className="eyebrow">A virada</span>
               <h2>O Cerne junta tudo em um lugar.</h2>
-              <p className="sec-lead">Um sistema no navegador hoje, com os apps de escritório e de campo a caminho.</p>
+              <p className="sec-lead">Cada nota, pesagem e compra entra uma vez e já aparece no custo, no estoque e no DRE. No navegador hoje, com os apps de escritório e de campo a caminho.</p>
             </header>
             <figure className="product-fig">
               <span className="product-pulse" aria-hidden="true" />
@@ -252,36 +254,45 @@ const CAPITULOS = [
   { t: 0, n: 'Visão geral', d: 'Indicadores da fazenda num painel só.' },
   { t: 3.6, n: 'Pecuária de corte', d: 'Rebanho, composição e manejos do período.' },
   { t: 6.4, n: 'Lotação de currais', d: 'Quem está onde e o que precisa de atenção.' },
-  { t: 9.2, n: 'Custos do confinamento', d: 'Quanto custa cada fase, sem esperar o fechamento.' },
-  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas e orçamento do período.' },
+  { t: 9.2, n: 'Custos do confinamento', d: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.' },
+  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas, atrasados e orçado × realizado.' },
 ]
-
-const DESKTOP_PIN = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
 
 export function TrailerSection() {
   const root = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
+  const bar = useRef<HTMLElement>(null)
   const capRef = useRef(0)
+  const userPaused = useRef(false)
   const media = useAfterFirstScroll()
   const [cap, setCap] = useState(0)
+  const [paused, setPaused] = useState(true)
+  const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
     const v = video.current
     if (!v) return
+    // movimento reduzido: o vídeo só toca se a pessoa pedir; senão toca ao entrar na tela e pausa ao sair
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; void v.play().catch(() => {}) } else v.pause()
+      if (e.isIntersecting) {
+        if (v.preload === 'none') v.preload = 'auto'
+        if (!reduced && !userPaused.current) void v.play().catch(() => {})
+      } else v.pause()
     }, { threshold: 0.35 })
     io.observe(v)
     const onTime = () => {
       const t = v.currentTime % 15
       let i = 0
       CAPITULOS.forEach((c, k) => { if (t >= c.t) i = k })
-      capRef.current = i
-      setCap(i)
+      if (i !== capRef.current) { capRef.current = i; setCap(i) }
+      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(1, v.currentTime / (v.duration || 15))})`
     }
+    const onState = () => setPaused(v.paused)
     v.addEventListener('timeupdate', onTime)
-    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime) }
-  }, [])
+    v.addEventListener('play', onState)
+    v.addEventListener('pause', onState)
+    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime); v.removeEventListener('play', onState); v.removeEventListener('pause', onState) }
+  }, [reduced])
 
   const goTo = (i: number) => {
     const v = video.current
@@ -289,27 +300,14 @@ export function TrailerSection() {
     setCap(i)
     if (!v) return
     v.currentTime = CAPITULOS[i].t + 0.05
+    userPaused.current = false
     void v.play().catch(() => {})
   }
-
-  // desktop: a seção fica fixa e cada trecho do scroll abre um capítulo
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia()
-    mm.add(DESKTOP_PIN, () => {
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=240%', pin: true, scrub: true, refreshPriority: 5,
-          onUpdate: (self) => {
-            const i = Math.min(CAPITULOS.length - 1, Math.floor(self.progress * CAPITULOS.length))
-            if (i !== capRef.current) goTo(i)
-          },
-        },
-      }).fromTo('.trailer .browser', { scale: 0.94 }, { scale: 1, ease: 'none', duration: 0.25 })
-        .fromTo('.trailer .scrub-bar i', { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
-    })
-    return () => mm.revert()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const toggle = () => {
+    const v = video.current
+    if (!v) return
+    if (v.paused) { userPaused.current = false; void v.play().catch(() => {}) } else { userPaused.current = true; v.pause() }
+  }
 
   return (
     <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
@@ -322,13 +320,15 @@ export function TrailerSection() {
         <div className="trailer-grid">
           <figure className="browser" data-reveal>
             <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web">
+            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web" aria-describedby="trailer-desc">
               <source src={asset('/video/system-loop.webm')} type="video/webm" />
               <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
             </video>
+            <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
+            <button type="button" className="video-toggle" onClick={toggle}>{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
           </figure>
           <ol className="chapters">
-            <li className="scrub-bar" aria-hidden="true"><i /></li>
+            <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
             {CAPITULOS.map((c, i) => (
               <li key={c.n} data-reveal>
                 <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
@@ -346,14 +346,70 @@ export function TrailerSection() {
 
 /* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
 // grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
-const MODULOS = [
-  { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Rebanho, lotes, currais, dieta, trato diário e leitura de cocho.', feats: ['Mapa de currais', 'Dieta e batelada', 'Trato e cocho', 'Manejo e reprodução'], img: 'lotacao-currais' },
-  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões, planejamento de safra, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Pesagem rodoviária'], img: 'talhoes' },
-  { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Cotação, compra, recebimento e fábrica de ração.', feats: ['Cotações', 'Recebimentos', 'Fábrica de ração'], img: 'suprimentos' },
-  { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Custos, resultado e depreciação.', feats: ['Livro caixa', 'Depreciações', 'Ativos'], img: 'financeiros' },
-  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'] },
-  { k: 'f', n: '06', tag: 'Gestão', t: 'Dashboards e relatórios', d: 'Visão geral, custos, lotação, desempenho de lotes e pluviometria, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Lotação de currais', 'Desempenho de lotes', 'Pluviometria'], img: 'custos-confinamento' },
+type Modulo = { k: string; n: string; tag: string; t: string; d: string; feats?: string[]; img?: string; chips?: string[]; note?: string }
+const MODULOS: Modulo[] = [
+  { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Do nascimento à venda: reprodução, pesagens, sanitário, nutrição e o mapa de confinamento com currais, dietas e batidas.', feats: ['Mapa de confinamento', 'Reprodução: IATF, FIV e monta', 'Pesagem e GMD', 'Relatórios SISBOV'], img: 'lotacao-currais' },
+  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões no mapa, planejamento de safra, apontamentos, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Balança rodoviária'], img: 'talhoes' },
+  { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Solicitação, cotação, aprovação, compra e recebimento, com SLA e fábrica de ração.', feats: ['Cotação via link', 'Aprovação de compras', 'Fábrica de ração'], img: 'suprimentos' },
+  { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Contas a pagar e receber, conciliação OFX, DRE e depreciação.', feats: ['Conciliação bancária', 'DRE', 'Orçado × realizado'], img: 'financeiros' },
+  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
+  { k: 'g', n: '06', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
+  { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
+  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
 ]
+
+// ícones das conquistas (traço 24px, herdam a cor do medalhão)
+const ICONES = {
+  rastreio: <><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z" /><path d="m9.5 10.5 1.8 1.8 3.2-3.3" /></>,
+  balanca: <><path d="M3 17V8h10v9" /><path d="M13 11h4l3 3v3h-7" /><circle cx="7" cy="18" r="1.6" /><circle cx="16.5" cy="18" r="1.6" /><path d="M6 11.5h4" /></>,
+  link: <><path d="M5 18.5V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H9.5L5 18.5Z" /><path d="M9 9.5h6M9 12h3.5" /></>,
+  custo: <><path d="M4 20h16" /><path d="M7 16v-3M12 16V9M17 16V6" /><path d="m14.5 6 2.5-2.5L19.5 6" /></>,
+  fazendas: <><path d="M3 20h18" /><path d="M5 20v-8l4-3 4 3v8" /><path d="M13 20v-6l3.5-2.5L20 14v6" /><path d="M8 20v-3h2v3" /></>,
+  permissao: <><path d="M12 3 5 6v5c0 4.4 3 8.2 7 10 4-1.8 7-5.6 7-10V6l-7-3Z" /><circle cx="12" cy="11" r="2" /><path d="M12 13v3" /></>,
+  historico: <><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v3.5h3.5" /><path d="M12 8v4l2.5 2" /></>,
+  contador: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /><path d="M9 14h6M12 11v6" /></>,
+}
+type Conquista = { t: string; d: string; i: keyof typeof ICONES }
+
+const DIFERENCIAIS: Conquista[] = [
+  { t: 'Rastreio aberto ao comprador', d: 'Uma página pública mostra a origem do produto, a fazenda e o produtor.', i: 'rastreio' },
+  { t: 'Da balança à nota', d: 'O peso do caminhão entra direto no sistema e vira romaneio e NF-e.', i: 'balanca' },
+  { t: 'Cotação respondida por link', d: 'O fornecedor recebe pelo WhatsApp e preenche o preço sem precisar de login.', i: 'link' },
+  { t: 'Custo e margem por lote', d: 'COE, COT e margem operacional de cada lote e talhão, fechados sem planilha paralela.', i: 'custo' },
+]
+
+/** Cada item é "conquistado" ao entrar na tela: o anel do medalhão se desenha, o selo aparece e um brilho passa pelo card.
+ * Usado nos diferenciais (Sistema) e em Controle e segurança. */
+function Conquistas({ items, className }: { items: Conquista[]; className?: string }) {
+  const ref = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    const items = Array.from(ref.current?.children ?? [])
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return
+        e.target.classList.add('is-earned')
+        io.unobserve(e.target)
+      })
+    }, { rootMargin: '0px 0px -12% 0px' })
+    items.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+  return (
+    <ul ref={ref} className={className}>
+      {items.map((d, n) => (
+        <li key={d.t} className="conq" style={{ '--n': n } as React.CSSProperties}>
+          <span className="medal" aria-hidden="true">
+            <svg className="medal-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" pathLength="1" /></svg>
+            <svg className="medal-icon" viewBox="0 0 24 24">{ICONES[d.i]}</svg>
+            <i className="medal-check" />
+          </span>
+          <strong>{d.t}</strong>
+          <span className="conq-d">{d.d}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 export function SystemSection() {
   const root = useRef<HTMLElement>(null)
@@ -378,17 +434,19 @@ export function SystemSection() {
           <header className="sec-head" data-reveal>
             <span className="eyebrow">O sistema</span>
             <h2 id="sistema-title">A fazenda inteira, num só cadastro.</h2>
-            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Escolha um setor.</p>
+            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Clique em um setor para ver o que o Cerne faz ali.</p>
           </header>
         </div>
-        <FazendaCerne />
+        {farmNear ? (
+          <Suspense fallback={<div className="fz-placeholder" />}><FazendaCerne /></Suspense>
+        ) : <div className="fz-placeholder" />}
       </section>
     <section ref={root} className="sec sec-light system" id="modulos" aria-labelledby="modulos-title">
       <div className="wrap">
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Os módulos</span>
-          <h2 id="modulos-title">Seis frentes. Um só cadastro.</h2>
-          <p className="sec-lead">Os módulos que já estão no menu do Cerne Web.</p>
+          <h2 id="modulos-title">Oito frentes. Um só cadastro.</h2>
+          <p className="sec-lead">Os módulos que já estão no menu do Cerne Web, da porteira ao contador.</p>
         </header>
         <div className="bento">
           {MODULOS.map((m) => (
@@ -400,19 +458,19 @@ export function SystemSection() {
                 {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
               </div>
               {m.img ? (
-                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" loading="lazy" decoding="async" />}</div>
+                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" width={m.img === 'talhoes' ? 960 : 1280} height={m.img === 'talhoes' ? 720 : 800} loading="lazy" decoding="async" />}</div>
               ) : (
                 <div className="base">
                   <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
-                  <p className="base-note"><i aria-hidden="true" />Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.</p>
+                  {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
                 </div>
               )}
             </article>
           ))}
         </div>
-        <div className="spine" data-reveal aria-hidden="true">
-          <span>Um só cadastro</span>
-          <ol>{MODULOS.map((m) => <li key={m.k}><i />{m.t}</li>)}</ol>
+        <div className="diferenciais">
+          <h3 className="dif-title" data-reveal>Diferenciais</h3>
+          <Conquistas items={[...DIFERENCIAIS, ...CONFIANCA]} />
         </div>
       </div>
     </section>
@@ -432,25 +490,22 @@ export function EditionsSection() {
         </header>
         <div className="editions-grid">
           <article className="edition web" data-reveal>
-            <span className="badge on">Disponível · navegador</span>
             <h3>Cerne Web</h3>
-            <p>O ERP completo: cadastros, dashboards, suprimentos, estoque, financeiro e operação.</p>
-            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" loading="lazy" />}
+            <p>Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.</p>
+            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" width={1280} height={800} loading="lazy" decoding="async" />}
             <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
           </article>
           <article className="edition app" data-reveal>
-            <span className="badge">Em construção · em teste</span>
             <h3>Cerne Administração</h3>
             <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Quero testar</a>
+            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Entrar na lista de testes</a>
           </article>
           <article className="edition app" data-reveal>
-            <span className="badge">Em construção · em teste</span>
             <h3>Cerne Operação</h3>
             <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Quero testar</a>
+            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Entrar na lista de testes</a>
           </article>
         </div>
         <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
@@ -466,7 +521,7 @@ const PASSOS = [
   { t: 'Apontamento', d: 'Registrado em etapas.' },
   { t: 'Gestor', d: 'Avalia e vê o resultado.' },
 ]
-/** Onde cada passo acende (fração do scroll): OS já no celular, leitura de cocho, subida até a vista da fazenda, escritório. */
+/** Onde cada passo acende (fração do scroll): OS já no celular, leitura de cocho, subida sobre o corredor, escritório. */
 const PASSO_EM = [0, 0.05, 0.27, 0.74]
 /** O plano termina aqui; o resto do scroll segura o escritório com o cartão do gestor. */
 const PLANO_FIM = 0.9
@@ -475,8 +530,9 @@ const PIN_MQ = '(prefers-reduced-motion: no-preference)'
 type PerfisManifest = { count: number; width: number; height: number }
 
 /**
- * Plano contínuo em tela cheia: leitura de cocho com a OS no celular -> a câmera sobe e mostra a fazenda inteira
- * (confinamento, armazém, silos, caminhão carregando) -> desce e entra no escritório do gestor. Textos em vidro
+ * Plano contínuo em tela cheia: leitura de cocho com a OS no celular -> a câmera sobe acima do corredor de trato
+ * (confinamento, escritório, silos, caminhão carregando) -> voa por ele, entra pela fachada de vidro e chega ao
+ * gestor. Desktop e mobile têm planos próprios (16:9 e 9:16), com o mesmo percurso. Textos em vidro
  * por cima, em três momentos (campo, fazenda, gestor), e os 4 passos da OS acendendo no rodapé.
  */
 export function ProfilesSection() {
@@ -487,12 +543,14 @@ export function ProfilesSection() {
   const [step, setStep] = useState(0)
   const [mobile] = useState(() => window.matchMedia('(max-width: 820px) and (orientation: portrait)').matches)
   const [still] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  // celular: recorte vertical; desktop a partir de 1200 px reais com boa rede: HD 1920 px (a seção ocupa a tela
-  // inteira, então o 1280 px já perde nitidez em ~1400 px); demais: 1280 px. AVIF sempre que houver suporte
-  const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
+  // celular: plano 9:16 próprio; desktop a partir de 1200 px reais com boa rede: HD 1920 px (a seção ocupa a tela
+  // inteira, então o 1280 px já perde nitidez em ~1400 px); a partir de 2200 px reais: 2k (2560 px), para ler o app
+  // e o painel em monitor grande; demais: 1280 px. AVIF sempre que houver suporte
+  const [variant] = useState(() => (mobile ? 'mobile' : prefersHd(2200) ? 'desktop-2k' : prefersHd(1200) ? 'desktop-hd' : 'desktop'))
   const [ext] = useState(() => (supportsAvif() ? 'avif' : 'webp') as 'avif' | 'webp')
   const [m, setM] = useState<PerfisManifest | null>(null)
-  const dir = asset(`/frames/perfis/${variant}`)
+  // pasta versionada: o R2 serve os quadros como immutable (1 ano), então um plano novo vai para uma pasta nova
+  const dir = asset(`/frames/perfis-v4/${variant}`)
 
   useEffect(() => {
     if (!near || still) return
@@ -506,7 +564,7 @@ export function ProfilesSection() {
       const tl = gsap.timeline({
         defaults: { ease: 'power1.out' },
         scrollTrigger: {
-          trigger: root.current, start: 'top top', end: '+=480%', pin: true, scrub: 0.5, refreshPriority: 4,
+          trigger: root.current, start: 'top top', end: '+=280%', pin: true, scrub: 0.5, refreshPriority: 4,
           onUpdate: (st) => {
             const p = st.progress
             scrub.current?.setFrame(Math.min(1, p / PLANO_FIM) * frames.current)
@@ -543,8 +601,8 @@ export function ProfilesSection() {
             <h2 id="perfis-title">Quem decide e quem executa, no mesmo fluxo.</h2>
           </header>
           <article className="pf-glass pf-card">
-            <span className="pf-kicker">No curral</span>
-            <h3>Campo</h3>
+            <span className="pf-kicker">Campo</span>
+            <h3>Quem está no curral</h3>
             <ul><li>Minhas ordens: iniciar, pausar, retomar</li><li>Trato diário e leitura de cocho</li><li>Pesagem e sanitário em etapas</li></ul>
             <p className="note">Pelo app Operação, em construção.</p>
           </article>
@@ -560,8 +618,8 @@ export function ProfilesSection() {
 
         <div className="pf-phase pf-gestor">
           <article className="pf-glass pf-card">
-            <span className="pf-kicker">No escritório</span>
-            <h3>Gestor</h3>
+            <span className="pf-kicker">Escritório</span>
+            <h3>Quem decide no escritório</h3>
             <ul><li>Resultado, receita, custo e margem</li><li>Rebanho e confinamento com alertas</li><li>Ordens de serviço e apontamentos</li></ul>
           </article>
         </div>
@@ -603,27 +661,20 @@ export function TwinSection() {
             <div><dt>Aproveitamento</dt><dd>86%</dd></div>
           </dl>
           <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <a className="btn btn-light" href="#contato" data-interest="todos">Quero conhecer o GB Twin</a>
+          <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
         </div>
       </div>
     </section>
   )
 }
 
-/* ───────────────────────── 08 · Confiança ───────────────────────── */
-export function TrustSection() {
-  return (
-    <section className="sec sec-light trust" aria-labelledby="confianca-title">
-      <div className="wrap trust-inner" data-reveal>
-        <span className="eyebrow">Quem constrói</span>
-        <h2 id="confianca-title">Feito por quem conhece o campo.</h2>
-        <p className="sec-lead">Desenvolvido pela GB Agritech. <Tbd>redação e prova a validar</Tbd></p>
-        <p className="fineprint">Depoimentos, parcerias e selos só entram com material real validado para o Cerne.</p>
-      </div>
-    </section>
-  )
-}
-
+/* ───────────────────────── Controle e segurança (dentro do Sistema) ───────────────────────── */
+const CONFIANCA: Conquista[] = [
+  { t: 'Multifazenda e multiempresa', d: 'Cada fazenda com seus dados, todas na mesma visão.', i: 'fazendas' },
+  { t: 'Permissões por ação', d: 'Perfis de acesso e autorizadores para cada compra.', i: 'permissao' },
+  { t: 'Histórico de alterações', d: 'Logs do sistema e atividades recentes por fazenda.', i: 'historico' },
+  { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.', i: 'contador' },
+]
 /* ───────────────────────── 09 · Form completo ───────────────────────── */
 type CErr = Partial<Record<'name' | 'email' | 'whatsapp' | 'consent', string>>
 
@@ -652,7 +703,11 @@ export function ContactSection() {
 
   const onSubmit = async (ev: FormEvent, intent: 'lista' | 'demonstracao') => {
     ev.preventDefault()
-    if (![check('name'), check('email'), check('whatsapp'), check('consent')].every(Boolean)) return
+    const results = [check('name'), check('email'), check('whatsapp'), check('consent')]
+    if (!results.every(Boolean)) {
+      document.getElementById([`${uid}-name`, `${uid}-email`, `${uid}-whatsapp`, `${uid}-consent`][results.indexOf(false)])?.focus()
+      return
+    }
     setStatus('loading')
     try {
       await submitLead({ origem: 'form-completo', intencao: intent, nome: v.name.trim(), email: v.email.trim(), whatsapp: v.whatsapp, tamanho: v.size, interesse: v.interest, consent: v.consent })
@@ -679,13 +734,13 @@ export function ContactSection() {
           <span className="eyebrow">Acesso antecipado</span>
           <h2 id="contato-title">Esteja entre os primeiros a usar o Cerne.</h2>
           <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
-          <a className="btn btn-ghost whats" aria-disabled="true" href="#contato" onClick={(e) => e.preventDefault()}>Falar agora no WhatsApp <Tbd>número a definir</Tbd></a>
+          <button type="button" className="btn btn-ghost whats" disabled>Falar agora no WhatsApp <Tbd>número a definir</Tbd></button>
         </header>
 
         {status === 'success' ? (
           <div className="form big" role="status" data-reveal>
             <h3>Pronto, seu acesso está reservado.</h3>
-            <p className="sub" style={{ display: 'block' }}>Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
+            <p className="sub show">Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
           </div>
         ) : (
           <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
@@ -719,13 +774,13 @@ export function ContactSection() {
               </div>
             </div>
             <label className="consent">
-              <input type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} />
+              <input id={`${uid}-consent`} type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${uid}-consent-e` : undefined} />
               <span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span>
             </label>
-            {errors.consent && <span className="err" style={{ marginTop: -8, marginBottom: 10 }}>{errors.consent}</span>}
+            {errors.consent && <span className="err err-consent" id={`${uid}-consent-e`}>{errors.consent}</span>}
             <div className="actions">
               <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}</button>
-              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Prefiro agendar demonstração</button>
+              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Agendar demonstração</button>
             </div>
             {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
           </form>
@@ -738,10 +793,163 @@ export function ContactSection() {
 /* ───────────────────────── 10 · Dúvidas ───────────────────────── */
 const FAQ = [
   { q: 'O Cerne já está disponível?', a: 'O Cerne Web está disponível. Os apps de Administração e Operação estão em construção e em fase de teste.', tbd: true },
+  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte (cria, recria e engorda), confinamento e agricultura, com custo e margem por lote e por talhão. Na lavoura há safra, talhões no mapa, planejamento, apontamentos de máquina, colheita, romaneio e rentabilidade por cultura.' },
+  { q: 'O Cerne emite nota fiscal?', a: 'Sim. NF-e, CT-e e MDF-e, com consulta e manifestação de DF-e, NFS-e recebidas e o LCDPR (Livro Caixa Digital do Produtor Rural). Também tem partida dobrada, para o fiscal e o contábil fecharem com o mesmo lançamento.' },
+  { q: 'Meu contador usa o Domínio. Integra?', a: 'Sim. O Cerne exporta movimento bancário, folha, contas a pagar e receber e NFS-e para o Domínio.' },
+  { q: 'Tenho mais de uma fazenda ou CNPJ. Funciona?', a: 'Sim. O Cerne é multifazenda e multiempresa: dados separados por fazenda, com visão consolidada e transferências de animais, lotes e estoque entre elas.' },
+  { q: 'Controla compras e estoque?', a: 'Sim. A compra segue o caminho solicitação, cotação, autorização, compra e recebimento, com prazo (SLA) e ranking de fornecedores. O fornecedor responde a cotação por um link, inclusive pelo WhatsApp. A nota de entrada alimenta o estoque, com saldo por armazém e transferência entre armazéns e fazendas.' },
+  { q: 'Tem integração com balança?', a: 'Sim. A pesagem rodoviária registra o caminhão no sistema e a NF-e pode ser emitida a partir da pesagem. Há romaneio, contratos de venda e tabelas de desconto e classificação.' },
+  { q: 'Concilia o extrato do banco?', a: 'Sim. O Cerne importa o extrato em OFX, concilia mês a mês e permite congelar os meses já fechados. Junto vêm contas a pagar e a receber, DRE, fluxo de caixa e previsto × realizado.' },
+  { q: 'Mostra o custo e a margem de cada lote?', a: 'Sim. COE × COT e margem operacional, com custeio por lote, animal, área e módulo, DRE e rateio por centro de custo. Cada nota, pesagem e compra entra uma vez e já aparece no custo.' },
+  { q: 'Quais relatórios já vêm prontos?', a: '115 relatórios em PDF e Excel e 10 painéis, entre eles pecuária de corte, financeiro, suprimentos, confinamento, pluviômetro, ativos e depreciação.' },
+  { q: 'Cobre reprodução e sanitário?', a: 'Sim. IATF, FIV e monta natural, estação de monta, diagnóstico de gestação, desmama, vacinas e sanitário por animal ou lote, ficha e histórico de cada animal e relatórios para o SISBOV.' },
+  { q: 'Dá para rastrear o produto até o comprador?', a: 'Sim. Cada produto rastreado ganha uma página pública, aberta por código, e a fazenda pode ter o seu próprio site.' },
+  { q: 'Consigo controlar quem faz o quê?', a: 'Sim. Há perfis e permissões por ação, autorizadores de compra, histórico de cada alteração (logs) e atividades recentes. O sistema tem português, inglês e espanhol.' },
+  { q: 'E frota, equipe e ordens de serviço?', a: 'Estão no mesmo cadastro: manutenção preventiva, abastecimento e transferência de máquinas; faltas, adiantamentos e apuração mensal da equipe; e ordens de serviço com monitoramento e avaliação.' },
+  { q: 'Consigo começar com os dados que já tenho?', a: 'Sim. Dá para lançar saldos iniciais e importar extratos OFX e planilhas, como orçamento e correção de estoque.' },
+  { q: 'Funciona no celular?', a: 'O Cerne Web roda no navegador e pode ser instalado como app. Os apps de campo e de gestão estão em teste.' },
   { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
-  { q: 'Serve para a minha operação?', a: 'O Cerne atende pecuária de corte, confinamento e agricultura.', tbd: true },
 ]
+
+// perguntas agrupadas por tema (as respostas ficam em FAQ acima); as três primeiras abrem sozinhas
+const FAQ_GRUPOS = [
+  { t: 'Produto', qs: ['O Cerne já está disponível?', 'Serve para a minha operação?', 'Funciona no celular?', 'Quais relatórios já vêm prontos?', 'Mostra o custo e a margem de cada lote?'] },
+  { t: 'Fiscal e financeiro', qs: ['O Cerne emite nota fiscal?', 'Meu contador usa o Domínio. Integra?', 'Concilia o extrato do banco?'] },
+  { t: 'Operação da fazenda', qs: ['Controla compras e estoque?', 'Tem integração com balança?', 'Cobre reprodução e sanitário?', 'Dá para rastrear o produto até o comprador?', 'E frota, equipe e ordens de serviço?'] },
+  { t: 'Controle e contratação', qs: ['Tenho mais de uma fazenda ou CNPJ. Funciona?', 'Consigo controlar quem faz o quê?', 'Consigo começar com os dados que já tenho?', 'Como funciona o teste?', 'Quanto custa?'] },
+]
+const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
+
+/* ───────────────────────── Planos (comparativo sem preço) ───────────────────────── */
+// célula por plano [Pro, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
+type PlCel = 'i' | 'o' | 'n' | string
+type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
+const PLANOS = [
+  { k: 'pro', t: 'Pro', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
+  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['2 atividades', '5 usuários'] },
+  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['todas as atividades', '10 usuários'] },
+]
+const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
+  { g: 'Base de todos os planos', mods: [
+    { m: 'Financeiro', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber', 'Caixa e bancos', 'Fluxo bancário'] },
+    { m: 'Estoque e entradas', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e', 'Baixas, correções e transferências', 'Saldo por armazém'] },
+    { m: 'Fiscal', p: ['i', 'i', 'i'], f: ['Emissão de NF-e', 'XML e LCDPR', 'Regras fiscais e acesso do contador'] },
+    { m: 'Frota e bens', p: ['i', 'i', 'i'], f: ['Manutenções e revisões', 'Abastecimentos', 'Inventário de bens'] },
+    { m: 'Cadastros', p: ['i', 'i', 'i'], f: ['Fazendas e safras', 'Produtos e armazéns', 'Fornecedores, clientes e funcionários'] },
+    { m: 'Atividades', p: ['1 à escolha', '2 à escolha', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
+    { m: 'Relatórios e painéis', p: ['i', 'i', 'i'], f: ['Relatórios em PDF e Excel', 'Painéis de acompanhamento', 'Pluviometria'] },
+  ] },
+  { g: 'Gestão e custos', mods: [
+    { m: 'Gestão gerencial', p: ['n', 'i', 'i'], f: ['DRE', 'Previsto × realizado', 'Centro de custo e rateios', 'Contratos e financiamentos'] },
+    { m: 'Contabilidade', p: ['n', 'i', 'i'], f: ['Depreciação mensal e prevista', 'Partida dobrada e plano de contas'] },
+    { m: 'Conciliação bancária', p: ['o', 'i', 'i'], f: ['Importação de OFX e extratos', 'Meses conciliados'] },
+    { m: 'CT-e e MDF-e', p: ['o', 'i', 'i'], f: ['Emissão e manifestação de CT-e', 'Emissão de MDF-e'] },
+    { m: 'Integração Domínio', p: ['o', 'i', 'i'], f: ['Exportação de movimentos e títulos', 'NFS-e e CSV para a contabilidade'] },
+    { m: 'Planejamento e orçamento', p: ['o', 'i', 'i'], f: ['Planejamento agrícola e pecuário', 'Previsão orçamentária'] },
+    { m: 'Reprodução', p: ['o', 'i', 'i'], f: ['Estação de monta e protocolos', 'Acasalamento e diagnóstico de gestação', 'Genealogia'] },
+    { m: 'Confinamento', p: ['o', 'i', 'i'], f: ['Dietas e batidas', 'Pátios, currais e mapa', 'Fases de alimentação'] },
+    { m: 'Fábrica de ração', p: ['o', 'i', 'i'], f: ['Formulação e batidas', 'Custo de produção da ração'] },
+    { m: 'Balança e contratos de grãos', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária', 'Descontos e classificação', 'Contratos de venda de grãos'] },
+    { m: 'Carregamento de frutas', p: ['o', 'i', 'i'], f: ['Cargas', 'Fechamento semanal e títulos'] },
+  ] },
+  { g: 'Operação corporativa', mods: [
+    { m: 'Compras', p: ['o', 'o', 'i'], f: ['Solicitação e cotação com fornecedores', 'Autorização por alçada', 'Compra e recebimento', 'SLA e savings'] },
+    { m: 'Vendas e pedidos', p: ['o', 'o', 'i'], f: ['Orçamentos e pedidos', 'Vendas e relatórios por cliente e produto'] },
+    { m: 'Ordens de serviço', p: ['o', 'o', 'i'], f: ['Abertura e acompanhamento', 'Monitoramento e avaliações'] },
+    { m: 'Gestão de pessoal', p: ['o', 'o', 'i'], f: ['Faltas e adiantamentos', 'Apuração mensal', 'Folha para o Domínio'] },
+    { m: 'Gestão documental', p: ['o', 'o', 'i'], f: ['Repositório de documentos com vencimentos'] },
+    { m: 'Rastreabilidade', p: ['o', 'o', 'i'], f: ['Rastreio por lote', 'Página pública da fazenda'] },
+    { m: 'Implantação e suporte', p: ['n', 'n', 'i'], f: ['Implantação dedicada', 'Atendimento prioritário com SLA'] },
+  ] },
+]
+const CelPlano = ({ c }: { c: PlCel }) =>
+  c === 'i' ? <span className="pl-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg><span className="sr-only">Incluído</span></span>
+  : c === 'o' ? <span className="pl-opt">Opcional</span>
+  : c === 'n' ? <span className="pl-no" aria-label="Não incluso">—</span>
+  : <span className="pl-txt">{c}</span>
+
+/**
+ * Comparativo dos planos por módulo e funcionalidade, sem preço. No celular a tabela rola na horizontal com a
+ * coluna das funcionalidades fixa, para a página não crescer em altura. Começa só com os módulos e funciona como
+ * acordeão: abrir um módulo fecha o que estava aberto.
+ */
+export function PlansSection() {
+  const scroller = useRef<HTMLDivElement>(null)
+  const [shadow, setShadow] = useState(false)
+  const [aberto, setAberto] = useState<string | null>(null)
+  const alterna = (m: string) => setAberto((a) => (a === m ? null : m))
+  const total = COMPARATIVO.reduce((a, g) => a + g.mods.length, 0)
+  const inclusos = [0, 1, 2].map((k) => COMPARATIVO.reduce((a, g) => a + g.mods.filter((x) => x.p[k] !== 'n' && x.p[k] !== 'o').length, 0))
+  return (
+    <section className="sec sec-light planos" id="planos" aria-labelledby="planos-title">
+      <div className="wrap">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Planos <Tbd /></span>
+          <h2 id="planos-title">Escolha pelo tamanho da sua gestão.</h2>
+          <p className="sec-lead">Três planos sobre o mesmo cadastro. Comece pelo essencial e some módulos quando a operação pedir, sem trocar de sistema.</p>
+        </header>
+        <div className="pl-legend" data-reveal>
+          <span><CelPlano c="i" /> Incluído</span>
+          <span><CelPlano c="o" /> Contratado à parte</span>
+          <span><CelPlano c="n" /> Não incluso</span>
+        </div>
+        <p className="pl-swipe" aria-hidden="true">Arraste a tabela para o lado para ver os três planos →</p>
+        <div ref={scroller} className={`pl-scroll${shadow ? ' is-scrolled' : ''}`} tabIndex={0} role="region" aria-label="Comparativo de funcionalidades por plano"
+          onScroll={(e) => setShadow(e.currentTarget.scrollLeft > 2)} data-reveal>
+          <table className="pl-table" id="planos-tabela">
+            <thead>
+              <tr>
+                <th className="pl-fix" scope="col">Módulos e funcionalidades</th>
+                {PLANOS.map((p) => (
+                  <th key={p.k} className={`pl-head ${p.k}`} scope="col">
+                    <b>{p.t}</b><span>{p.d}</span>
+                    <em>{p.u.map((x) => <i key={x}>{x}</i>)}</em>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            {COMPARATIVO.map((g) => (
+              <tbody key={g.g}>
+                <tr className="pl-grp"><th className="pl-fix" scope="rowgroup" colSpan={1}>{g.g}</th><td colSpan={3} /></tr>
+                {g.mods.flatMap((mod) => {
+                  const open = aberto === mod.m
+                  return [
+                    <tr key={mod.m} className={`pl-mod${open ? ' is-open' : ''}`}>
+                      <th className="pl-fix" scope="row">
+                        <button type="button" aria-expanded={open} onClick={() => alterna(mod.m)}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>{mod.m}
+                        </button>
+                      </th>
+                      {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
+                    </tr>,
+                    ...(open ? mod.f.map((f) => (
+                      <tr key={mod.m + f} className="pl-feat">
+                        <th className="pl-fix" scope="row">{f}</th>
+                        {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
+                      </tr>
+                    )) : []),
+                  ]
+                })}
+              </tbody>
+            ))}
+            <tfoot>
+              <tr>
+                <th className="pl-fix" scope="row">Módulos incluídos<small>os demais são contratados à parte ou vêm no plano de cima</small></th>
+                {inclusos.map((n, k) => <td key={k}><span className="pl-txt">{n} de {total}</span></td>)}
+              </tr>
+              <tr className="pl-cta">
+                <th className="pl-fix" scope="row" />
+                {PLANOS.map((p) => <td key={p.k}><a className="btn btn-ghost" href="#contato" data-interest="demonstracao">Falar sobre o {p.t}</a></td>)}
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p className="fineprint" data-reveal>Valores sob consulta, de acordo com o porte da fazenda (cabeças ou hectares) e o número de usuários.</p>
+      </div>
+    </section>
+  )
+}
 
 export function FaqSection() {
   return (
@@ -752,11 +960,19 @@ export function FaqSection() {
           <h2 id="duvidas-title">O que mais perguntam.</h2>
         </header>
         <div className="faq-list">
-          {FAQ.map((f) => (
-            <details key={f.q} data-reveal>
-              <summary>{f.q}</summary>
-              <p>{f.a} {f.tbd && <Tbd />}</p>
-            </details>
+          {FAQ_GRUPOS.map((g) => (
+            <div className="faq-group" key={g.t}>
+              <h3 className="faq-group-title" data-reveal>{g.t}</h3>
+              {g.qs.map((q) => {
+                const f = FAQ.find((x) => x.q === q)!
+                return (
+                  <details key={f.q} data-reveal open={FAQ_ABERTAS.has(f.q) || undefined}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a} {f.tbd && <Tbd />}</p>
+                  </details>
+                )
+              })}
+            </div>
           ))}
         </div>
       </div>
@@ -774,7 +990,7 @@ export function Footer() {
           <p>uma solução GB Agritech</p>
         </div>
         <nav aria-label="Rodapé">
-          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#duvidas">Dúvidas</a>
+          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#planos">Planos</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>

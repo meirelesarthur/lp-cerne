@@ -20,13 +20,28 @@ export const validators = {
   consent: (v: boolean) => (v ? '' : 'Aceite para receber nosso contato.'),
 }
 
-/** Envia para VITE_FORM_ENDPOINT (POST JSON). Sem endpoint: mock local, nada sai do navegador. */
+/** Origem da visita (UTM e referrer), anexada a todo lead para medir canal. */
+function attribution() {
+  const q = new URLSearchParams(window.location.search)
+  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid']
+  const out: Record<string, string> = {}
+  keys.forEach((k) => { const v = q.get(k); if (v) out[k] = v.slice(0, 120) })
+  if (document.referrer) out.referrer = document.referrer.slice(0, 200)
+  return out
+}
+
+/** Envia para VITE_FORM_ENDPOINT (POST JSON). Sem endpoint: mock local em desenvolvimento; em produção falha (nunca finge sucesso). */
 export async function submitLead(payload: Record<string, unknown>) {
+  const body = { ...payload, ...attribution(), pagina: window.location.pathname }
   if (ENDPOINT) {
-    const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     if (!res.ok) throw new Error(String(res.status))
     return
   }
+  if (import.meta.env.PROD) {
+    console.error('[Cerne LP] VITE_FORM_ENDPOINT não configurado: o lead não foi enviado.')
+    throw new Error('no-endpoint')
+  }
   await new Promise((r) => setTimeout(r, 900))
-  console.info('[Cerne LP] lead (mock, não enviado):', payload)
+  console.info('[Cerne LP] lead (mock, não enviado):', body)
 }

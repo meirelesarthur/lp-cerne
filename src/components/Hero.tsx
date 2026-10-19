@@ -149,6 +149,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
       })
       tl.to(state, { frame: m.count - 1, duration: P.seqEnd, onUpdate: () => scrub.current?.setFrame(state.frame) }, 0)
         .to('.hero-hint', { opacity: 0, duration: 0.04 }, 0)
+        .to('.hero-intro', { autoAlpha: 0, y: -28, ease: 'power2.in', duration: 0.06 }, 0)
         .to('.hero-progress i', { scaleX: 1, duration: P.appEnd }, 0)
         .to('.hero-progress', { autoAlpha: 0, duration: 0.03 }, P.appEnd)
       if (m.final && geo) {
@@ -164,8 +165,9 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
           .to('.frame-box', { x: zoom.tx, y: zoom.ty, scale: zoom.s, duration: 0.08, ease: 'power2.inOut' }, P.appEnd)
           .to('.tablet-video', { autoAlpha: 1, duration: 0.04 }, P.appEnd)
           .to('.hero-shade', { opacity: 1, duration: 0.08 }, P.appEnd)
-          .fromTo('.hero-copy', { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.02)
-          .fromTo('.hero-form-wrap', { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.05)
+          // autoAlpha: fora da fase o bloco fica com visibility:hidden (não recebe foco nem é lido)
+          .fromTo('.hero-copy', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.02)
+          .fromTo('.hero-form-wrap', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.appEnd + 0.05)
       }
       heroTrigger = tl.scrollTrigger ?? null
     }, root)
@@ -217,10 +219,22 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
         )}
         <div className="hero-shade" />
 
+        {/* primeira tela: proposta de valor e CTA já no quadro 0; some nos primeiros pixels de rolagem, e o título final assume */}
+        {!isStatic && (
+          <div className="hero-intro">
+            <div className="hero-intro-copy">
+              <h1>Do campo ao financeiro, <em>num só sistema.</em></h1>
+              <p className="lead">Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda num só lugar, e o custo de cada lote e talhão sem esperar o fechamento do mês.</p>
+              <button type="button" className="btn btn-primary" onClick={focusHeroForm}>Quero acesso antecipado</button>
+            </div>
+          </div>
+        )}
+
         <div className="hero-content">
           <div className="hero-copy">
-            <h1>Do campo ao financeiro, <em>num só sistema.</em></h1>
-            <p className="lead">O Cerne reúne rebanho, confinamento, suprimentos e financeiro da sua fazenda em um ERP web feito para o agro.</p>
+            {isStatic ? <h1>Do campo ao financeiro, <em>num só sistema.</em></h1> : <p className="h1" aria-hidden="true">Do campo ao financeiro, <em>num só sistema.</em></p>}
+            <p className="lead">Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda num só lugar, e o custo de cada lote e talhão sem esperar o fechamento do mês.</p>
+            <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">
             <HeroForm emailId={EMAIL_ID} />

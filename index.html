@@ -3,15 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f8f4" />
-    <meta name="description" content="Cerne: rebanho, confinamento, suprimentos e financeiro da sua fazenda em um ERP web feito para o agro." />
-    <title>Cerne | ERP para o agro</title>
+    <meta name="description" content="Rebanho, lavoura, suprimentos, fiscal e financeiro da fazenda num só sistema: 115 relatórios, NF-e, MDF-e e LCDPR, custo por lote e por talhão." />
+    <title>Cerne | ERP da fazenda: pecuária, lavoura, fiscal e financeiro</title>
+    <link rel="canonical" href="%VITE_SITE_URL%/" data-site />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Cerne" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" data-site />
+    <meta property="og:title" content="Cerne | Do campo ao financeiro, num só sistema" />
+    <meta property="og:description" content="Rebanho, lavoura, suprimentos, fiscal e financeiro da fazenda no mesmo cadastro. 115 relatórios e 10 painéis prontos." />
+    <meta property="og:image" content="%VITE_SITE_URL%/og-cerne.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Gestor com tablet mostrando o painel do Cerne Web diante de um confinamento e de uma lavoura" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cerne | Do campo ao financeiro, num só sistema" />
+    <meta name="twitter:description" content="Rebanho, lavoura, suprimentos, fiscal e financeiro da fazenda no mesmo cadastro. 115 relatórios e 10 painéis prontos." />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og-cerne.jpg" />
+    <link rel="preconnect" href="%VITE_ASSET_BASE%" crossorigin data-asset />
     <link rel="preload" as="image" fetchpriority="high" href="%VITE_ASSET_BASE%/frames/hero/desktop/poster-first.webp" media="(min-width: 821px), (orientation: landscape)" />
     <link rel="preload" as="image" fetchpriority="high" href="%VITE_ASSET_BASE%/frames/hero/mobile/poster-first.webp" media="(max-width: 820px) and (orientation: portrait)" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://gbagritech.com.br/#organization",
+            "name": "GB Agritech",
+            "url": "https://gbagritech.com.br"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Cerne Web",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "pt-BR",
+            "description": "ERP da fazenda: pecuária, lavoura, suprimentos, fiscal (NF-e, CT-e, MDF-e, LCDPR) e financeiro no mesmo sistema, com custo por lote e por talhão.",
+            "publisher": { "@id": "https://gbagritech.com.br/#organization" }
+          },
+          {
+            "@type": "WebSite",
+            "name": "Cerne",
+            "inLanguage": "pt-BR",
+            "publisher": { "@id": "https://gbagritech.com.br/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="font-family: system-ui, sans-serif; max-width: 640px; margin: 15vh auto; padding: 0 20px; color: #171717">
+        <h1>Cerne: do campo ao financeiro, num só sistema.</h1>
+        <p>Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda num só lugar: 115 relatórios, 10 painéis, NF-e, CT-e, MDF-e e LCDPR.</p>
+        <p>Esta página usa JavaScript para exibir o conteúdo completo. Para falar com a equipe, acesse <a href="https://gbagritech.com.br">gbagritech.com.br</a>.</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
