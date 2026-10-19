@@ -76,7 +76,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 **Hero**
 - H1 mantido: "Do campo ao financeiro, num só sistema." É forte.
 - Lead → **"Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda no mesmo cadastro, com custo por lote e por talhão sem planilha paralela."**
-- Abaixo do lead, uma linha de prova: **"115 relatórios · 11 painéis · NF-e, MDF-e e LCDPR"**.
+- Abaixo do lead, uma linha de prova: **"115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR"**.
 
 **02 Escopo (GroundSection)**
 - H2 "Tudo da fazenda em uma visão só." → **"Uma fazenda, um cadastro, nenhuma planilha paralela."**
@@ -100,7 +100,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
 - Pecuária: itens → Mapa de confinamento · Reprodução IATF/FIV · Pesagem e GMD · SISBOV (relatórios).
 - Suprimentos: acrescentar **"Cotação respondida pelo fornecedor via link"** e **"SLA de compras"**.
 - Financeiro: Contas a pagar/receber · Conciliação OFX · DRE · Previsto × realizado.
-- Dashboards e relatórios: **"115 relatórios em PDF e Excel e 11 painéis prontos"**. Trocar a lista pelos painéis reais.
+- Dashboards e relatórios: **"115 relatórios em PDF e Excel e 10 painéis prontos"**. Trocar a lista pelos painéis reais.
 
 **Maquete (model.ts)**
 - Confinamento: tirar "trato diário/leitura de cocho" do Web e deixar "Mapa de confinamento, dietas, batidas, pesagem e sanitário". O trato fica como "pelo app Operação (em teste)", se confirmado.
@@ -143,7 +143,7 @@ A LP fala de 4 a 6 frentes e trata o fiscal como "[a validar]".
    Defaults para as decisões do §4 até haver validação:
    - (1) trato e cocho ficam só como app Operação (em teste) e saem das afirmações do Web;
    - (2) mantém "acesso antecipado" e reforça "Agendar demonstração" para o Web já disponível;
-   - (3) números publicados como "115 relatórios" e "11 painéis";
+   - (3) números publicados como "115 relatórios" e "10 painéis";
    - (4) e (5) fiscal, rastreio e balança são afirmados como funcionalidades do Web.
 1. Salvar esta análise em `workbench/docs/15-copy-vs-produto.md`, seguindo a numeração atual dos docs.
 2. Aplicar a copy aprovada:
