@@ -194,6 +194,8 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .base .chips { margin: 0; }
 .base-note { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding-top: 16px; border-top: 1px dashed #b9d4c1; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
 .base-note i { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(5, 150, 105, .16); }
+/* a nota ocupa a largura toda do card (o limite de 46ch de .cell p é para a descrição) */
+.cell .base-note { max-width: none; }
 .cell-f .feats li { background: #fff; }
 .spine { margin-top: 34px; display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; padding: 18px 24px; border-radius: 16px; background: rgba(255, 255, 255, .7); border: 1px solid var(--border); backdrop-filter: blur(8px); }
 .spine > span { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); white-space: nowrap; }
