@@ -821,6 +821,136 @@ const FAQ_GRUPOS = [
 ]
 const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
 
+/* ───────────────────────── Planos (comparativo sem preço) ───────────────────────── */
+// célula por plano [Pro, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
+type PlCel = 'i' | 'o' | 'n' | string
+type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
+const PLANOS = [
+  { k: 'pro', t: 'Pro', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
+  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['2 atividades', '5 usuários'] },
+  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['todas as atividades', '10 usuários'] },
+]
+const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
+  { g: 'Base de todos os planos', mods: [
+    { m: 'Financeiro', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber', 'Caixa e bancos', 'Fluxo bancário'] },
+    { m: 'Estoque e entradas', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e', 'Baixas, correções e transferências', 'Saldo por armazém'] },
+    { m: 'Fiscal', p: ['i', 'i', 'i'], f: ['Emissão de NF-e', 'XML e LCDPR', 'Regras fiscais e acesso do contador'] },
+    { m: 'Frota e bens', p: ['i', 'i', 'i'], f: ['Manutenções e revisões', 'Abastecimentos', 'Inventário de bens'] },
+    { m: 'Cadastros', p: ['i', 'i', 'i'], f: ['Fazendas e safras', 'Produtos e armazéns', 'Fornecedores, clientes e funcionários'] },
+    { m: 'Atividades', p: ['1 à escolha', '2 à escolha', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
+    { m: 'Relatórios e painéis', p: ['i', 'i', 'i'], f: ['Relatórios em PDF e Excel', 'Painéis de acompanhamento', 'Pluviometria'] },
+  ] },
+  { g: 'Gestão e custos', mods: [
+    { m: 'Gestão gerencial', p: ['n', 'i', 'i'], f: ['DRE', 'Previsto × realizado', 'Centro de custo e rateios', 'Contratos e financiamentos'] },
+    { m: 'Contabilidade', p: ['n', 'i', 'i'], f: ['Depreciação mensal e prevista', 'Partida dobrada e plano de contas'] },
+    { m: 'Conciliação bancária', p: ['o', 'i', 'i'], f: ['Importação de OFX e extratos', 'Meses conciliados'] },
+    { m: 'CT-e e MDF-e', p: ['o', 'i', 'i'], f: ['Emissão e manifestação de CT-e', 'Emissão de MDF-e'] },
+    { m: 'Integração Domínio', p: ['o', 'i', 'i'], f: ['Exportação de movimentos e títulos', 'NFS-e e CSV para a contabilidade'] },
+    { m: 'Planejamento e orçamento', p: ['o', 'i', 'i'], f: ['Planejamento agrícola e pecuário', 'Previsão orçamentária'] },
+    { m: 'Reprodução', p: ['o', 'i', 'i'], f: ['Estação de monta e protocolos', 'Acasalamento e diagnóstico de gestação', 'Genealogia'] },
+    { m: 'Confinamento', p: ['o', 'i', 'i'], f: ['Dietas e batidas', 'Pátios, currais e mapa', 'Fases de alimentação'] },
+    { m: 'Fábrica de ração', p: ['o', 'i', 'i'], f: ['Formulação e batidas', 'Custo de produção da ração'] },
+    { m: 'Balança e contratos de grãos', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária', 'Descontos e classificação', 'Contratos de venda de grãos'] },
+    { m: 'Carregamento de frutas', p: ['o', 'i', 'i'], f: ['Cargas', 'Fechamento semanal e títulos'] },
+  ] },
+  { g: 'Operação corporativa', mods: [
+    { m: 'Compras', p: ['o', 'o', 'i'], f: ['Solicitação e cotação com fornecedores', 'Autorização por alçada', 'Compra e recebimento', 'SLA e savings'] },
+    { m: 'Vendas e pedidos', p: ['o', 'o', 'i'], f: ['Orçamentos e pedidos', 'Vendas e relatórios por cliente e produto'] },
+    { m: 'Ordens de serviço', p: ['o', 'o', 'i'], f: ['Abertura e acompanhamento', 'Monitoramento e avaliações'] },
+    { m: 'Gestão de pessoal', p: ['o', 'o', 'i'], f: ['Faltas e adiantamentos', 'Apuração mensal', 'Folha para o Domínio'] },
+    { m: 'Gestão documental', p: ['o', 'o', 'i'], f: ['Repositório de documentos com vencimentos'] },
+    { m: 'Rastreabilidade', p: ['o', 'o', 'i'], f: ['Rastreio por lote', 'Página pública da fazenda'] },
+    { m: 'Implantação e suporte', p: ['n', 'n', 'i'], f: ['Implantação dedicada', 'Atendimento prioritário com SLA'] },
+  ] },
+]
+const CelPlano = ({ c }: { c: PlCel }) =>
+  c === 'i' ? <span className="pl-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg><span className="sr-only">Incluído</span></span>
+  : c === 'o' ? <span className="pl-opt">Opcional</span>
+  : c === 'n' ? <span className="pl-no" aria-label="Não incluso">—</span>
+  : <span className="pl-txt">{c}</span>
+
+/**
+ * Comparativo dos planos por módulo e funcionalidade, sem preço. No celular a tabela rola na horizontal com a
+ * coluna das funcionalidades fixa, para a página não crescer em altura. Começa só com os módulos e funciona como
+ * acordeão: abrir um módulo fecha o que estava aberto.
+ */
+export function PlansSection() {
+  const scroller = useRef<HTMLDivElement>(null)
+  const [shadow, setShadow] = useState(false)
+  const [aberto, setAberto] = useState<string | null>(null)
+  const alterna = (m: string) => setAberto((a) => (a === m ? null : m))
+  const total = COMPARATIVO.reduce((a, g) => a + g.mods.length, 0)
+  const inclusos = [0, 1, 2].map((k) => COMPARATIVO.reduce((a, g) => a + g.mods.filter((x) => x.p[k] !== 'n' && x.p[k] !== 'o').length, 0))
+  return (
+    <section className="sec sec-light planos" id="planos" aria-labelledby="planos-title">
+      <div className="wrap">
+        <header className="sec-head" data-reveal>
+          <span className="eyebrow">Planos <Tbd /></span>
+          <h2 id="planos-title">Escolha pelo tamanho da sua gestão.</h2>
+          <p className="sec-lead">Três planos sobre o mesmo cadastro. Comece pelo essencial e some módulos quando a operação pedir, sem trocar de sistema.</p>
+        </header>
+        <div className="pl-legend" data-reveal>
+          <span><CelPlano c="i" /> Incluído</span>
+          <span><CelPlano c="o" /> Contratado à parte</span>
+          <span><CelPlano c="n" /> Não incluso</span>
+        </div>
+        <p className="pl-swipe" aria-hidden="true">Arraste a tabela para o lado para ver os três planos →</p>
+        <div ref={scroller} className={`pl-scroll${shadow ? ' is-scrolled' : ''}`} tabIndex={0} role="region" aria-label="Comparativo de funcionalidades por plano"
+          onScroll={(e) => setShadow(e.currentTarget.scrollLeft > 2)} data-reveal>
+          <table className="pl-table" id="planos-tabela">
+            <thead>
+              <tr>
+                <th className="pl-fix" scope="col">Módulos e funcionalidades</th>
+                {PLANOS.map((p) => (
+                  <th key={p.k} className={`pl-head ${p.k}`} scope="col">
+                    <b>{p.t}</b><span>{p.d}</span>
+                    <em>{p.u.map((x) => <i key={x}>{x}</i>)}</em>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            {COMPARATIVO.map((g) => (
+              <tbody key={g.g}>
+                <tr className="pl-grp"><th className="pl-fix" scope="rowgroup" colSpan={1}>{g.g}</th><td colSpan={3} /></tr>
+                {g.mods.flatMap((mod) => {
+                  const open = aberto === mod.m
+                  return [
+                    <tr key={mod.m} className={`pl-mod${open ? ' is-open' : ''}`}>
+                      <th className="pl-fix" scope="row">
+                        <button type="button" aria-expanded={open} onClick={() => alterna(mod.m)}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>{mod.m}
+                        </button>
+                      </th>
+                      {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
+                    </tr>,
+                    ...(open ? mod.f.map((f) => (
+                      <tr key={mod.m + f} className="pl-feat">
+                        <th className="pl-fix" scope="row">{f}</th>
+                        {mod.p.map((c, k) => <td key={k}><CelPlano c={c} /></td>)}
+                      </tr>
+                    )) : []),
+                  ]
+                })}
+              </tbody>
+            ))}
+            <tfoot>
+              <tr>
+                <th className="pl-fix" scope="row">Módulos incluídos<small>os demais são contratados à parte ou vêm no plano de cima</small></th>
+                {inclusos.map((n, k) => <td key={k}><span className="pl-txt">{n} de {total}</span></td>)}
+              </tr>
+              <tr className="pl-cta">
+                <th className="pl-fix" scope="row" />
+                {PLANOS.map((p) => <td key={p.k}><a className="btn btn-ghost" href="#contato" data-interest="demonstracao">Falar sobre o {p.t}</a></td>)}
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p className="fineprint" data-reveal>Valores sob consulta, de acordo com o porte da fazenda (cabeças ou hectares) e o número de usuários.</p>
+      </div>
+    </section>
+  )
+}
+
 export function FaqSection() {
   return (
     <section className="sec sec-light faq" id="duvidas" aria-labelledby="duvidas-title">
@@ -860,7 +990,7 @@ export function Footer() {
           <p>uma solução GB Agritech</p>
         </div>
         <nav aria-label="Rodapé">
-          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
+          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#planos">Planos</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>

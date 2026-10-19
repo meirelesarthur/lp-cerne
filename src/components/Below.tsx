@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import {
-  ContactSection, EditionsSection, FaqSection, Footer, ProblemSection,
+  ContactSection, EditionsSection, FaqSection, Footer, PlansSection, ProblemSection,
   ProfilesSection, SystemSection, TrailerSection, TwinSection,
 } from './Sections'
 import { initHeaderTone, initReveal } from '../lib/reveal'
@@ -27,6 +27,7 @@ export default function Below() {
       <EditionsSection />
       <ProfilesSection />
       <TwinSection />
+      <PlansSection />
       <FaqSection />
       <ContactSection />
     </>

@@ -431,3 +431,61 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .faq-group-title { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
 .faq-group details + details { margin-top: 10px; }
 .trailer .scrub-bar i { transition: transform .25s linear; }
+
+/* ===== Planos: comparativo por módulo e funcionalidade (sem preço); no celular rola na horizontal ===== */
+.pl-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
+.pl-legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.pl-swipe { display: none; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.pl-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); overscroll-behavior-x: contain; box-shadow: 0 10px 30px rgba(23, 40, 30, .05); }
+.pl-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pl-table { width: 100%; min-width: 760px; border-collapse: separate; border-spacing: 0; font-size: 15px; }
+.pl-table th, .pl-table td { padding: 10px 18px; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; font-weight: 400; }
+.pl-table .pl-fix { position: sticky; left: 0; z-index: 1; width: 40%; min-width: 260px; text-align: left; background: var(--surface); }
+.pl-scroll.is-scrolled .pl-fix { box-shadow: 10px 0 12px -12px rgba(23, 40, 30, .45); }
+.pl-table thead th { position: relative; padding-block: 22px 18px; vertical-align: bottom; border-bottom: 2px solid var(--border); }
+.pl-table thead .pl-fix { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pl-head { --c: var(--accent-hover); width: 20%; }
+.pl-head.dlx { --c: #9a6408; } .pl-head.ent { --c: #3c4a9e; }
+.pl-head::before { content: ''; position: absolute; left: 14px; right: 14px; top: 0; height: 4px; border-radius: 0 0 4px 4px; background: var(--c); }
+.pl-head b { display: block; font-size: 22px; font-weight: 600; letter-spacing: -.01em; color: var(--c); }
+.pl-head span { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
+.pl-head em { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px 0; margin-top: 10px; padding: 4px 10px; border-radius: 8px; background: var(--mint); font-size: 12px; font-style: normal; color: var(--text-soft); }
+.pl-head em i { font-style: normal; white-space: nowrap; }
+.pl-head em i + i::before { content: '·'; margin: 0 6px; }
+.pl-grp th, .pl-grp td { padding-block: 9px; background: var(--mint); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
+.pl-grp .pl-fix { background: var(--mint); }
+.pl-mod th, .pl-mod td { padding-top: 14px; }
+.pl-mod button { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-weight: 600; color: var(--text); cursor: pointer; text-align: left; }
+.pl-mod button svg { flex: none; width: 16px; height: 16px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(90deg); transition: transform .2s; }
+.pl-mod button[aria-expanded='false'] svg { transform: none; }
+.pl-mod button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+/* módulo aberto: linha e funcionalidades num tom só, para ler como um bloco */
+.pl-mod.is-open > *, .pl-mod.is-open + .pl-feat > *, .pl-mod.is-open ~ .pl-feat > * { background: #f3f8f4; }
+.pl-mod.is-open button { color: var(--accent-hover); }
+.pl-feat th { padding-left: 40px; font-size: 14px; color: var(--text-soft); }
+.pl-feat th, .pl-feat td { padding-block: 7px; border-bottom-color: transparent; }
+.pl-feat td { opacity: .55; }
+.pl-table tbody tr.pl-mod + tr.pl-feat th, .pl-table tbody tr.pl-feat + tr.pl-feat th { border-bottom-color: transparent; }
+.pl-table tbody tr:not(.pl-grp):hover > * { background: #f3f8f4; }
+.pl-yes { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dcefe3; color: var(--accent-hover); vertical-align: middle; }
+.pl-yes svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pl-opt { display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px dashed #b98aa6; background: #f7ebf2; color: #8a3b6b; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pl-no { color: #9aa99f; }
+.pl-txt { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pl-table tfoot th, .pl-table tfoot td { border-bottom: 0; border-top: 2px solid var(--border); padding-block: 16px; }
+.pl-table tfoot th { font-weight: 600; }
+.pl-table tfoot small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 400; color: var(--muted); }
+.pl-table tfoot .pl-txt { font-size: 16px; }
+.pl-table .pl-cta th, .pl-table .pl-cta td { border-top: 0; padding-top: 0; padding-bottom: 20px; }
+.pl-cta .btn { font-size: 14px; padding-inline: 14px; white-space: nowrap; }
+@media (max-width: 760px) {
+  .pl-swipe { display: block; }
+  .pl-table { min-width: 560px; font-size: 14px; }
+  .pl-table th, .pl-table td { padding-inline: 10px; }
+  .pl-table .pl-fix { width: auto; min-width: 168px; max-width: 176px; }
+  .pl-feat th { padding-left: 32px; font-size: 13px; }
+  .pl-head b { font-size: 18px; }
+  .pl-head em { flex-direction: column; font-size: 11px; padding: 4px 8px; }
+  .pl-head em i + i::before { content: none; }
+  .pl-cta .btn { font-size: 12.5px; padding-inline: 10px; }
+}
