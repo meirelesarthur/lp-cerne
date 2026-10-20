@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Icon, WhatsappIcon } from '../lib/icons'
 
 /** CTA fixo depois do Hero (o header só leva de volta ao topo); some quando o formulário completo ou a maquete da fazenda estão na tela. */
 export function StickyCta() {
@@ -18,8 +19,9 @@ export function StickyCta() {
     return () => window.removeEventListener('scroll', sync)
   }, [])
   return (
-    <a className={`sticky-cta btn btn-primary${hide ? ' is-hidden' : ''}`} href="#contato" data-interest="demonstracao" tabIndex={hide ? -1 : 0} aria-hidden={hide || undefined}>
-      Agendar demonstração
+    <a className={`sticky-cta btn btn-primary${hide ? ' is-hidden' : ''}`} href="#contato" tabIndex={hide ? -1 : 0} aria-hidden={hide || undefined}>
+      <Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />
+      Entre em contato
     </a>
   )
 }
