@@ -140,22 +140,9 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 }
 
 /* ===== 04 · Trailer ===== */
-.trailer-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: clamp(24px, 3vw, 48px); align-items: center; }
-.browser { position: relative; margin: 0; justify-self: center; width: min(100%, calc((100svh - 260px) * 1740 / 1200)); border-radius: 14px; overflow: hidden; background: #0b2016; border: 1px solid #1c3f2c; box-shadow: 0 40px 100px rgba(0, 0, 0, .45); }
 .browser-bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: #10261b; }
 .browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a4a38; }
 .browser-bar span { margin-left: 12px; font-size: 12px; color: #7da893; }
-.browser video { display: block; width: 100%; aspect-ratio: 1740 / 1200; object-fit: cover; background: #f3f4f3; }
-.chapters { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.scrub-bar { height: 2px; margin: 0 14px 10px; background: rgba(169, 199, 182, .2); border-radius: 2px; overflow: hidden; }
-.scrub-bar i { display: block; height: 100%; background: #4ade80; transform-origin: 0 50%; transform: scaleX(0); }
-@media (max-width: 960px) { .scrub-bar { display: none; } }
-.chapters button { width: 100%; display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: #a9c7b6; text-align: left; cursor: pointer; transition: background .25s, border-color .25s, color .25s; }
-.chapters button:hover { border-color: #1c3f2c; }
-.chapters button.on { background: rgba(74, 222, 128, .08); border-color: rgba(74, 222, 128, .35); color: #e2f0e8; }
-.chapters b { font-size: 13px; color: #4ade80; padding-top: 2px; }
-.chapters strong { display: block; font-size: 16px; font-weight: 600; color: inherit; }
-.chapters small { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.4; color: #7da893; }
 
 /* ===== 05 · Sistema (bento) ===== */
 .cell { display: flex; flex-direction: column; gap: 20px; padding: 26px 26px 0; border-radius: 20px; background: #fff; border: 1px solid var(--border); overflow: hidden; transition: transform .25s, box-shadow .25s; min-height: 220px; }
@@ -315,11 +302,10 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 /* ===== Responsivo ===== */
 @media (max-width: 960px) {
   .frentes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .fatos, .trailer-grid, .contact-grid, .faq-inner, .editions-grid { grid-template-columns: 1fr; }
-  .chapters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fatos, .contact-grid, .faq-inner, .editions-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
-  .frentes, .row2, .chapters { grid-template-columns: 1fr; }
+  .frentes, .row2 { grid-template-columns: 1fr; }
   .ground-content { padding-top: 24vh; }
 }
 
@@ -395,13 +381,10 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .dif-title { margin: 0 0 16px; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
 .fz-placeholder { min-height: 100svh; }
 @media (max-width: 719px) { .fz-placeholder { min-height: clamp(470px, 64svh, 640px); } }
-.video-toggle { position: absolute; right: 12px; bottom: 12px; min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .5); background: rgba(5, 16, 8, .72); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(6px); }
-.video-toggle:hover { background: rgba(5, 16, 8, .88); }
 .form .sub.show { display: block; margin: 0; }
 .faq-group + .faq-group { margin-top: 28px; }
 .faq-group-title { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
 .faq-group details + details { margin-top: 10px; }
-.trailer .scrub-bar i { transition: transform .25s linear; }
 
 /* ===== Planos: comparativo por módulo e funcionalidade (sem preço); no celular rola na horizontal ===== */
 .pl-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
@@ -474,7 +457,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-mod button svg { color: var(--muted); }
 .pl-yes svg { stroke: currentColor; }
 .medal-icon { color: currentColor; }
-.video-toggle { display: inline-flex; align-items: center; gap: 6px; }
 
 /* título dentro da primeira célula da tabela (sem cabeçalho de seção) e legenda no rodapé */
 .pl-table thead th.pl-title { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--text); vertical-align: middle; }

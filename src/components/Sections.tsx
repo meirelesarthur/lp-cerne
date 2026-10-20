@@ -7,10 +7,11 @@ import { MaskedHeading } from './fx/MaskedHeading'
 import { StrokeText } from './fx/StrokeText'
 import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
 import { FolderFloat } from './fx/FolderFloat'
+import { CardSwap, type SwapItem } from './fx/CardSwap'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
-  BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
+  BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
   SecurityLockIcon, Tick02Icon, WeightScale01Icon,
 } from '../lib/icons'
 
@@ -182,87 +183,20 @@ export function ProblemSection() {
 }
 
 /* ───────────────────────── 04 · Trailer ───────────────────────── */
-const CAPITULOS = [
-  { t: 0, n: 'Visão geral', d: 'Indicadores da fazenda num painel só.' },
-  { t: 3.6, n: 'Pecuária de corte', d: 'Rebanho, composição e manejos do período.' },
-  { t: 6.4, n: 'Lotação de currais', d: 'Quem está onde e o que precisa de atenção.' },
-  { t: 9.2, n: 'Custos do confinamento', d: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.' },
-  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas, atrasados e orçado × realizado.' },
+// as cinco telas que passam na pilha (a cada 3 s); imagens já usadas no resto da página
+const TELAS: SwapItem[] = [
+  { key: 'geral', title: 'Visão geral', desc: 'Indicadores da fazenda num painel só.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão geral' },
+  { key: 'pecuaria', title: 'Pecuária de corte', desc: 'Rebanho, composição e manejos do período.', src: '/screens/pecuaria.webp', alt: 'Cerne Web: painel Pecuária de corte' },
+  { key: 'lotacao', title: 'Lotação de currais', desc: 'Quem está onde e o que precisa de atenção.', src: '/screens/lotacao-currais.webp', alt: 'Cerne Web: lotação de currais' },
+  { key: 'custos', title: 'Custos do confinamento', desc: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.', src: '/screens/custos-confinamento.webp', alt: 'Cerne Web: custos do confinamento' },
+  { key: 'financeiro', title: 'Financeiro', desc: 'Receitas, despesas, atrasados e orçado × realizado.', src: '/screens/financeiros.webp', alt: 'Cerne Web: financeiro' },
 ]
 
 export function TrailerSection() {
   const root = useRef<HTMLElement>(null)
-  const video = useRef<HTMLVideoElement>(null)
-  const bar = useRef<HTMLElement>(null)
-  const capRef = useRef(0)
-  const userPaused = useRef(false)
   const media = useAfterFirstScroll()
-  const [cap, setCap] = useState(0)
-  const [paused, setPaused] = useState(true)
-  const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const topoNear = useNear(root, '60% 0px')
   const [topo] = useState(() => window.matchMedia(TOPO_MQ).matches && !shouldSkipScrub())
-
-  useEffect(() => {
-    const v = video.current
-    if (!v) return
-    // movimento reduzido: o vídeo só toca se a pessoa pedir; senão toca ao entrar na tela e pausa ao sair
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        if (v.preload === 'none') v.preload = 'auto'
-        if (!reduced && !userPaused.current) void v.play().catch(() => {})
-      } else v.pause()
-    }, { threshold: 0.35 })
-    io.observe(v)
-    const onTime = () => {
-      const t = v.currentTime % 15
-      let i = 0
-      CAPITULOS.forEach((c, k) => { if (t >= c.t) i = k })
-      if (i !== capRef.current) { capRef.current = i; setCap(i) }
-      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(1, v.currentTime / (v.duration || 15))})`
-    }
-    const onState = () => setPaused(v.paused)
-    v.addEventListener('timeupdate', onTime)
-    v.addEventListener('play', onState)
-    v.addEventListener('pause', onState)
-    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime); v.removeEventListener('play', onState); v.removeEventListener('pause', onState) }
-  }, [reduced])
-
-  const goTo = (i: number) => {
-    const v = video.current
-    capRef.current = i
-    setCap(i)
-    if (!v) return
-    v.currentTime = CAPITULOS[i].t + 0.05
-    userPaused.current = false
-    void v.play().catch(() => {})
-  }
-  const toggle = () => {
-    const v = video.current
-    if (!v) return
-    if (v.paused) { userPaused.current = false; void v.play().catch(() => {}) } else { userPaused.current = true; v.pause() }
-  }
-
-  // roda de capítulos: arraste na vertical ou use as setas (cima/baixo) para girar; cada passo troca o capítulo e o vídeo
-  const drag = useRef<{ y: number; i: number } | null>(null)
-  const wheel = {
-    onPointerDown: (e: React.PointerEvent) => { drag.current = { y: e.clientY, i: capRef.current } },
-    onPointerMove: (e: React.PointerEvent) => {
-      const d = drag.current
-      if (!d) return
-      const i = Math.max(0, Math.min(CAPITULOS.length - 1, d.i - Math.round((e.clientY - d.y) / 64)))
-      if (i !== capRef.current) goTo(i)
-    },
-    onPointerUp: () => { drag.current = null },
-    onPointerCancel: () => { drag.current = null },
-    onKeyDown: (e: React.KeyboardEvent) => {
-      const dir = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0
-      if (!dir) return
-      e.preventDefault()
-      const i = Math.max(0, Math.min(CAPITULOS.length - 1, capRef.current + dir))
-      if (i !== capRef.current) { goTo(i); (e.currentTarget.querySelectorAll('button')[i] as HTMLElement | undefined)?.focus() }
-    },
-  }
 
   return (
     <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
@@ -273,27 +207,8 @@ export function TrailerSection() {
           <h2 id="trailer-title">Veja o Cerne por dentro.</h2>
           <p className="sec-lead">Telas reais do Cerne Web, com dados de demonstração.</p>
         </header>
-        <div className="trailer-grid">
-          <figure className="browser" data-reveal>
-            <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web" aria-describedby="trailer-desc">
-              <source src={asset('/video/system-loop.webm')} type="video/webm" />
-              <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
-            </video>
-            <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
-            <button type="button" className="video-toggle" onClick={toggle}><Icon icon={paused ? PlayIcon : PauseIcon} size={16} strokeWidth={2} />{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
-          </figure>
-          <ol className="chapters wheel" data-reveal {...wheel}>
-            <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
-            {CAPITULOS.map((c, i) => (
-              <li key={c.n} style={{ '--d': i - cap } as React.CSSProperties} data-far={Math.abs(i - cap) > 2 || undefined}>
-                <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
-                  <b>{String(i + 1).padStart(2, '0')}</b>
-                  <span><strong>{c.n}</strong><small>{c.d}</small></span>
-                </button>
-              </li>
-            ))}
-          </ol>
+        <div data-reveal>
+          <CardSwap label="Telas do Cerne Web" interval={3000} items={TELAS.map((t) => ({ ...t, src: media && t.src ? asset(t.src) : undefined }))} />
         </div>
       </div>
     </section>

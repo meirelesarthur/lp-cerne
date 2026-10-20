@@ -112,20 +112,37 @@
   .ff-notes li { position: static; opacity: 1; transform: none; transition: none; box-shadow: none; }
 }
 
-/* ── Option Wheel (capítulos do Trailer): roda vertical em 3D; o capítulo ativo fica ao centro ── */
-@media (min-width: 961px) and (prefers-reduced-motion: no-preference) {
-  .chapters.wheel { display: block; position: relative; height: 400px; perspective: 900px; perspective-origin: 0 50%; touch-action: pan-y; user-select: none; cursor: grab; mask-image: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent); }
-  .chapters.wheel:active { cursor: grabbing; }
-  .chapters.wheel .scrub-bar { display: none; }
-  .chapters.wheel li:not(.scrub-bar) {
-    position: absolute; left: 0; right: 0; top: 50%; margin-top: -42px;
-    transform-origin: 0 50%;
-    transform: translateY(calc(var(--d) * 86px)) rotateX(calc(var(--d) * -26deg)) translateZ(calc(var(--d) * var(--d) * -28px));
-    opacity: calc(1 - var(--d) * var(--d) * .22 - (var(--d) * var(--d) * var(--d) * var(--d)) * .02);
-    transition: transform .55s cubic-bezier(.3, .8, .2, 1), opacity .4s;
+/* ── Card Swap (Trailer): telas empilhadas em 3D, centralizadas, trocando a cada 3 s ── */
+.cs { display: grid; justify-items: center; gap: 22px; }
+.cs-stage { list-style: none; margin: 0; padding: 0; position: relative; width: min(100%, 860px); aspect-ratio: 1.45; }
+.cs-card { position: absolute; left: 0; bottom: 0; width: 100%; border-radius: 14px; overflow: hidden; background: #0b2016; border: 1px solid #1c3f2c; box-shadow: 0 30px 70px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; transition: opacity .5s; }
+.cs-card.is-front { opacity: 1; pointer-events: auto; }
+.cs-screen { aspect-ratio: 1280 / 800; background: #f3f4f3; }
+.cs-screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.cs-hit { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.cs-hit:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.cs-caption { display: grid; gap: 4px; text-align: center; min-height: 52px; }
+.cs-caption strong { font-size: 20px; font-weight: 600; color: #fff; }
+.cs-caption span { font-size: 15px; color: #a9c7b6; }
+.cs-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.cs-pill { position: relative; overflow: hidden; padding: 8px 14px; border-radius: 999px; border: 1px solid #1c3f2c; background: transparent; color: #a9c7b6; font: inherit; font-size: 13.5px; cursor: pointer; transition: border-color .25s, color .25s; }
+.cs-pill span { position: relative; }
+.cs-pill i { position: absolute; inset: 0; background: rgba(74, 222, 128, .2); transform: scaleX(0); transform-origin: 0 50%; }
+.cs-pill.on { border-color: rgba(74, 222, 128, .55); color: #e2f0e8; }
+.cs-pill.on i { transform: scaleX(1); }
+.cs-pill.on.run i { animation: cs-fill var(--ms) linear forwards; }
+.cs-pill:focus-visible { outline: 2px solid #86efac; outline-offset: 2px; }
+@keyframes cs-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+  .cs-stage { transform: translateX(-4%); }
+  .cs-card {
+    width: 88%; transform-origin: 0 100%;
+    transform: translate3d(calc(var(--p) * 3.6%), calc(var(--p) * -4.6%), calc(var(--p) * -70px));
+    opacity: calc(1 - var(--p) * .15); pointer-events: auto; z-index: calc(10 - var(--p));
+    transition: transform .8s cubic-bezier(.34, 1.3, .5, 1), opacity .6s;
   }
-  .chapters.wheel li[data-far] { opacity: 0; pointer-events: none; }
-  .chapters.wheel button { min-height: 84px; }
+  .cs-card:not(.is-front)::after { content: ''; position: absolute; inset: 0; background: rgba(8, 26, 18, .38); pointer-events: none; }
+  .cs-stage { perspective: 1500px; perspective-origin: 40% 70%; }
 }
 
 /* ── Topography (fundo do Trailer): canvas atrás do conteúdo, sem capturar ponteiro ── */
