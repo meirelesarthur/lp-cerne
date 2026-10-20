@@ -5,6 +5,7 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
+import MagicRings from './MagicRings'
 import {
   ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
   SecurityLockIcon, Tick02Icon, WeightScale01Icon,
@@ -41,6 +42,7 @@ const CONVERSA = [
 export function ProblemSection() {
   const root = useRef<HTMLElement>(null)
   const media = useAfterFirstScroll()
+  const [fx, setFx] = useState(false)
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia()
@@ -61,44 +63,11 @@ export function ProblemSection() {
         return axis === 'x' ? m.x + (i - 1) * m.w * 0.24 - c.x : m.y + 6 - c.y
       }
 
-      // anéis mágicos: ondas verdes concêntricas saem do ponto de luz e varrem a tela (canvas 2D, dirigido pela rolagem)
-      const cv = q<HTMLCanvasElement>('.rings')
-      const rctx = cv.getContext('2d')!
-      const wave = { t: 0 }
-      const RINGS = 16
-      const sizeRings = () => { const d = Math.min(2, window.devicePixelRatio || 1); cv.width = Math.round(W() * d); cv.height = Math.round(H() * d) }
-      const drawRings = () => {
-        rctx.clearRect(0, 0, cv.width, cv.height)
-        if (wave.t <= 0 || wave.t >= 1.2) return
-        const d = cv.width / W(), c = target(), cx = c.x * d, cy = (c.y + 6) * d
-        const maxR = Math.hypot(Math.max(c.x, W() - c.x), Math.max(c.y, H() - c.y)) * 1.15 * d
-        for (let i = 0; i < RINGS; i++) {
-          const u = (wave.t - i * 0.032) / 0.46 // vida do anel i: 0 nasce no ponto, 1 some na borda
-          if (u <= 0 || u >= 1) continue
-          const r = Math.max(2, (1 - Math.pow(1 - u, 2.2)) * maxR)
-          const a = Math.pow(1 - u, 1.25) * (i === 0 ? 1 : 0.85)
-          const lw = (2.2 + 11 * (1 - u)) * d
-          rctx.beginPath(); rctx.arc(cx, cy, r, 0, Math.PI * 2)
-          // brilho em duas camadas largas e translúcidas (mais barato que shadowBlur em tela cheia)
-          rctx.lineWidth = lw * 5.5; rctx.strokeStyle = `rgba(16,185,129,${(a * 0.09).toFixed(3)})`; rctx.stroke()
-          rctx.lineWidth = lw * 2.4; rctx.strokeStyle = `rgba(52,211,153,${(a * 0.2).toFixed(3)})`; rctx.stroke()
-          // fio brilhante: gradiente cônico que gira, com trechos mais claros (efeito de "magia" no anel)
-          const g = (rctx as CanvasRenderingContext2D & { createConicGradient?: (a: number, x: number, y: number) => CanvasGradient }).createConicGradient?.(i * 1.1 + wave.t * 6, cx, cy)
-          if (g) {
-            g.addColorStop(0, `rgba(236,253,245,${a.toFixed(3)})`)
-            g.addColorStop(0.2, `rgba(52,211,153,${(a * 0.3).toFixed(3)})`)
-            g.addColorStop(0.4, `rgba(110,231,183,${a.toFixed(3)})`)
-            g.addColorStop(0.62, `rgba(16,185,129,${(a * 0.25).toFixed(3)})`)
-            g.addColorStop(0.82, `rgba(167,243,208,${a.toFixed(3)})`)
-            g.addColorStop(1, `rgba(236,253,245,${a.toFixed(3)})`)
-          }
-          rctx.lineWidth = lw; rctx.strokeStyle = g ?? `rgba(52,211,153,${a.toFixed(3)})`; rctx.stroke()
-        }
-      }
-
       // o funil liga a boca (sob as peças) ao ponto da tela do notebook: vidro verde em 3D, redesenhado a cada refresh
       const drawFunnel = () => {
-        sizeRings(); drawRings()
+        // anéis (MagicRings, React Bits): quadrado centrado no ponto de luz, grande o bastante para varrer a tela
+        const fx = q<HTMLElement>('.rings-fx'), S = Math.max(W(), H()) * 1.15, tp = target()
+        fx.style.cssText = `width:${S}px;height:${S}px;left:${tp.x - S / 2}px;top:${tp.y + 6 - S / 2}px`
         const svg = q<SVGSVGElement>('.funnel'), m = mouth(), t = target(), d = t.y - m.y, a = m.w / 2, ry = Math.max(16, m.w * 0.07), neck = 15
         svg.setAttribute('viewBox', `0 0 ${W()} ${H()}`)
         const hw = (u: number) => neck + (a - neck) * Math.pow(1 - u, 2.15) // meia-largura do corpo em u (0 boca ... 1 bico)
@@ -140,7 +109,7 @@ export function ProblemSection() {
 
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=220%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=220%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel, onToggle: (self) => setFx(self.isActive) },
       })
       // 0 → 1 = toda a duração
       gsap.set('.orb-core, .orb-halo, .orb-bloom', { transformOrigin: '50% 50%', svgOrigin: undefined })
@@ -163,8 +132,9 @@ export function ProblemSection() {
         .to('.orb-core', { scale: 1.9, duration: 0.05, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.63)
         .to('.funnel-shell', { autoAlpha: 0, y: -10, duration: 0.09, ease: 'power2.in' }, 0.66)
         .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 1 }, { scale: 52, autoAlpha: 0, ease: 'power3.out', duration: 0.26 }, 0.7)
-        // ondas de anéis verdes saindo do ponto de luz e varrendo a tela enquanto o produto se revela
-        .fromTo(wave, { t: 0 }, { t: 1, ease: 'none', duration: 0.3, onUpdate: drawRings }, 0.64)
+        // MagicRings entra com o clarão, pulsa em ondas verdes e se dissolve quando o produto está nítido
+        .fromTo('.rings-fx', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.05, ease: 'power1.out' }, 0.6)
+        .to('.rings-fx', { autoAlpha: 0, duration: 0.12, ease: 'power1.in' }, 0.84)
         .to('.orb-core, .orb-halo', { scale: 8, autoAlpha: 0, duration: 0.1, ease: 'power2.out' }, 0.72)
         .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.73)
         .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.76)
@@ -250,7 +220,9 @@ export function ProblemSection() {
           </div>
         </div>
 
-        <canvas className="rings" aria-hidden="true" />
+        <div className="rings-fx" aria-hidden="true">
+          {fx && <MagicRings color="#10b981" colorTwo="#6ee7b7" theme="light" ringCount={10} motion="ripple" speed={1.1} lineThickness={2.6} glow={1.05} baseRadius={0.1} radiusStep={0.07} expansion={0.3} clickBurst={false} followMouse={false} />}
+        </div>
         <svg className="funnel" aria-hidden="true">
           <defs>
             <linearGradient id="fn-body" x1="0" y1="0" x2="1" y2="0">
