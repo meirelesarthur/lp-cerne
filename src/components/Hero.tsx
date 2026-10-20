@@ -231,7 +231,10 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
           </div>
         </div>
 
-        <div className="hero-mouse" aria-hidden="true"><Icon icon={Mouse01Icon} size={32} strokeWidth={1.5} /></div>
+        <div className="hero-mouse" aria-hidden="true">
+          <Icon icon={Mouse01Icon} size={32} strokeWidth={1.5} />
+          <span className="hero-chevs"><Icon icon={ArrowDown01Icon} size={22} strokeWidth={2.4} /><Icon icon={ArrowDown01Icon} size={22} strokeWidth={2.4} /></span>
+        </div>
         <div className="hero-hint" aria-hidden="true">Role para conhecer<Icon icon={ArrowDown01Icon} size={18} strokeWidth={2.2} /></div>
         <div className="hero-progress" aria-hidden="true"><i /></div>
       </div>
