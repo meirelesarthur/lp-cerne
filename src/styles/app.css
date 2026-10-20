@@ -96,13 +96,17 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
 .hero-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(23, 40, 30, .12); z-index: 5; }
 .hero-progress i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
 .hero-hint { position: absolute; right: clamp(8px, 1.2vw, 18px); top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 10px; writing-mode: vertical-rl; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .7), 0 0 3px rgba(0, 0, 0, .5); white-space: nowrap; }
+.hero-mouse { position: absolute; left: 50%; bottom: clamp(20px, 3.5vh, 36px); transform: translateX(-50%); z-index: 5; display: grid; color: #fff; filter: drop-shadow(0 1px 8px rgba(0, 0, 0, .65)); pointer-events: none; }
+/* a rodinha do mouse (2º traço do ícone) desce e some, em loop: convida a rolar */
+.hero-mouse svg path:nth-child(2) { animation: wheel 1.7s ease-in-out infinite; }
+@keyframes wheel { 0% { transform: translateY(-1px); opacity: 0; } 25% { opacity: 1; } 75% { transform: translateY(5px); opacity: 0; } 100% { transform: translateY(5px); opacity: 0; } }
 .hero-hint svg { flex: none; animation: hint 1.8s ease-in-out infinite; }
 @keyframes hint { 0%, 100% { transform: translateY(-3px); opacity: .5; } 50% { transform: translateY(4px); opacity: 1; } }
 
 /* Sem scrub: poster final e conteúdo visível */
 .hero.static .hero-pin { height: auto; min-height: 100svh; }
 .hero.static .hero-copy, .hero.static .hero-form-wrap, .hero.static .hero-shade { opacity: 1; visibility: visible; }
-.hero.static .hero-hint, .hero.static .hero-progress { display: none; }
+.hero.static .hero-hint, .hero.static .hero-mouse, .hero.static .hero-progress { display: none; }
 .hero.static .tablet-screen { visibility: visible; opacity: 1; }
 .hero.static .hero-content { position: relative; min-height: 100svh; }
 
@@ -132,4 +136,4 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
     linear-gradient(0deg, rgba(var(--veil), .9) 0%, rgba(var(--veil), .6) 24%, rgba(var(--veil), 0) 34%),
     linear-gradient(180deg, rgba(var(--veil), .9) 0%, rgba(var(--veil), .6) 22%, rgba(var(--veil), 0) 32%); }
 }
-@media (prefers-reduced-motion: reduce) { .hero-hint svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-hint svg, .hero-mouse svg path:nth-child(2) { animation: none; } }
