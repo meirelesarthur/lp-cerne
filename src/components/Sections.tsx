@@ -679,16 +679,16 @@ const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a min
 type PlCel = 'i' | 'o' | 'n' | string
 type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
 const PLANOS = [
-  { k: 'pro', t: 'Professional', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
-  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['2 atividades', '5 usuários'] },
-  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['todas as atividades', '10 usuários'] },
+  { k: 'pro', t: 'Professional', d: 'Gestão essencial', u: ['Uma escolha', '3 usuários'] },
+  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['Duas escolhas', '5 usuários'] },
+  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['Todas', '10 usuários'] },
 ]
 const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
   { g: 'Base de todos os planos', mods: [
     { m: 'Financeiro e fiscal', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber, caixa e bancos', 'Emissão de NF-e, XML e LCDPR', 'Regras fiscais e acesso do contador'] },
     { m: 'Estoque, frota e bens', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e, baixas e transferências', 'Saldo por armazém', 'Manutenções, abastecimentos e inventário de bens'] },
     { m: 'Cadastros, relatórios e painéis', p: ['i', 'i', 'i'], f: ['Fazendas, safras, produtos e pessoas', 'Relatórios em PDF e Excel', 'Painéis de acompanhamento e pluviometria'] },
-    { m: 'Atividades', p: ['1 à escolha', '2 à escolha', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
+    { m: 'Atividades', p: ['Uma escolha', 'Duas escolhas', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
   ] },
   { g: 'Gestão e custos', mods: [
     { m: 'Gestão gerencial e contabilidade', p: ['n', 'i', 'i'], f: ['DRE e previsto × realizado', 'Centro de custo, rateios e contratos', 'Depreciação, partida dobrada e plano de contas'] },
