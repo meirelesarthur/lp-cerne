@@ -421,8 +421,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-table tfoot th { font-weight: 600; }
 .pl-table tfoot small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 400; color: var(--muted); }
 .pl-table tfoot .pl-txt { font-size: 16px; }
-.pl-table .pl-cta th, .pl-table .pl-cta td { border-top: 0; padding-top: 0; padding-bottom: 20px; }
-.pl-cta .btn { font-size: 14px; padding-inline: 14px; white-space: nowrap; }
 @media (max-width: 760px) {
   .pl-swipe { display: block; }
   .pl-table { min-width: 560px; font-size: 14px; }
@@ -432,7 +430,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .pl-head b { font-size: 18px; }
   .pl-head em { flex-direction: column; font-size: 11px; padding: 4px 8px; }
   .pl-head em i + i::before { content: none; }
-  .pl-cta .btn { font-size: 12.5px; padding-inline: 10px; }
 }
 
 /* três divisórias verticais, uma à esquerda de cada plano */

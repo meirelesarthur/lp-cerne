@@ -775,10 +775,6 @@ export function PlansSection() {
                 <th className="pl-fix" scope="row">Módulos incluídos<small>os demais são contratados à parte ou vêm no plano de cima</small></th>
                 {inclusos.map((n, k) => <td key={k}><span className="pl-txt">{n} de {total}</span></td>)}
               </tr>
-              <tr className="pl-cta">
-                <th className="pl-fix" scope="row" />
-                {PLANOS.map((p) => <td key={p.k}><a className="btn btn-ghost" href="#contato" data-interest="demonstracao">Falar sobre o {p.t}</a></td>)}
-              </tr>
               <tr className="pl-keyrow">
                 <td colSpan={4}>
                   <div className="pl-legend">
