@@ -25,7 +25,8 @@ html[data-hero-done][data-header-dark] .header { background: rgba(8, 26, 18, .78
 html[data-hero-done][data-header-dark] .logo-on-scene { opacity: 1; filter: none; }
 html[data-hero-done][data-header-dark] .logo-on-glass { opacity: 0; }
 html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(23, 40, 30, .08); }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 22px; border-radius: 20px; border: 1px solid transparent; font-weight: 600; font-size: 15px; cursor: pointer; transition: background .2s, border-color .2s; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 22px; border-radius: 10px; border: 1px solid transparent; font-weight: 600; font-size: 15px; cursor: pointer; transition: background .2s, border-color .2s; }
+@supports (corner-shape: squircle) { .btn, .video-toggle { corner-shape: squircle; border-radius: 16px; } }
 .btn-primary { background: var(--accent-hover); color: var(--on-accent); }
 .btn-primary:hover:not(:disabled) { background: #065f46; }
 .btn-primary:disabled { opacity: .65; cursor: progress; }
@@ -49,7 +50,9 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
 .hero-intro::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(5, 16, 8, .72) 0%, rgba(5, 16, 8, .48) 24%, rgba(5, 16, 8, 0) 46%); }
 .hero-intro-copy { grid-column: 1; display: grid; justify-items: start; gap: 16px; color: #fff; text-shadow: 0 1px 14px rgba(0, 0, 0, .45); }
 .hero-intro-copy > * { pointer-events: auto; }
-.hero .hero-intro h1 { margin: 0; font-size: clamp(30px, 3.2vw, 56px); line-height: 1.05; font-weight: 600; letter-spacing: -.025em; max-width: 13ch; color: #fff; }
+.hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #bbf7d0; }
+.hero-intro-proof { margin: 2px 0 0; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: rgba(255, 255, 255, .88); }
+.hero .hero-intro h1 { margin: 0; font-size: clamp(30px, 3.2vw, 56px); line-height: 1.05; font-weight: 600; letter-spacing: -.025em; max-width: 16ch; color: #fff; }
 .hero .hero-intro h1 em { font-style: normal; color: #86efac; }
 .hero .hero-intro .lead { color: rgba(255, 255, 255, .94); }
 
@@ -92,7 +95,7 @@ html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filt
 
 .hero-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(23, 40, 30, .12); z-index: 5; }
 .hero-progress i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
-.hero-hint { position: absolute; left: 50%; bottom: 28px; padding: 9px 18px; border-radius: 999px; background: rgba(5, 16, 8, .5); backdrop-filter: blur(6px); transform: translateX(-50%); z-index: 5; display: flex; flex-direction: row; align-items: center; gap: 10px; white-space: nowrap; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 14px rgba(0, 0, 0, .55); }
+.hero-hint { position: absolute; right: clamp(8px, 1.2vw, 18px); top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 10px; writing-mode: vertical-rl; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .7), 0 0 3px rgba(0, 0, 0, .5); white-space: nowrap; }
 .hero-hint svg { flex: none; animation: hint 1.8s ease-in-out infinite; }
 @keyframes hint { 0%, 100% { transform: translateY(-3px); opacity: .5; } 50% { transform: translateY(4px); opacity: 1; } }
 

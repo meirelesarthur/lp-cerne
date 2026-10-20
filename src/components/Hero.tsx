@@ -211,17 +211,19 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
         {!isStatic && (
           <div className="hero-intro">
             <div className="hero-intro-copy">
-              <h1>Do campo ao financeiro, <em>num só sistema.</em></h1>
-              <p className="lead">Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda num só lugar, e o custo de cada lote e talhão sem esperar o fechamento do mês.</p>
+              <span className="hero-eyebrow">ERP para pecuária e lavoura</span>
+              <h1>Sua fazenda, do campo ao financeiro, <em>num só sistema.</em></h1>
+              <p className="lead">Rebanho, lavoura, estoque, fiscal e financeiro no mesmo lugar. Veja o custo e a margem de cada lote sem esperar o fechamento do mês.</p>
               <button type="button" className="btn btn-primary" onClick={focusHeroForm}>Quero acesso antecipado</button>
+              <p className="hero-intro-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
             </div>
           </div>
         )}
 
         <div className="hero-content">
           <div className="hero-copy">
-            {isStatic ? <h1>Do campo ao financeiro, <em>num só sistema.</em></h1> : <p className="h1" aria-hidden="true">Do campo ao financeiro, <em>num só sistema.</em></p>}
-            <p className="lead">Rebanho, lavoura, compras, estoque, fiscal e financeiro da sua fazenda num só lugar, e o custo de cada lote e talhão sem esperar o fechamento do mês.</p>
+            {isStatic ? <h1>Sua fazenda, do campo ao financeiro, <em>num só sistema.</em></h1> : <p className="h1" aria-hidden="true">Sua fazenda, do campo ao financeiro, <em>num só sistema.</em></p>}
+            <p className="lead">Rebanho, lavoura, estoque, fiscal e financeiro no mesmo lugar. Veja o custo e a margem de cada lote sem esperar o fechamento do mês.</p>
             <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">

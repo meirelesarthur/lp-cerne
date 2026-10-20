@@ -424,7 +424,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .dif-title { margin: 0 0 16px; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
 .fz-placeholder { min-height: 100svh; }
 @media (max-width: 719px) { .fz-placeholder { min-height: clamp(470px, 64svh, 640px); } }
-.video-toggle { position: absolute; right: 12px; bottom: 12px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .5); background: rgba(5, 16, 8, .72); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(6px); }
+.video-toggle { position: absolute; right: 12px; bottom: 12px; min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .5); background: rgba(5, 16, 8, .72); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(6px); }
 .video-toggle:hover { background: rgba(5, 16, 8, .88); }
 .form .sub.show { display: block; margin: 0; }
 .faq-group + .faq-group { margin-top: 28px; }
