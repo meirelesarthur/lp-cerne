@@ -112,7 +112,7 @@ export function LeadForm({ variant, emailId }: { variant: 'hero' | 'page'; email
       <label className="consent">
         <input id={id('consent')} type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); check('consent', e.target.checked) }}
           aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${id('consent')}-e` : undefined} />
-        <span>Concordo em receber contato da GB Agritech sobre o Cerne, conforme a Política de Privacidade (LGPD).</span>
+        <span>Concordo em receber contato da GB Agritech sobre o Cerne, conforme a LGPD.</span>
       </label>
       {errors.consent && <span className="err err-consent" id={`${id('consent')}-e`}>{errors.consent}</span>}
 

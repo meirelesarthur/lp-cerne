@@ -6,7 +6,6 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
 import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
-import ecoBg from '../assets/ecossistema-campo.jpg'
 import { FolderFloat } from './fx/FolderFloat'
 import { CardSwap, type SwapItem } from './fx/CardSwap'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
@@ -329,58 +328,38 @@ export function SystemSection() {
   )
 }
 
-/* ───────────────────────── 06 · Ecossistema (Web + app Administração + app Operação) ───────────────────────── */
+/* ───────────────────────── 06 · Edições (Web + app Administração + app Operação) ───────────────────────── */
 // vem junto com a contratação: o Cerne Web no escritório e os dois apps para separar as responsabilidades no dia a dia
-const ECO = [
-  { k: 'web', tag: 'Disponível hoje', who: 'No escritório', title: 'Cerne Web', d: 'O centro de comando da fazenda: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Custo e margem de cada lote na hora, sem planilha paralela.' },
-  { k: 'adm', tag: 'Em teste', who: 'Para quem decide', title: 'Cerne Administração', d: 'Resultado, rebanho e ordens de serviço na palma da mão. O gestor acompanha a fazenda inteira de onde estiver, sem ligar para ninguém.' },
-  { k: 'op', tag: 'Em teste', who: 'Para quem executa', title: 'Cerne Operação', d: 'Minhas ordens, trato, cocho, pesagem e sanitário registrados na hora, do curral ou da lavoura. O campo anota uma vez e o escritório já enxerga.' },
-]
-
 export function EditionsSection() {
-  const root = useRef<HTMLElement>(null)
-  const near = useNear(root, '80% 0px')
   const media = useAfterFirstScroll()
-  const [focus, setFocus] = useState<string | null>(null)
-  const img = (name: string) => (media ? asset(`/screens/${name}.webp`) : undefined)
   return (
-    <section ref={root} className="eco" id="edicoes" aria-labelledby="edicoes-title" data-header-dark style={(near ? { '--eco-bg': `url(${ecoBg})` } : undefined) as unknown as React.CSSProperties}>
+    <section className="sec sec-light editions" id="edicoes" aria-labelledby="edicoes-title">
       <div className="wrap">
-        <header className="sec-head center on-photo" data-reveal>
+        <header className="sec-head" data-reveal>
           <span className="eyebrow">Tudo isso vem com o Cerne</span>
-          <MaskedHeading id="edicoes-title" text="Você contrata um sistema e leva para casa um ecossistema inteiro." />
+          <h2 id="edicoes-title">Você contrata um sistema e leva para casa um ecossistema inteiro.</h2>
           <p className="sec-lead">O Cerne Web para o escritório, o app Administração para quem decide e o app Operação para quem executa. Cada pessoa da fazenda com a ferramenta certa na mão, todo mundo no mesmo dado, e os problemas do dia a dia resolvidos de uma vez.</p>
         </header>
-
-        <div className="eco-stage" data-focus={focus ?? undefined} data-reveal>
-          <figure className="eco-dev eco-web">
-            <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            {media && <img src={img('visao-geral')} alt="Cerne Web: painel Visão geral da fazenda" width={1280} height={800} loading="lazy" decoding="async" />}
-          </figure>
-          <figure className="eco-dev eco-phone eco-adm">
-            {media && <img src={img('app-administracao')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}
-          </figure>
-          <figure className="eco-dev eco-phone eco-op">
-            {media && <img src={img('app-operacao')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}
-          </figure>
+        <div className="editions-grid">
+          <article className="edition web" data-reveal>
+            <span className="who">No escritório</span>
+            <h3>Cerne Web</h3>
+            <p>O centro de comando da fazenda: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Custo e margem de cada lote na hora, sem planilha paralela.</p>
+            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" width={1280} height={800} loading="lazy" decoding="async" />}
+          </article>
+          <article className="edition app" data-reveal>
+            <span className="who">Para quem decide</span>
+            <h3>Cerne Administração</h3>
+            <p>Resultado, rebanho e ordens de serviço na palma da mão. O gestor acompanha a fazenda inteira de onde estiver, sem ligar para ninguém.</p>
+            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+          </article>
+          <article className="edition app" data-reveal>
+            <span className="who">Para quem executa</span>
+            <h3>Cerne Operação</h3>
+            <p>Minhas ordens, trato, cocho, pesagem e sanitário registrados na hora, do curral ou da lavoura. O campo anota uma vez e o escritório já enxerga.</p>
+            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}</div>
+          </article>
         </div>
-
-        <ul className="eco-cards">
-          {ECO.map((e) => (
-            <li key={e.k} tabIndex={0} onPointerEnter={() => setFocus(e.k)} onPointerLeave={() => setFocus(null)} onFocus={() => setFocus(e.k)} onBlur={() => setFocus(null)} data-reveal>
-              <span className="eco-tag">{e.tag}</span>
-              <span className="eco-who">{e.who}</span>
-              <h3>{e.title}</h3>
-              <p>{e.d}</p>
-            </li>
-          ))}
-        </ul>
-
-        <div className="eco-cta" data-reveal>
-          <p><strong>Contratou o Cerne, levou os três.</strong> Os apps vêm junto com o sistema.</p>
-          <a className="btn btn-primary" href="#contato" data-interest="todos">Quero o ecossistema completo</a>
-        </div>
-        <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
       </div>
     </section>
   )
@@ -751,7 +730,6 @@ export function Footer() {
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
-          <a href="#contato">Política de Privacidade <Tbd>link</Tbd></a>
         </div>
       </div>
     </footer>
