@@ -415,6 +415,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-table tbody tr:not(.pl-grp):hover > * { background: #e6f0e9; }
 .pl-yes { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dcefe3; color: var(--accent-hover); vertical-align: middle; }
 .pl-yes svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pl-feat .pl-yes { background: none; }
 .pl-opt { display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px dashed #b98aa6; background: #f7ebf2; color: #8a3b6b; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .pl-no { color: #9aa99f; }
 .pl-txt { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
