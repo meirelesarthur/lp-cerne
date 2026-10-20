@@ -30,3 +30,67 @@
     transition: clip-path .9s cubic-bezier(.5, 0, .2, 1), color .6s ease .8s, -webkit-text-stroke-color .6s ease .8s;
   }
 }
+
+/* ── Accordion Gallery (módulos com tela) ── */
+.acg { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; height: clamp(380px, 46vw, 500px); }
+.acg-p { flex: 1 1 0; min-width: 0; transition: flex-grow .55s cubic-bezier(.3, .8, .2, 1); }
+.acg-p.is-on { flex-grow: 7; }
+.acg-btn { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; background: #0e2a1d; color: #fff; text-align: left; cursor: pointer; font: inherit; }
+.acg-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.acg-shot { position: absolute; inset: 0; }
+.acg-shot img { position: absolute; left: 0; top: 0; height: 100%; width: max(100%, 780px); object-fit: cover; object-position: left top; opacity: .2; transition: opacity .5s; }
+.is-on .acg-shot img { opacity: 1; }
+.acg-strip { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 18px 0 22px; transition: opacity .3s; }
+.acg-strip b { font-size: 13px; color: #4ade80; }
+.acg-strip span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 15px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+.is-on .acg-strip { opacity: 0; pointer-events: none; }
+.acg-cap { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 8px; padding: 70px 26px 24px; background: linear-gradient(180deg, transparent, rgba(8, 26, 18, .9) 55%); opacity: 0; transform: translateY(14px); transition: opacity .35s, transform .45s cubic-bezier(.3, .8, .2, 1); pointer-events: none; }
+.is-on .acg-cap { opacity: 1; transform: none; transition-delay: .15s; }
+.acg-cap .cell-top { margin: 0; }
+.acg-cap .cell-n { background: #fff; }
+.acg-cap .cell-tag { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .28); color: #c9f2d3; }
+.acg-cap strong { font-size: 22px; font-weight: 600; }
+.acg-d { max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #e3efe6; }
+.acg-feats { display: flex; flex-wrap: wrap; gap: 6px; }
+.acg-feats i { font-style: normal; padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .2); font-size: 12.5px; color: #fff; }
+
+/* ── Folder Float (módulos sem tela) ── */
+.folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.cell.folder { padding-bottom: 22px; gap: 0; }
+.cell.folder .cell-top { margin-bottom: 10px; }
+.cell.folder .base-note { margin-top: 14px; }
+.ff { position: relative; height: 250px; margin-top: auto; }
+.ff-notes { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; z-index: 1; }
+.ff-notes li { position: absolute; left: 50%; bottom: 56px; padding: 7px 12px; border-radius: 999px; background: #fff; border: 1px solid #cfe2d3; box-shadow: 0 6px 16px rgba(23, 40, 30, .1); font-size: 13.5px; color: var(--text-soft); white-space: nowrap; opacity: 0; transform: translateX(-50%) scale(.5); transition: transform .5s cubic-bezier(.34, 1.56, .64, 1) var(--d), opacity .25s ease var(--d); }
+.ff-folder { position: absolute; left: 50%; bottom: 0; z-index: 2; width: 170px; height: 112px; margin-left: -85px; padding: 0; border: 0; background: none; cursor: pointer; perspective: 500px; }
+.ff-folder:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 12px; }
+.ff-back, .ff-front { position: absolute; left: 0; right: 0; }
+.ff-back { top: 14px; bottom: 0; border-radius: 4px 12px 12px 12px; background: #047857; }
+.ff-back::before { content: ''; position: absolute; left: 0; top: -14px; width: 62px; height: 16px; border-radius: 8px 8px 0 0; background: #047857; }
+.ff-front { bottom: 0; height: 82px; border-radius: 8px 8px 12px 12px; background: linear-gradient(180deg, #34d399, #059669); transform-origin: 50% 100%; transition: transform .45s cubic-bezier(.3, .8, .2, 1); }
+.ff.is-open .ff-notes li { opacity: 1; transform: translate(calc(-50% + var(--x)), var(--y)) rotate(var(--r)) scale(1); }
+.ff.is-open .ff-front { transform: rotateX(-34deg); }
+@media (hover: hover) {
+  .ff:hover .ff-notes li { opacity: 1; transform: translate(calc(-50% + var(--x)), var(--y)) rotate(var(--r)) scale(1); }
+  .ff:hover .ff-front { transform: rotateX(-34deg); }
+}
+
+@media (max-width: 960px) {
+  .acg { flex-direction: column; height: auto; }
+  .acg-p { flex: none; height: 62px; transition: height .5s cubic-bezier(.3, .8, .2, 1); }
+  .acg-p.is-on { height: min(420px, 74vw); }
+  .acg-strip { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 20px; align-items: center; }
+  .acg-strip span { writing-mode: horizontal-tb; transform: none; }
+  .acg-shot img { width: 100%; }
+  .acg-cap { padding: 50px 20px 18px; }
+  .folders { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acg-p, .acg-cap, .acg-shot img, .acg-strip { transition: none; }
+  /* sem animação: as notas ficam sempre à mostra, numa lista comum */
+  .ff { height: auto; }
+  .ff-folder { display: none; }
+  .ff-notes { position: static; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ff-notes li { position: static; opacity: 1; transform: none; transition: none; box-shadow: none; }
+}

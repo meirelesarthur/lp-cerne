@@ -5,6 +5,8 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
 import { StrokeText } from './fx/StrokeText'
+import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
+import { FolderFloat } from './fx/FolderFloat'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
@@ -270,8 +272,8 @@ export function TrailerSection() {
   )
 }
 
-/* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
-// grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
+/* ───────────────────────── 05 · Sistema (módulos) ───────────────────────── */
+// frentes com tela real entram na galeria de painéis; as sem tela viram pastas que soltam os subitens
 type Modulo = { k: string; n: string; tag: string; t: string; d: string; feats?: string[]; img?: string; chips?: string[]; note?: string }
 const MODULOS: Modulo[] = [
   { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Do nascimento à venda: reprodução, pesagens, sanitário, nutrição e o mapa de confinamento com currais, dietas e batidas.', feats: ['Mapa de confinamento', 'Reprodução: IATF, FIV e monta', 'Pesagem e GMD', 'Relatórios SISBOV'], img: 'lotacao-currais' },
@@ -283,6 +285,9 @@ const MODULOS: Modulo[] = [
   { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
   { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
 ]
+
+const GALERIA = MODULOS.filter((m) => m.img)
+const PASTAS = MODULOS.filter((m) => !m.img)
 
 // ícones das conquistas (Hugeicons, herdam a cor do medalhão)
 const ICONES = {
@@ -342,17 +347,6 @@ export function SystemSection() {
   const farmRef = useRef<HTMLElement>(null)
   const farmNear = useNear(farmRef, '150% 0px')
   const media = useAfterFirstScroll()
-  // leve parallax das telas dentro das molduras (transform só, sem layout)
-  useLayoutEffect(() => {
-    if (!media || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('.shot img').forEach((img) => {
-        gsap.fromTo(img, { yPercent: 0 }, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } })
-      })
-    }, root)
-    return () => ctx.revert()
-  }, [media])
-
   return (
     <>
       <section ref={farmRef} className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={(farmNear ? { '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } : undefined) as unknown as React.CSSProperties}>
@@ -374,23 +368,17 @@ export function SystemSection() {
           <h2 id="modulos-title">Oito frentes. Um só cadastro.</h2>
           <p className="sec-lead">Os módulos que já estão no menu do Cerne Web, da porteira ao contador.</p>
         </header>
-        <div className="bento">
-          {MODULOS.map((m) => (
-            <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
-              <div className="cell-text">
-                <div className="cell-top"><span className="cell-n">{m.n}</span><span className="cell-tag">{m.tag}</span></div>
-                <h3>{m.t}</h3>
-                <p>{m.d}</p>
-                {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
-              </div>
-              {m.img ? (
-                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" width={m.img === 'talhoes' ? 960 : 1280} height={m.img === 'talhoes' ? 720 : 800} loading="lazy" decoding="async" />}</div>
-              ) : (
-                <div className="base">
-                  <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
-                  {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
-                </div>
-              )}
+        <div data-reveal>
+          <AccordionGallery label="Módulos com tela" items={GALERIA.map((m): GalleryItem => ({ key: m.k, n: m.n, tag: m.tag, title: m.t, desc: m.d, feats: m.feats, src: media ? asset(`/screens/${m.img}.webp`) : undefined }))} />
+        </div>
+        <div className="folders">
+          {PASTAS.map((m) => (
+            <article key={m.k} className="cell folder" data-reveal>
+              <div className="cell-top"><span className="cell-n">{m.n}</span><span className="cell-tag">{m.tag}</span></div>
+              <h3>{m.t}</h3>
+              <p>{m.d}</p>
+              <FolderFloat items={m.chips!} />
+              {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
             </article>
           ))}
         </div>

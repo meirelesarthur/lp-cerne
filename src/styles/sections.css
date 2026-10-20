@@ -158,30 +158,12 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .chapters small { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.4; color: #7da893; }
 
 /* ===== 05 · Sistema (bento) ===== */
-.bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
 .cell { display: flex; flex-direction: column; gap: 20px; padding: 26px 26px 0; border-radius: 20px; background: #fff; border: 1px solid var(--border); overflow: hidden; transition: transform .25s, box-shadow .25s; min-height: 220px; }
 .cell:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(23, 40, 30, .1); }
 .cell h3 { margin: 0 0 6px; font-size: 19px; font-weight: 600; }
 .cell p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 46ch; }
 /* moldura de tela: proporção fixa, encosta na base e na direita do card */
-.shot { position: relative; margin: auto -26px 0 0; aspect-ratio: 16 / 9; overflow: hidden; border-top-left-radius: 12px; border: 1px solid var(--border); border-right: 0; border-bottom: 0; background: #f3f4f3; box-shadow: -12px -12px 32px rgba(23, 40, 30, .06); }
-.shot img { position: absolute; left: 0; top: 0; width: 100%; height: 112%; object-fit: cover; object-position: left top; display: block; will-change: transform; }
-.chips { list-style: none; margin: auto 0 26px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.chips li { padding: 7px 12px; border-radius: 999px; background: #fff; border: 1px solid #cfe2d3; font-size: 13.5px; color: var(--text-soft); }
-.cell-a { grid-column: span 8; }
-.cell-b { grid-column: span 4; background: var(--mint); }
-.cell-c, .cell-d { grid-column: span 4; }
-.cell-e { grid-column: span 4; background: var(--mint); }
-.cell-g, .cell-h { grid-column: span 6; }
-.cell-g { background: var(--mint); }
-.cell-g .cell-n { background: #fff; }
-.cell-f { grid-column: span 12; flex-direction: row; align-items: stretch; gap: 32px; }
-.cell-f .cell-text { flex: 0 0 30%; align-self: center; padding-bottom: 26px; }
-.cell-f .shot { flex: 1; aspect-ratio: auto; min-height: 280px; margin-top: 0; }
-.cell-a .shot { aspect-ratio: 16 / 8; }
 /* o mapa de talhões é 4:3 e os talhões ficam no meio: sem esticar a moldura, para não recortar só um canto */
-.cell-b .shot { aspect-ratio: 4 / 3; margin-left: 0; border-top-right-radius: 0; }
-.cell-b .shot img { object-position: center; }
 
 /* enriquecimento do bento: textura de fundo, numeração, selos, funcionalidades e a "espinha" do cadastro único */
 .system { background: var(--canvas); isolation: isolate; }
@@ -196,14 +178,10 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .feats { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .feats li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #f2f6f2; border: 1px solid #e1ebe3; font-size: 12.5px; color: var(--text-soft); }
 .feats li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-.cell-b .cell-n, .cell-e .cell-n { background: #fff; }
-.base { margin: auto 0 26px; display: grid; gap: 18px; }
-.base .chips { margin: 0; }
 .base-note { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding-top: 16px; border-top: 1px dashed #b9d4c1; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
 .base-note i { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(5, 150, 105, .16); }
 /* a nota ocupa a largura toda do card (o limite de 46ch de .cell p é para a descrição) */
 .cell .base-note { max-width: none; }
-.cell-f .feats li { background: #fff; }
 
 /* ===== 06 · Edições ===== */
 .editions-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 3fr); gap: 16px; }
@@ -347,11 +325,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 @media (max-width: 960px) {
   .frentes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fatos, .trailer-grid, .contact-grid, .faq-inner, .editions-grid { grid-template-columns: 1fr; }
-  .bento { grid-template-columns: 1fr; }
-  .bento .cell { grid-column: auto; }
-  .cell-f { flex-direction: column; gap: 20px; }
-  .cell-f .cell-text { flex: none; padding-bottom: 0; }
-  .cell-f .shot { min-height: 0; aspect-ratio: 16 / 9; }
   .chapters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
