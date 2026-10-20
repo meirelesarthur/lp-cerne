@@ -186,10 +186,10 @@ const GAP = 28 // px entre uma operação e a seguinte
 // quatro como uma linha só (o eixo x é contínuo: a inclinação não muda a largura do texto) e o conjunto acompanha a curva.
 // x, w, y no viewBox 760×430 (y = topo da faixa no início da face), k = inclinação (dy/dx)
 const SEGS = [
-  { x: 15, w: 402, y: 181, k: 0.5 }, // parede esquerda, descendo 2:1
-  { x: 417, w: 28, y: 382, k: 0.2 }, // chanfro esquerdo
-  { x: 445, w: 28, y: 387.6, k: -0.2 }, // chanfro direito
-  { x: 473, w: 272, y: 382, k: -0.5 }, // parede direita, subindo 2:1
+  { x: 15, w: 402, y: 186, k: 0.5 }, // parede esquerda, descendo 2:1
+  { x: 417, w: 28, y: 387, k: 0.2 }, // chanfro esquerdo
+  { x: 445, w: 28, y: 392.6, k: -0.2 }, // chanfro direito
+  { x: 473, w: 272, y: 387, k: -0.5 }, // parede direita, subindo 2:1
 ]
 const X0 = SEGS[0].x
 const XN = SEGS[SEGS.length - 1].x + SEGS[SEGS.length - 1].w

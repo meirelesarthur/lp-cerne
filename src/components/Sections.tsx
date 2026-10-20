@@ -217,10 +217,10 @@ const MODULOS: Modulo[] = [
   { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões no mapa, planejamento de safra, apontamentos, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Balança rodoviária'], img: 'talhoes' },
   { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Solicitação, cotação, aprovação, compra e recebimento, com SLA e fábrica de ração.', feats: ['Cotação via link', 'Aprovação de compras', 'Fábrica de ração'], img: 'suprimentos' },
   { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Contas a pagar e receber, conciliação OFX, DRE e depreciação.', feats: ['Conciliação bancária', 'DRE', 'Orçado × realizado'], img: 'financeiros' },
-  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
-  { k: 'g', n: '06', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
-  { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
-  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
+  { k: 'f', n: '05', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
+  { k: 'e', n: '06', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
+  { k: 'g', n: '07', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
+  { k: 'h', n: '08', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
 ]
 
 const GALERIA = MODULOS.filter((m) => m.img)
@@ -289,9 +289,9 @@ export function SystemSection() {
       <section ref={farmRef} className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={(farmNear ? { '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } : undefined) as unknown as React.CSSProperties}>
         <div className="wrap farm-head">
           <header className="sec-head" data-reveal>
-            <span className="eyebrow">O sistema</span>
-            <h2 id="sistema-title">A fazenda inteira, num só cadastro.</h2>
-            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Clique em um setor para ver o que o Cerne faz ali.</p>
+            <span className="eyebrow">O Cerne da sua fazenda</span>
+            <h2 id="sistema-title">A fazenda inteira em um só lugar: o Cerne.</h2>
+            <p className="sec-lead">Tudo o que acontece da porteira ao escritório vira um registro no Cerne, e o escritório acompanha cada setor no mesmo lugar. Clique em um setor e veja o que o Cerne faz ali.</p>
           </header>
         </div>
         {farmNear ? (
@@ -301,8 +301,8 @@ export function SystemSection() {
     <section ref={root} className="sec sec-light system" id="modulos" aria-labelledby="modulos-title">
       <div className="wrap">
         <header className="sec-head" data-reveal>
-          <span className="eyebrow">Os módulos</span>
-          <h2 id="modulos-title">Oito frentes. Um só cadastro.</h2>
+          <span className="eyebrow">Os módulos do Cerne</span>
+          <h2 id="modulos-title">Oito frentes. Um só cadastro: o Cerne.</h2>
           <p className="sec-lead">Os módulos que já estão no menu do Cerne Web, da porteira ao contador.</p>
         </header>
         <div data-reveal>
