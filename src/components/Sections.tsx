@@ -5,7 +5,6 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
-import MagicRings from './MagicRings'
 import {
   ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
   SecurityLockIcon, Tick02Icon, WeightScale01Icon,
@@ -13,6 +12,9 @@ import {
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
 const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
+
+// WebGL dos anéis (~20 KB): só baixa quando a seção Problema está a ~2 telas de distância
+const MagicRings = lazy(() => import('./MagicRings'))
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -43,6 +45,8 @@ export function ProblemSection() {
   const root = useRef<HTMLElement>(null)
   const media = useAfterFirstScroll()
   const [fx, setFx] = useState(false)
+  const near = useNear(root, '250% 0px')
+  useEffect(() => { if (near) void import('./MagicRings') }, [near])
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia()
@@ -221,7 +225,7 @@ export function ProblemSection() {
         </div>
 
         <div className="rings-fx" aria-hidden="true">
-          {fx && <MagicRings color="#10b981" colorTwo="#6ee7b7" theme="light" ringCount={10} motion="ripple" speed={1.1} lineThickness={2.6} glow={1.05} baseRadius={0.1} radiusStep={0.07} expansion={0.3} clickBurst={false} followMouse={false} />}
+          {fx && <Suspense fallback={null}><MagicRings color="#10b981" colorTwo="#6ee7b7" theme="light" ringCount={10} motion="ripple" speed={1.1} lineThickness={2.6} glow={1.05} baseRadius={0.1} radiusStep={0.07} expansion={0.3} clickBurst={false} followMouse={false} /></Suspense>}
         </div>
         <svg className="funnel" aria-hidden="true">
           <defs>
