@@ -78,7 +78,7 @@ export function FazendaCerne() {
     if (!zone) return
     const off = (e: PointerEvent) => {
       const t = e.target as Element | null
-      if (t?.closest('.fz-canvas, .fz-card, .fz-hint')) return
+      if (t?.closest('.fz-canvas, .fz-card, .fz-hint, .fz-pick')) return
       setZone(null)
     }
     document.addEventListener('pointerdown', off)
@@ -130,6 +130,17 @@ export function FazendaCerne() {
       {/* sem a pill de instrução; só com movimento reduzido (sem letreiro) a última operação continua como aviso */}
       {still && readout && <p className="fz-hint" aria-live="polite">{readout}</p>}
 
+      <div className="fz-slot">
+      {!zone && (
+        <div className="fz-pick">
+          <p>Escolha um setor</p>
+          <div>
+            {ZONE_ORDER.map((z) => (
+              <button key={z} type="button" onClick={() => pick(z)}>{ZONES[z].name}</button>
+            ))}
+          </div>
+        </div>
+      )}
       {zone && (
         <aside className="fz-card" aria-live="polite" role="region" aria-label={ZONES[zone].title}>
           <div className="fz-card-body" key={zone}>
@@ -153,6 +164,7 @@ export function FazendaCerne() {
           </div>
         </aside>
       )}
+      </div>
     </figure>
   )
 }

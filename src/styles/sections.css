@@ -354,19 +354,23 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 }
 
 /* ===== Sistema: maquete em tela cheia, sobre uma foto suave da lavoura ===== */
-.farm { position: relative; padding: 0; background: var(--canvas); overflow: hidden; isolation: isolate; }
+.farm { position: relative; margin-top: clamp(48px, 9vh, 110px); padding: 0; background: var(--canvas); overflow: hidden; isolation: isolate; }
 .farm::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
   linear-gradient(180deg, var(--canvas) 0%, rgba(245, 248, 244, 0) 16%, rgba(245, 248, 244, 0) 80%, var(--canvas) 100%),
   var(--farm-bg, none) center / cover no-repeat; }
-.farm .fz-figure { margin: 0; padding-top: clamp(340px, 40vh, 400px); display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
-.farm .farm-head { position: absolute; left: 0; right: 0; top: clamp(88px, 12vh, 130px); z-index: 4; pointer-events: none; transition: opacity .35s; }
+.farm .fz-figure { margin: 0; padding-top: clamp(270px, 31vh, 320px); display: grid; align-content: center; min-height: 100vh; min-height: 100svh; }
+.farm .farm-head { position: absolute; left: 0; right: 0; top: clamp(40px, 5.5vh, 64px); z-index: 4; pointer-events: none; transition: opacity .35s; }
 .farm .farm-head .sec-head { margin: 0; max-width: 460px; pointer-events: auto; }
 .farm .farm-head h2 { font-size: clamp(28px, 3vw, 44px); }
 .farm .farm-head .sec-head { text-shadow: 0 0 14px rgba(245, 248, 244, .95), 0 0 34px rgba(245, 248, 244, .85); }
 .system { padding-top: clamp(40px, 6vh, 72px); }
 @media (max-width: 719px) {
-  .farm .farm-head { position: relative; padding: 88px 0 0; }
-  .farm .fz-figure { padding-top: 0; min-height: 0; height: clamp(470px, 64svh, 640px); display: block; position: relative; }
+  .farm { margin-top: 20px; }
+  .farm .farm-head { position: relative; padding: 36px 0 30px; pointer-events: auto; }
+  /* o texto fica num painel fosco: sobre as colinas do fundo a leitura era ruim */
+  .farm .farm-head .sec-head { padding: 18px 20px; border-radius: 18px; background: rgba(245, 248, 244, .86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); text-shadow: none; }
+  .farm .farm-head .sec-lead { color: var(--text-soft); font-size: 16px; }
+  .farm .fz-figure { padding-top: 12px; min-height: 0; height: auto; display: block; position: relative; }
 }
 /* rede de segurança: o rodapé da foto do chão sempre se desfaz em transparência (nunca uma borda seca) */
 .ground-bg img { -webkit-mask-image: linear-gradient(#000 82%, transparent 100%); mask-image: linear-gradient(#000 82%, transparent 100%); }
@@ -512,3 +516,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-table tfoot .pl-keyrow td { border-left: 0; border-top: 1px solid var(--border); padding-block: 14px; text-align: left; }
 .pl-keyrow .pl-legend { position: sticky; left: 18px; width: max-content; max-width: calc(100vw - 80px); margin: 0; }
 .planos { padding-top: clamp(64px, 9vh, 110px); }
+
+/* CTA fixo menor no celular: não cobre o conteúdo */
+@media (max-width: 719px) { .sticky-cta { min-height: 40px; padding: 0 16px; font-size: 14px; right: 12px; bottom: 12px; } }

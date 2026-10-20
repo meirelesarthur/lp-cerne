@@ -89,11 +89,16 @@
   .fz-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
   .fz-scroll::-webkit-scrollbar { display: none; }
   .fz-full .fz-canvas { width: 128%; min-width: 500px; margin: 0; }
-  /* altura da seção fixa: o cartão é uma folha de vidro sobre a parte de baixo, sem mexer no resto */
-  .fz-full .fz-card { position: absolute; left: 12px; right: 12px; bottom: 44px; top: auto; width: auto; margin: 0; max-height: 52%; overflow: auto; padding: 14px 16px; }
+  /* o cartão não cobre mais a maquete: ele ocupa um espaço reservado logo abaixo (a altura da seção não muda ao abrir um setor) */
+  .fz-slot { display: block; min-height: 268px; margin: 12px 12px 0; }
+  .fz-full .fz-card { position: static; width: auto; margin: 0; max-height: none; overflow: visible; padding: 16px 18px; background: rgba(255, 255, 255, .9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .fz-pick { display: grid; gap: 12px; padding: 16px 18px; border-radius: 20px; background: rgba(255, 255, 255, .86); box-shadow: 0 0 0 1px rgba(14, 42, 29, .08); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .fz-pick p { margin: 0; font-size: 15px; font-weight: 600; color: var(--text); }
+  .fz-pick > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .fz-pick button { min-height: 48px; border-radius: 12px; border: 1px solid rgba(14, 42, 29, .16); background: #fff; font: inherit; font-size: 15px; font-weight: 600; color: var(--accent-hover); cursor: pointer; }
   .fz-card-body { gap: 7px; }
-  .fz-full .fz-card h3 { font-size: 18px; }
-  .fz-full .fz-card p { font-size: 13.5px; line-height: 1.45; }
+  .fz-full .fz-card h3 { font-size: 19px; }
+  .fz-full .fz-card p { font-size: 14.5px; line-height: 1.5; }
   .fz-full .fz-card .fz-where, .fz-nav { display: none; }
   .fz-hint { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); white-space: nowrap; font-size: 12.5px; padding: 5px 12px; }
   .fz-label { font-size: 13px; padding: 6px 12px 6px 24px; min-height: 36px; }
@@ -142,3 +147,7 @@
   .fz-full .fz-stage { transition: transform .5s var(--anatomy-ease, ease); }
   .fz-figure[data-zone='estoque'] .fz-stage { transform: translateX(clamp(0px, calc((1900px - 100vw) * .45), 190px)); }
 }
+
+.fz-slot { display: contents; }
+.fz-pick { display: none; }
+@media (max-width: 719px) { .fz-slot { display: block; } .fz-pick { display: grid; } }
