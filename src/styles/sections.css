@@ -404,7 +404,9 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 /* módulo aberto: linha e funcionalidades num tom só, para ler como um bloco */
 /* linhas alternadas (zebra) para o olho acompanhar o módulo até as colunas; aberto e hover ficam mais marcados */
 .pl-table tbody tr.z1 > * { background: #eef4ef; }
-.pl-mod.is-open > *, .pl-mod.is-open ~ .pl-feat > * { background: #e3efe7; }
+.pl-table tbody .pl-mod:not(.is-open):hover > * { background: #e0ede4; }
+/* aberto (selecionado): um tom abaixo do hover, e as funcionalidades herdam; ambos mais escuros que o verde da zebra */
+.pl-table tbody .pl-mod.is-open > *, .pl-table tbody .pl-mod.is-open ~ .pl-feat > * { background: #cfe3d6; }
 .pl-mod.is-open button { color: var(--accent-hover); }
 .pl-feat th { padding-left: 40px; font-size: 14px; color: var(--text-soft); }
 .pl-feat th, .pl-feat td { padding-block: 7px; border-bottom-color: transparent; }
