@@ -66,26 +66,27 @@ export function ProblemSection() {
     mm.add(PROBLEM_PIN, () => {
       const rootEl = root.current!
       const q = (sel: string) => rootEl.querySelector(sel)
-      gsap.set('.vira-art .layer-a', { rotate: -5 })
-      gsap.set('.vira-art .layer-b', { rotate: 4 })
-      gsap.set('.vira-art .layer-c', { rotate: -2, xPercent: -50 })
+      // as três peças ficam juntas no centro (sem a janela do sistema à mostra); a janela nasce atrás delas, no mesmo ponto
+      gsap.set('.vira-art .layer', { xPercent: -50, yPercent: -50 })
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
         scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=300%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true },
       })
       void q
+      const vw = () => window.innerWidth, vh = () => window.innerHeight
       // 0 → 1 = toda a duração
-      tl.fromTo('.vira-frame', { clipPath: 'inset(43% 29% 7% 29% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0.1)
-        .fromTo('.vira-media', { scale: 1.3 }, { scale: 1, duration: 0.5 }, 0.1)
-        // a dor é empurrada para fora conforme a janela cresce
-        .to('.vira-copy', { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.2 }, 0.1)
-        .to('.vira-art .layer-a', { x: () => -window.innerWidth * 0.5, y: -40, rotate: -22, autoAlpha: 0, ease: 'power2.in', duration: 0.36 }, 0.12)
-        .to('.vira-art .layer-b', { x: () => window.innerWidth * 0.5, y: -60, rotate: 20, autoAlpha: 0, ease: 'power2.in', duration: 0.36 }, 0.14)
-        .to('.vira-art .layer-c', { y: () => window.innerHeight * 0.55, rotate: 8, autoAlpha: 0, ease: 'power2.in', duration: 0.34 }, 0.16)
+      tl.fromTo('.vira-art .layer-a', { x: () => -vw() * 0.17, y: () => -vh() * 0.02, rotate: -7, scale: 1 }, { x: 0, y: 0, rotate: -3, scale: 0.7, duration: 0.3 }, 0)
+        .fromTo('.vira-art .layer-b', { x: () => vw() * 0.17, y: () => -vh() * 0.06, rotate: 6, scale: 1 }, { x: 0, y: 0, rotate: 3, scale: 0.7, duration: 0.3 }, 0)
+        .fromTo('.vira-art .layer-c', { x: 0, y: () => vh() * 0.07, rotate: -2, scale: 1 }, { x: 0, y: 0, rotate: 0, scale: 0.7, duration: 0.3 }, 0)
+        .to('.vira-copy', { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.2 }, 0.06)
+        // a janela do Cerne cresce do centro até a tela inteira, e as peças são absorvidas por ela
+        .fromTo('.vira-frame', { clipPath: 'inset(63% 50% 37% 50% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0.2)
+        .fromTo('.vira-media', { scale: 1.35 }, { scale: 1, duration: 0.5 }, 0.2)
+        .to('.vira-art .layer', { scale: 0.42, autoAlpha: 0, ease: 'power2.in', stagger: 0.03, duration: 0.14 }, 0.42)
         // o sistema ocupa a tela: véu escuro para o texto, título da virada e as frentes entrando uma a uma
-        .fromTo('.vira-scrim', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: 'none' }, 0.42)
-        .fromTo('.vira-final-head', { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.14, ease: 'power3.out' }, 0.56)
-        .fromTo('.vira-chips li', { autoAlpha: 0, y: 26, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.1, ease: 'back.out(1.6)', stagger: 0.04 }, 0.7)
+        .fromTo('.vira-scrim', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: 'none' }, 0.5)
+        .fromTo('.vira-final-head', { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.14, ease: 'power3.out' }, 0.62)
+        .fromTo('.vira-chips li', { autoAlpha: 0, y: 26, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.1, ease: 'back.out(1.6)', stagger: 0.04 }, 0.74)
         .set({}, {}, 1)
     })
     return () => mm.revert()
