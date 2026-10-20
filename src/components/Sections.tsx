@@ -1,7 +1,7 @@
 import { asset } from '../lib/assets'
 import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
-import { gsap } from '../lib/scroll'
+import { gsap, shouldSkipScrub } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
 import { StrokeText } from './fx/StrokeText'
@@ -16,6 +16,10 @@ import {
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
 const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
+
+// curvas de nível (WebGL) só baixam quando o Trailer chega perto da tela e só em desktop com movimento permitido
+const Topography = lazy(() => import('./fx/Topography'))
+const TOPO_MQ = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -196,6 +200,8 @@ export function TrailerSection() {
   const [cap, setCap] = useState(0)
   const [paused, setPaused] = useState(true)
   const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const topoNear = useNear(root, '60% 0px')
+  const [topo] = useState(() => window.matchMedia(TOPO_MQ).matches && !shouldSkipScrub())
 
   useEffect(() => {
     const v = video.current
@@ -260,6 +266,7 @@ export function TrailerSection() {
 
   return (
     <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
+      <div className="fx-topo-slot" aria-hidden="true">{topo && topoNear && <Suspense fallback={null}><Topography /></Suspense>}</div>
       <div className="wrap">
         <header className="sec-head center" data-reveal>
           <span className="eyebrow">O sistema em funcionamento</span>

@@ -134,3 +134,10 @@
   .swap-dots button[aria-pressed='true'] { width: 44px; background: #86efac; }
   .swap-dots button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 }
+
+/* ── Topography (fundo do Trailer): canvas atrás do conteúdo, sem capturar ponteiro ── */
+.trailer { position: relative; overflow: hidden; }
+.trailer > .wrap { position: relative; z-index: 1; }
+.fx-topo-slot { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.fx-topo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; animation: fx-topo-in 1.4s ease .2s forwards; }
+@keyframes fx-topo-in { to { opacity: 1; } }

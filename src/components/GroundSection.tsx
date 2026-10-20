@@ -53,7 +53,7 @@ function useSwap(n: number) {
 }
 
 export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
-  const sw = useSwap(FRENTES.length)
+  const { ref: swapRef, active, setActive, setPaused, swap } = useSwap(FRENTES.length)
   const g = geo?.ready ? geo.manifest.ground : undefined
   let style: React.CSSProperties | undefined
   if (geo && g) {
@@ -82,18 +82,18 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
 
         <div className="ground-split">
           <div className="swap-wrap">
-            <ul ref={sw.ref} className="frentes" data-reveal onPointerEnter={() => sw.setPaused(true)} onPointerLeave={() => sw.setPaused(false)}>
+            <ul ref={swapRef} className="frentes" data-reveal onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
               {FRENTES.map((f, i) => (
-                <li key={f.t} className="glass-card" style={{ '--p': (i - sw.active + FRENTES.length) % FRENTES.length } as React.CSSProperties}>
+                <li key={f.t} className="glass-card" style={{ '--p': (i - active + FRENTES.length) % FRENTES.length } as React.CSSProperties}>
                   <span className="gc-ico"><Icon icon={f.i} size={26} /></span>
                   <h3>{f.t}</h3>
                   <p>{f.d}</p>
                 </li>
               ))}
             </ul>
-            {sw.swap && (
+            {swap && (
               <div className="swap-dots" role="group" aria-label="Frentes do Cerne">
-                {FRENTES.map((f, i) => <button key={f.t} type="button" aria-label={f.t} aria-pressed={i === sw.active} onClick={() => sw.setActive(i)} />)}
+                {FRENTES.map((f, i) => <button key={f.t} type="button" aria-label={f.t} aria-pressed={i === active} onClick={() => setActive(i)} />)}
               </div>
             )}
           </div>
