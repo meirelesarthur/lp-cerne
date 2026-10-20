@@ -2,10 +2,9 @@ import { asset } from '../lib/assets'
 import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { whatsappHref } from '../lib/form'
 import { LeadForm } from './LeadForm'
-import { gsap, shouldSkipScrub } from '../lib/scroll'
+import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
-import { StrokeText } from './fx/StrokeText'
 import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
 import { FolderFloat } from './fx/FolderFloat'
 import { CardSwap, type SwapItem } from './fx/CardSwap'
@@ -18,10 +17,6 @@ import {
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
 const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
-
-// curvas de nível (WebGL) só baixam quando o Trailer chega perto da tela e só em desktop com movimento permitido
-const Topography = lazy(() => import('./fx/Topography'))
-const TOPO_MQ = '(min-width: 961px) and (prefers-reduced-motion: no-preference)'
 
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
@@ -485,21 +480,14 @@ export function ProfilesSection() {
 const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas']
 
 export function TwinSection() {
-  const root = useRef<HTMLElement>(null)
-  const near = useNear(root, '60% 0px')
-  // relevo em WebGL só em tela larga, com movimento permitido; senão fica o fundo estático de anéis
-  const [topo] = useState(() => window.matchMedia(TOPO_MQ).matches && !shouldSkipScrub())
   const wa = whatsappHref('Olá! Quero conhecer o GB Twin.')
   return (
-    <section ref={root} className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
-      <div className="twin-terrain" aria-hidden="true">
-        {topo && near && <Suspense fallback={null}><Topography /></Suspense>}
+    <section className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
+      <div className="twin-bg" aria-hidden="true">
+        <img src={asset('/frames/twin-bg.webp')} alt="" width={2200} height={1238} loading="lazy" decoding="async" />
       </div>
       <div className="twin-grid">
-        <figure className="twin-figure" data-reveal>
-          <span className="twin-glow" aria-hidden="true" />
-          <img src={asset('/frames/twin-drone.webp')} alt="Drone sobrevoando a lavoura com o mapa de copas do GB Twin no tablet" width={1200} height={1007} loading="lazy" decoding="async" />
-        </figure>
+        <div className="twin-spacer" aria-hidden="true" />
         <div className="twin-copy">
           <span className="eyebrow">GB Twin</span>
           <MaskedHeading id="twin-title" text="Cada pé da lavoura, contado do alto." />
@@ -507,15 +495,7 @@ export function TwinSection() {
           <ul className="twin-list">
             {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
           </ul>
-          <dl className="twin-stats">
-            <div><dt>Copas</dt><dd><StrokeText>120.855</StrokeText></dd></div>
-            <div><dt>Estande</dt><dd><StrokeText>3.568</StrokeText><small>/ha</small></dd></div>
-            <div><dt>Aproveitamento</dt><dd><StrokeText>86%</StrokeText></dd></div>
-          </dl>
-          <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <div className="twin-cta">
-            <a className="btn btn-light" href={wa} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar sobre o GB Twin</a>
-          </div>
+          <a className="btn btn-light" href={wa} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar sobre o GB Twin</a>
         </div>
       </div>
     </section>
