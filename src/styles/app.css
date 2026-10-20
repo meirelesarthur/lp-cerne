@@ -27,6 +27,7 @@ html[data-hero-done][data-header-dark] .logo-on-glass { opacity: 0; }
 html[data-hero-done] .header { background: rgba(var(--veil), .82); backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(23, 40, 30, .08); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 22px; border-radius: 10px; border: 1px solid transparent; font-weight: 600; font-size: 15px; cursor: pointer; transition: background .2s, border-color .2s; }
 @supports (corner-shape: squircle) { .btn, .video-toggle { corner-shape: squircle; border-radius: 16px; } }
+a.btn { text-decoration: none; }
 .btn-primary { background: var(--accent-hover); color: var(--on-accent); }
 .btn-primary:hover:not(:disabled) { background: #065f46; }
 .btn-primary:disabled { opacity: .65; cursor: progress; }
