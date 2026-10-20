@@ -66,7 +66,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .layer { position: relative; width: 100%; border-radius: 12px; background: #fff; border: 1px solid var(--border); box-shadow: 0 18px 44px rgba(23, 40, 30, .14); overflow: hidden; }
 .layer-b { margin-top: 10px; overflow: visible; background: #fffdf4; border-color: #eadfbf; transform: rotate(.8deg); }
 .layer-c { transform: rotate(-.8deg); }
-.vira-frame { position: relative; order: 3; width: min(1100px, calc(100% - 2 * var(--gutter))); margin: 0 auto; aspect-ratio: 1740 / 1200; border-radius: 20px; overflow: hidden; background: #0b2016; box-shadow: 0 30px 80px rgba(8, 30, 16, .25); }
+.vira-frame { position: relative; order: 4; width: min(1100px, calc(100% - 2 * var(--gutter))); margin: 32px auto 0; aspect-ratio: 1740 / 1200; border-radius: 20px; overflow: hidden; background: #0b2016; box-shadow: 0 30px 80px rgba(8, 30, 16, .25); }
 .vira-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
 .vira-scrim { display: none; }
 .vira-final { width: min(820px, calc(100% - 2 * var(--gutter))); margin: 32px auto 0; text-align: center; }
@@ -75,7 +75,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .vira-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--border); font-size: 14.5px; font-weight: 600; color: var(--text-soft); }
 .vira-chips svg { flex: none; color: var(--accent-hover); }
 .vira-stage { display: flex; flex-direction: column; }
-.vira-copy { order: 0; } .vira-art { order: 1; } .vira-final { order: 4; }
+.vira-copy { order: 0; } .vira-art { order: 1; } .vira-final { order: 3; }
 /* planilha: janela do Excel, populada, com erro e número em dúvida */
 .xl-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #1d6f42; color: #fff; font-size: 11.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .xl-ico { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 3px; background: #fff; color: #1d6f42; font-style: normal; font-size: 10px; font-weight: 800; flex: none; }
