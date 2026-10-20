@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
 import type { IconSvgElement } from '@hugeicons/react'
 import type { HeroGeometry } from './Hero'
-import { MaskedHeading } from './fx/MaskedHeading'
 import { Analytics01Icon, BarnsIcon, Building02Icon, Icon, Invoice01Icon, SmartPhone01Icon, TractorIcon, WarehouseIcon } from '../lib/icons'
 
 /**
@@ -21,39 +19,7 @@ const FATOS: { i: IconSvgElement; t: string; d: string; tbd?: boolean }[] = [
   { i: SmartPhone01Icon, t: 'Acesse de onde estiver', d: 'No navegador hoje, instalável como app. Os apps de campo estão em teste.' },
 ]
 
-/** Pilha 3D (Card Swap) só em tela grande e sem movimento reduzido; fora disso as 4 frentes ficam na grade de sempre. */
-const SWAP_MQ = '(min-width: 1100px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)'
-
-/** Qual frente está na frente da pilha; avança sozinha enquanto a pilha está na tela e sem o mouse em cima. */
-function useSwap(n: number) {
-  const ref = useRef<HTMLUListElement>(null)
-  const [active, setActive] = useState(0)
-  const [inView, setInView] = useState(false)
-  const [paused, setPaused] = useState(false)
-  const [swap, setSwap] = useState(() => window.matchMedia(SWAP_MQ).matches)
-  useEffect(() => {
-    const mq = window.matchMedia(SWAP_MQ)
-    const on = () => setSwap(mq.matches)
-    mq.addEventListener('change', on)
-    return () => mq.removeEventListener('change', on)
-  }, [])
-  useEffect(() => {
-    const el = ref.current
-    if (!el || !swap) return
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [swap])
-  useEffect(() => {
-    if (!swap || !inView || paused) return
-    const t = window.setInterval(() => setActive((a) => (a + 1) % n), 4500)
-    return () => window.clearInterval(t)
-  }, [swap, inView, paused, n])
-  return { ref, active, setActive, setPaused, swap }
-}
-
 export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
-  const { ref: swapRef, active, setActive, setPaused, swap } = useSwap(FRENTES.length)
   const g = geo?.ready ? geo.manifest.ground : undefined
   let style: React.CSSProperties | undefined
   if (geo && g) {
@@ -76,40 +42,31 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
       <div className="ground-content">
         <header className="sec-head on-photo" data-reveal>
           <span className="eyebrow">O que o Cerne cobre</span>
-          <MaskedHeading id="escopo-title" text="Uma fazenda, um cadastro, nenhuma planilha paralela." />
+          <h2 id="escopo-title">Uma fazenda, um cadastro, nenhuma planilha paralela.</h2>
           <p className="sec-lead">Do curral ao caixa e da lavoura à nota fiscal: o Cerne Web organiza a rotina de quem decide.</p>
         </header>
 
-        <div className="ground-split">
-          <div className="swap-wrap">
-            <ul ref={swapRef} className="frentes" data-reveal onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
-              {FRENTES.map((f, i) => (
-                <li key={f.t} className="glass-card" style={{ '--p': (i - active + FRENTES.length) % FRENTES.length } as React.CSSProperties}>
-                  <span className="gc-ico"><Icon icon={f.i} size={26} /></span>
-                  <h3>{f.t}</h3>
-                  <p>{f.d}</p>
-                </li>
-              ))}
-            </ul>
-            {swap && (
-              <div className="swap-dots" role="group" aria-label="Frentes do Cerne">
-                {FRENTES.map((f, i) => <button key={f.t} type="button" aria-label={f.t} aria-pressed={i === active} onClick={() => setActive(i)} />)}
-              </div>
-            )}
-          </div>
+        <ul className="frentes">
+          {FRENTES.map((f) => (
+            <li key={f.t} className="glass-card" data-reveal>
+              <span className="gc-ico"><Icon icon={f.i} size={26} /></span>
+              <h3>{f.t}</h3>
+              <p>{f.d}</p>
+            </li>
+          ))}
+        </ul>
 
-          <ul className="fatos">
-            {FATOS.map((f) => (
-              <li key={f.t} data-reveal>
-                <span className="gc-ico gc-ico-sm"><Icon icon={f.i} size={22} /></span>
-                <div>
-                  <h3>{f.t} {f.tbd && <span className="tbd">a validar</span>}</h3>
-                  <p>{f.d}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="fatos">
+          {FATOS.map((f) => (
+            <li key={f.t} data-reveal>
+              <span className="gc-ico gc-ico-sm"><Icon icon={f.i} size={22} /></span>
+              <div>
+                <h3>{f.t} {f.tbd && <span className="tbd">a validar</span>}</h3>
+                <p>{f.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="ground-fade" aria-hidden="true" />
     </section>
