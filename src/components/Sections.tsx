@@ -61,8 +61,44 @@ export function ProblemSection() {
         return axis === 'x' ? m.x + (i - 1) * m.w * 0.24 - c.x : m.y + 6 - c.y
       }
 
+      // anéis mágicos: ondas verdes concêntricas saem do ponto de luz e varrem a tela (canvas 2D, dirigido pela rolagem)
+      const cv = q<HTMLCanvasElement>('.rings')
+      const rctx = cv.getContext('2d')!
+      const wave = { t: 0 }
+      const RINGS = 16
+      const sizeRings = () => { const d = Math.min(2, window.devicePixelRatio || 1); cv.width = Math.round(W() * d); cv.height = Math.round(H() * d) }
+      const drawRings = () => {
+        rctx.clearRect(0, 0, cv.width, cv.height)
+        if (wave.t <= 0 || wave.t >= 1.2) return
+        const d = cv.width / W(), c = target(), cx = c.x * d, cy = (c.y + 6) * d
+        const maxR = Math.hypot(Math.max(c.x, W() - c.x), Math.max(c.y, H() - c.y)) * 1.15 * d
+        for (let i = 0; i < RINGS; i++) {
+          const u = (wave.t - i * 0.032) / 0.46 // vida do anel i: 0 nasce no ponto, 1 some na borda
+          if (u <= 0 || u >= 1) continue
+          const r = Math.max(2, (1 - Math.pow(1 - u, 2.2)) * maxR)
+          const a = Math.pow(1 - u, 1.25) * (i === 0 ? 1 : 0.85)
+          const lw = (2.2 + 11 * (1 - u)) * d
+          rctx.beginPath(); rctx.arc(cx, cy, r, 0, Math.PI * 2)
+          // brilho em duas camadas largas e translúcidas (mais barato que shadowBlur em tela cheia)
+          rctx.lineWidth = lw * 5.5; rctx.strokeStyle = `rgba(16,185,129,${(a * 0.09).toFixed(3)})`; rctx.stroke()
+          rctx.lineWidth = lw * 2.4; rctx.strokeStyle = `rgba(52,211,153,${(a * 0.2).toFixed(3)})`; rctx.stroke()
+          // fio brilhante: gradiente cônico que gira, com trechos mais claros (efeito de "magia" no anel)
+          const g = (rctx as CanvasRenderingContext2D & { createConicGradient?: (a: number, x: number, y: number) => CanvasGradient }).createConicGradient?.(i * 1.1 + wave.t * 6, cx, cy)
+          if (g) {
+            g.addColorStop(0, `rgba(236,253,245,${a.toFixed(3)})`)
+            g.addColorStop(0.2, `rgba(52,211,153,${(a * 0.3).toFixed(3)})`)
+            g.addColorStop(0.4, `rgba(110,231,183,${a.toFixed(3)})`)
+            g.addColorStop(0.62, `rgba(16,185,129,${(a * 0.25).toFixed(3)})`)
+            g.addColorStop(0.82, `rgba(167,243,208,${a.toFixed(3)})`)
+            g.addColorStop(1, `rgba(236,253,245,${a.toFixed(3)})`)
+          }
+          rctx.lineWidth = lw; rctx.strokeStyle = g ?? `rgba(52,211,153,${a.toFixed(3)})`; rctx.stroke()
+        }
+      }
+
       // o funil liga a boca (sob as peças) ao ponto da tela do notebook: vidro verde em 3D, redesenhado a cada refresh
       const drawFunnel = () => {
+        sizeRings(); drawRings()
         const svg = q<SVGSVGElement>('.funnel'), m = mouth(), t = target(), d = t.y - m.y, a = m.w / 2, ry = Math.max(16, m.w * 0.07), neck = 15
         svg.setAttribute('viewBox', `0 0 ${W()} ${H()}`)
         const hw = (u: number) => neck + (a - neck) * Math.pow(1 - u, 2.15) // meia-largura do corpo em u (0 boca ... 1 bico)
@@ -95,7 +131,7 @@ export function ProblemSection() {
           `<path d="M ${left.join(' L ')}" fill="none" stroke="#6ee7b7" stroke-width="2"/>` +
           `<path d="M ${us.map((u) => `${(m.x + hw(u)).toFixed(1)} ${yAt(u).toFixed(1)}`).join(' L ')}" fill="none" stroke="#047857" stroke-width="2"/>` +
           tube + rimFront
-        for (const [cls, r] of [['.orb-halo', 30], ['.orb-core', 9], ['.orb-bloom', 44], ['.orb-wave', 44]] as const) {
+        for (const [cls, r] of [['.orb-halo', 30], ['.orb-core', 9], ['.orb-bloom', 44]] as const) {
           const c = svg.querySelector(cls)!
           c.setAttribute('cx', `${m.x}`); c.setAttribute('cy', `${t.y + 6}`); c.setAttribute('r', `${r}`)
         }
@@ -126,9 +162,9 @@ export function ProblemSection() {
         .fromTo('.orb-halo', { scale: 0.2, autoAlpha: 0 }, { scale: 1.6, autoAlpha: 0.9, ease: 'power2.out', duration: 0.08 }, 0.58)
         .to('.orb-core', { scale: 1.9, duration: 0.05, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.63)
         .to('.funnel-shell', { autoAlpha: 0, y: -10, duration: 0.09, ease: 'power2.in' }, 0.66)
-        .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 1 }, { scale: 52, autoAlpha: 0, ease: 'power3.out', duration: 0.26 }, 0.72)
-        // onda de choque: um anel fino que sai do ponto e varre a tela atrás do clarão
-        .fromTo('.orb-wave', { scale: 0.05, autoAlpha: 0.95 }, { scale: 46, autoAlpha: 0, ease: 'power2.out', duration: 0.3 }, 0.73)
+        .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 1 }, { scale: 52, autoAlpha: 0, ease: 'power3.out', duration: 0.26 }, 0.7)
+        // ondas de anéis verdes saindo do ponto de luz e varrendo a tela enquanto o produto se revela
+        .fromTo(wave, { t: 0 }, { t: 1, ease: 'none', duration: 0.3, onUpdate: drawRings }, 0.64)
         .to('.orb-core, .orb-halo', { scale: 8, autoAlpha: 0, duration: 0.1, ease: 'power2.out' }, 0.72)
         .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.73)
         .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.76)
@@ -214,6 +250,7 @@ export function ProblemSection() {
           </div>
         </div>
 
+        <canvas className="rings" aria-hidden="true" />
         <svg className="funnel" aria-hidden="true">
           <defs>
             <linearGradient id="fn-body" x1="0" y1="0" x2="1" y2="0">
@@ -246,7 +283,6 @@ export function ProblemSection() {
           </defs>
           <g className="funnel-shell" />
           <circle className="orb-bloom" fill="url(#fn-bloom)" />
-          <circle className="orb-wave" fill="none" stroke="#6ee7b7" strokeWidth="3" vectorEffect="non-scaling-stroke" />
           <circle className="orb-halo" fill="url(#fn-orb)" />
           <circle className="orb-core" fill="#fff" stroke="#34d399" strokeWidth="3" />
         </svg>
