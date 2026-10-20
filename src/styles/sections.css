@@ -387,12 +387,11 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-scroll.is-scrolled .pl-fix { box-shadow: 10px 0 12px -12px rgba(23, 40, 30, .45); }
 .pl-table thead th { position: relative; padding-block: 22px 18px; vertical-align: bottom; border-bottom: 2px solid var(--border); }
 .pl-table thead .pl-fix { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.pl-head { --c: var(--accent-hover); width: 20%; }
+.pl-head { --c: var(--accent-hover); width: 20%; background: var(--c); color: #fff; }
 .pl-head.dlx { --c: #9a6408; } .pl-head.ent { --c: #3c4a9e; }
-.pl-head::before { content: ''; position: absolute; left: 14px; right: 14px; top: 0; height: 4px; border-radius: 0 0 4px 4px; background: var(--c); }
-.pl-head b { display: block; font-size: 22px; font-weight: 600; letter-spacing: -.01em; color: var(--c); }
-.pl-head span { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
-.pl-head em { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px 0; margin-top: 10px; padding: 4px 10px; border-radius: 8px; background: var(--mint); font-size: 12px; font-style: normal; color: var(--text-soft); }
+.pl-head b { display: block; font-size: 22px; font-weight: 600; letter-spacing: -.01em; color: #fff; }
+.pl-head span { display: block; margin-top: 2px; font-size: 13px; color: rgba(255, 255, 255, .88); }
+.pl-head em { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px 0; margin-top: 10px; padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, .18); font-size: 12px; font-style: normal; color: #fff; }
 .pl-head em i { font-style: normal; white-space: nowrap; }
 .pl-head em i + i::before { content: '·'; margin: 0 6px; }
 .pl-grp th, .pl-grp td { padding-block: 9px; background: var(--mint); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-hover); }
@@ -434,6 +433,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 /* três divisórias verticais, uma à esquerda de cada plano */
 .pl-table thead th.pl-head, .pl-table tbody td, .pl-table tfoot td { border-left: 1px solid var(--border); }
+.pl-table thead th.pl-head { border-left-color: rgba(255, 255, 255, .28); }
 .pl-table .pl-grp td { border-left: 0; }
 
 /* ícones (Hugeicons) */
