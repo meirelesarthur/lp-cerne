@@ -35,8 +35,9 @@
 .acg { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; height: clamp(380px, 46vw, 500px); }
 .acg-p { flex: 1 1 0; min-width: 0; transition: flex-grow .55s cubic-bezier(.3, .8, .2, 1); }
 .acg-p.is-on { flex-grow: 7; }
-.acg-btn { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; background: #0e2a1d; color: #fff; text-align: left; cursor: pointer; font: inherit; }
-.acg-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.acg-btn { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; background: #0e2a1d; color: #fff; text-align: left; font: inherit; }
+.acg-hit { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
+.acg-hit:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
 .acg-shot { position: absolute; inset: 0; }
 .acg-shot img { position: absolute; left: 0; top: 0; height: 100%; width: max(100%, 780px); object-fit: cover; object-position: left top; opacity: .2; transition: opacity .5s; }
 .is-on .acg-shot img { opacity: 1; }
@@ -44,7 +45,8 @@
 .acg-strip b { font-size: 13px; color: #4ade80; }
 .acg-strip span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 15px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
 .is-on .acg-strip { opacity: 0; pointer-events: none; }
-.acg-cap { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 8px; padding: 70px 26px 24px; background: linear-gradient(180deg, transparent, rgba(8, 26, 18, .9) 55%); opacity: 0; transform: translateY(14px); transition: opacity .35s, transform .45s cubic-bezier(.3, .8, .2, 1); pointer-events: none; }
+.acg-cap { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 8px; padding: 70px 26px 24px; background: linear-gradient(180deg, transparent, rgba(8, 26, 18, .9) 55%); opacity: 0; transform: translateY(14px); transition: opacity .35s, transform .45s cubic-bezier(.3, .8, .2, 1); pointer-events: none; z-index: 2; }
+.is-on .acg-cap .acg-cta { pointer-events: auto; }
 .is-on .acg-cap { opacity: 1; transform: none; transition-delay: .15s; }
 .acg-cap .cell-top { margin: 0; }
 .acg-cap .cell-n { background: #fff; }
@@ -53,6 +55,18 @@
 .acg-d { max-width: 54ch; font-size: 14.5px; line-height: 1.5; color: #e3efe6; }
 .acg-feats { display: flex; flex-wrap: wrap; gap: 6px; }
 .acg-feats i { font-style: normal; padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .2); font-size: 12.5px; color: #fff; }
+
+/* variante grande (Edições): painéis mais altos, telas de celular em moldura e CTA na legenda */
+.acg-lg { height: clamp(460px, 44vw, 560px); }
+.acg-lg .acg-p.is-on { flex-grow: 6; }
+.acg-cta { justify-self: start; margin-top: 8px; }
+.acg-cap .btn-ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .55); }
+.acg-phone .acg-btn { background: radial-gradient(90% 70% at 80% 50%, #17402c 0%, #0e2a1d 60%, #081a12 100%); }
+.acg-phone .acg-shot img { position: static; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 1; }
+.acg-frame { position: absolute; right: 7%; top: 7%; bottom: 7%; aspect-ratio: 1170 / 2532; border-radius: 30px; border: 7px solid #1b2a21; background: #f3f6f3; overflow: hidden; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); opacity: .3; transition: opacity .5s; }
+.is-on .acg-frame { opacity: 1; }
+.acg-phone .acg-cap { right: 44%; background: none; padding: 0 0 30px 28px; }
+.acg-lg .acg-cap { padding-left: 28px; padding-right: 28px; }
 
 /* ── Folder Float (módulos sem tela) ── */
 .folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
@@ -82,6 +96,9 @@
   .acg-strip { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 20px; align-items: center; }
   .acg-strip span { writing-mode: horizontal-tb; transform: none; }
   .acg-shot img { width: 100%; }
+  .acg-lg .acg-p.is-on { height: 560px; }
+  .acg-frame { top: 70px; bottom: auto; height: 300px; right: 6%; }
+  .acg-phone .acg-cap { right: 0; padding: 50px 20px 18px; background: linear-gradient(180deg, transparent, rgba(8, 26, 18, .92) 45%); }
   .acg-cap { padding: 50px 20px 18px; }
   .folders { grid-template-columns: 1fr; }
 }

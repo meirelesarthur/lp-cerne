@@ -421,6 +421,12 @@ export function SystemSection() {
 }
 
 /* ───────────────────────── 06 · Edições ───────────────────────── */
+const EDICOES: GalleryItem[] = [
+  { key: 'web', n: '01', tag: 'Disponível hoje', title: 'Cerne Web', desc: 'Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão Geral', cta: { label: 'Agendar demonstração', href: '#contato', interest: 'demonstracao', primary: true } },
+  { key: 'adm', n: '02', tag: 'Em teste', title: 'Cerne Administração', desc: 'Para gestores e escritório: resultado, rebanho e ordens de serviço.', src: '/screens/app-administracao.webp', alt: 'App Administração: visão geral de rebanho e confinamento', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-administracao' } },
+  { key: 'op', n: '03', tag: 'Em teste', title: 'Cerne Operação', desc: 'Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.', src: '/screens/app-operacao.webp', alt: 'App Operação: ordem de serviço de vacinação do Lote 12', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-operacao' } },
+]
+
 export function EditionsSection() {
   const media = useAfterFirstScroll()
   return (
@@ -430,25 +436,8 @@ export function EditionsSection() {
           <span className="eyebrow">Como usar</span>
           <h2 id="edicoes-title">Um sistema. Três formas de usar.</h2>
         </header>
-        <div className="editions-grid">
-          <article className="edition web" data-reveal>
-            <h3>Cerne Web</h3>
-            <p>Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.</p>
-            {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" width={1280} height={800} loading="lazy" decoding="async" />}
-            <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
-          </article>
-          <article className="edition app" data-reveal>
-            <h3>Cerne Administração</h3>
-            <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Entrar na lista de testes</a>
-          </article>
-          <article className="edition app" data-reveal>
-            <h3>Cerne Operação</h3>
-            <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
-            <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Entrar na lista de testes</a>
-          </article>
+        <div data-reveal>
+          <AccordionGallery large label="Edições do Cerne" items={EDICOES.map((e): GalleryItem => ({ ...e, src: media && e.src ? asset(e.src) : undefined }))} />
         </div>
         <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
       </div>
