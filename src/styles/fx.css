@@ -107,6 +107,8 @@
 .cs-pill:focus-visible { outline: 2px solid #86efac; outline-offset: 2px; }
 @keyframes cs-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+  /* ajuste óptico: a tela da frente fica um pouco à direita do centro matemático, porque as de trás pesam para o lado */
+  .cs-stage { transform: translateX(4.5%); }
   .cs-card {
     width: 88%; transform-origin: 0 100%;
     transform: translate3d(calc(var(--p) * 3.6%), calc(var(--p) * -4.6%), calc(var(--p) * -70px));
