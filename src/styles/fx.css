@@ -169,3 +169,17 @@
   .twin-figure { width: min(520px, 100%); margin-inline: auto; }
   .twin-terrain::after { background: linear-gradient(180deg, rgba(3, 11, 7, .3), rgba(3, 11, 7, .5)); }
 }
+
+/* ── Formulário no Hero: mesmo conjunto de campos da seção final, num cartão mais compacto para caber na tela ── */
+.hero .form { width: min(100%, 400px); padding: 16px 18px; }
+.hero .form .sub { margin-bottom: 10px; }
+.hero .form .field { margin-bottom: 8px; }
+.hero .form .field label { margin-bottom: 3px; }
+.hero .form .field input, .hero .form .field select { min-height: 38px; font-size: 15px; }
+.hero .form .row2 { gap: 0 10px; }
+.hero .form .consent { margin: 2px 0 10px; }
+.hero .form .btn { min-height: 42px; }
+@media (max-width: 820px) {
+  /* celular: o parágrafo do Hero cede espaço para o formulário completo caber na primeira tela */
+  .hero .hero-copy .lead { display: none; }
+}

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
 import { coverBox, finalZoom, prefersHd, supportsAvif, type Box, type Manifest, type Zoom } from '../lib/stage'
 import { ArrowDown01Icon, Icon, Mouse01Icon } from '../lib/icons'
-import { HeroForm } from './HeroForm'
+import { LeadForm } from './LeadForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
 const EMAIL_ID = 'hero-email'
@@ -227,7 +227,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">
-            <HeroForm emailId={EMAIL_ID} />
+            <LeadForm variant="hero" emailId={EMAIL_ID} />
           </div>
         </div>
 

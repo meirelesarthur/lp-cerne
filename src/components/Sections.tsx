@@ -1,6 +1,7 @@
 import { asset } from '../lib/assets'
-import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { maskPhone, submitLead, validators, whatsappHref, type Status } from '../lib/form'
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { whatsappHref } from '../lib/form'
+import { LeadForm } from './LeadForm'
 import { gsap, shouldSkipScrub } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
@@ -12,7 +13,7 @@ import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
   BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
-  SecurityLockIcon, ShoppingCart01Icon, Tick02Icon, WeightScale01Icon,
+  SecurityLockIcon, ShoppingCart01Icon, Tick02Icon, WeightScale01Icon, WhatsappIcon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
@@ -334,7 +335,7 @@ export function SystemSection() {
 
 /* ───────────────────────── 06 · Edições ───────────────────────── */
 const EDICOES: GalleryItem[] = [
-  { key: 'web', n: '01', tag: 'Disponível hoje', title: 'Cerne Web', desc: 'Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão Geral', cta: { label: 'Agendar demonstração', href: '#contato', interest: 'demonstracao', primary: true } },
+  { key: 'web', n: '01', tag: 'Disponível hoje', title: 'Cerne Web', desc: 'Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão Geral', cta: { label: 'Quero acesso antecipado', href: '#contato', interest: 'web', primary: true } },
   { key: 'adm', n: '02', tag: 'Em teste', title: 'Cerne Administração', desc: 'Para gestores e escritório: resultado, rebanho e ordens de serviço.', src: '/screens/app-administracao.webp', alt: 'App Administração: visão geral de rebanho e confinamento', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-administracao' } },
   { key: 'op', n: '03', tag: 'Em teste', title: 'Cerne Operação', desc: 'Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.', src: '/screens/app-operacao.webp', alt: 'App Operação: ordem de serviço de vacinação do Lote 12', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-operacao' } },
 ]
@@ -513,7 +514,7 @@ export function TwinSection() {
           </dl>
           <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
           <div className="twin-cta">
-            <a className="btn btn-light" href={wa ?? '#contato'} data-interest="gb-twin" {...(wa ? { target: '_blank', rel: 'noreferrer' } : {})}>{wa ? 'Falar sobre o GB Twin no WhatsApp' : 'Quero conhecer o GB Twin'}</a>
+            <a className="btn btn-light" href={wa} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar sobre o GB Twin</a>
           </div>
         </div>
       </div>
@@ -529,115 +530,17 @@ const CONFIANCA: Conquista[] = [
   { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.', i: 'contador' },
 ]
 /* ───────────────────────── 09 · Form completo ───────────────────────── */
-type CErr = Partial<Record<'name' | 'email' | 'whatsapp' | 'consent', string>>
-
 export function ContactSection() {
-  const uid = useId()
-  const [v, setV] = useState({ name: '', email: '', whatsapp: '', size: '', interest: '', consent: false })
-  const [errors, setErrors] = useState<CErr>({})
-  const [status, setStatus] = useState<Status>('idle')
-
-  // os CTAs "Agendar demonstração" / "Quero testar" pré-selecionam o interesse
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement).closest('[data-interest]') as HTMLElement | null
-      if (a) setV((s) => ({ ...s, interest: a.dataset.interest ?? '' }))
-    }
-    document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
-  }, [])
-
-  const check = (k: keyof CErr) => {
-    const msg = k === 'consent' ? validators.consent(v.consent) : validators[k](v[k])
-    setErrors((e) => ({ ...e, [k]: msg }))
-    return !msg
-  }
-  const set = (k: keyof typeof v, val: string | boolean) => setV((s) => ({ ...s, [k]: val }))
-
-  const onSubmit = async (ev: FormEvent, intent: 'lista' | 'demonstracao') => {
-    ev.preventDefault()
-    const results = [check('name'), check('email'), check('whatsapp'), check('consent')]
-    if (!results.every(Boolean)) {
-      document.getElementById([`${uid}-name`, `${uid}-email`, `${uid}-whatsapp`, `${uid}-consent`][results.indexOf(false)])?.focus()
-      return
-    }
-    setStatus('loading')
-    try {
-      await submitLead({ origem: 'form-completo', intencao: intent, nome: v.name.trim(), email: v.email.trim(), whatsapp: v.whatsapp, tamanho: v.size, interesse: v.interest, consent: v.consent })
-      setStatus('success')
-    } catch {
-      setStatus('error')
-    }
-  }
-
-  const field = (k: 'name' | 'email' | 'whatsapp', label: string, props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="field" data-invalid={Boolean(errors[k])}>
-      <label htmlFor={`${uid}-${k}`}>{label}</label>
-      <input id={`${uid}-${k}`} {...props} value={v[k]} onBlur={() => check(k)}
-        onChange={(e) => set(k, k === 'whatsapp' ? maskPhone(e.target.value) : e.target.value)}
-        aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `${uid}-${k}-e` : undefined} />
-      {errors[k] && <span className="err" id={`${uid}-${k}-e`}>{errors[k]}</span>}
-    </div>
-  )
-
   return (
     <section className="sec sec-light contact" id="contato" aria-labelledby="contato-title">
       <div className="wrap contact-grid">
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Acesso antecipado</span>
           <MaskedHeading id="contato-title" text="Esteja entre os primeiros a usar o Cerne." />
-          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
-          <button type="button" className="btn btn-ghost whats" disabled>Falar agora no WhatsApp <Tbd>número a definir</Tbd></button>
+          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e fale com a nossa equipe.</p>
+          <a className="btn btn-ghost whats" href={whatsappHref('Olá! Quero saber mais sobre o Cerne.')} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar agora no WhatsApp</a>
         </header>
-
-        {status === 'success' ? (
-          <div className="form big" role="status" data-reveal>
-            <h3>Pronto, seu acesso está reservado.</h3>
-            <p className="sub show">Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
-          </div>
-        ) : (
-          <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
-            {field('name', 'Nome', { autoComplete: 'name', placeholder: 'Seu nome' })}
-            <div className="row2">
-              {field('email', 'E-mail', { type: 'email', autoComplete: 'email', inputMode: 'email', placeholder: 'voce@suafazenda.com.br' })}
-              {field('whatsapp', 'WhatsApp', { type: 'tel', autoComplete: 'tel-national', inputMode: 'tel', placeholder: '(00) 00000-0000' })}
-            </div>
-            <div className="row2">
-              <div className="field">
-                <label htmlFor={`${uid}-size`}>Tamanho da operação</label>
-                <select id={`${uid}-size`} value={v.size} onChange={(e) => set('size', e.target.value)}>
-                  <option value="">Selecione</option>
-                  <option value="ate-1000">Até 1.000 cabeças</option>
-                  <option value="1000-5000">1.000 a 5.000 cabeças</option>
-                  <option value="acima-5000">Acima de 5.000 cabeças</option>
-                  <option value="agricultura-outro">Agricultura / outro</option>
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor={`${uid}-interest`}>Interesse</label>
-                <select id={`${uid}-interest`} value={v.interest} onChange={(e) => set('interest', e.target.value)}>
-                  <option value="">Selecione</option>
-                  <option value="web">Cerne Web</option>
-                  <option value="app-administracao">App Administração</option>
-                  <option value="app-operacao">App Operação</option>
-                  <option value="demonstracao">Demonstração</option>
-                  <option value="gb-twin">GB Twin</option>
-                  <option value="todos">Todos</option>
-                </select>
-              </div>
-            </div>
-            <label className="consent">
-              <input id={`${uid}-consent`} type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${uid}-consent-e` : undefined} />
-              <span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span>
-            </label>
-            {errors.consent && <span className="err err-consent" id={`${uid}-consent-e`}>{errors.consent}</span>}
-            <div className="actions">
-              <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}</button>
-              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Agendar demonstração</button>
-            </div>
-            {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
-          </form>
-        )}
+        <div data-reveal><LeadForm variant="page" /></div>
       </div>
     </section>
   )
@@ -661,7 +564,7 @@ const FAQ = [
   { q: 'E frota, equipe e ordens de serviço?', a: 'Estão no mesmo cadastro: manutenção preventiva, abastecimento e transferência de máquinas; faltas, adiantamentos e apuração mensal da equipe; e ordens de serviço com monitoramento e avaliação.' },
   { q: 'Consigo começar com os dados que já tenho?', a: 'Sim. Dá para lançar saldos iniciais e importar extratos OFX e planilhas, como orçamento e correção de estoque.' },
   { q: 'Funciona no celular?', a: 'O Cerne Web roda no navegador e pode ser instalado como app. Os apps de campo e de gestão estão em teste.' },
-  { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
+  { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado e a nossa equipe entra em contato.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
 ]
 

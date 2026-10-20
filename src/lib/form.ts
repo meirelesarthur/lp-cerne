@@ -46,8 +46,9 @@ export async function submitLead(payload: Record<string, unknown>) {
   console.info('[Cerne LP] lead (mock, não enviado):', body)
 }
 
-/** Link do WhatsApp comercial (VITE_WHATSAPP, só dígitos com DDI, ex.: 5511999999999). Sem número configurado, devolve null. */
+/** WhatsApp comercial (DDI+DDD+número, só dígitos). VITE_WHATSAPP sobrescreve, se preciso trocar sem mexer no código. */
+export const WHATSAPP = String(import.meta.env.VITE_WHATSAPP || '5527999745731').replace(/\D/g, '')
+
 export function whatsappHref(text: string) {
-  const n = String(import.meta.env.VITE_WHATSAPP ?? '').replace(/\D/g, '')
-  return n ? `https://wa.me/${n}?text=${encodeURIComponent(text)}` : null
+  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`
 }
