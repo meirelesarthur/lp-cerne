@@ -498,7 +498,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 /* ícones (Hugeicons) */
 .gc-ico { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 14px; border-radius: 13px; color: #fff; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .34); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
-.fatos li { display: flex; gap: 14px; align-items: flex-start; }
+.fatos li { display: flex; gap: 14px; align-items: center; }
 .gc-ico-sm { flex: none; width: 40px; height: 40px; margin: 0; border-radius: 11px; }
 .pl-mod button svg { color: var(--muted); }
 .pl-yes svg { stroke: currentColor; }
