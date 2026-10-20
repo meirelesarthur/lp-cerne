@@ -132,3 +132,10 @@
   /* celular: o parágrafo do Hero cede espaço para o formulário completo caber na primeira tela */
   .hero .hero-copy .lead { display: none; }
 }
+
+/* Escopo no celular/tablet: os 3 fatos têm o mesmo estilo dos 4 cartões das frentes (ícone em cima, mesmo espaçamento e tipografia) */
+@media (max-width: 960px) {
+  .fatos li { display: block; padding: 24px; }
+  .fatos .gc-ico-sm { width: 46px; height: 46px; margin: 0 0 14px; border-radius: 13px; }
+  .fatos h3 { margin: 0 0 8px; font-size: 18px; }
+}
