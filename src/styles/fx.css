@@ -94,3 +94,19 @@
   .ff-notes { position: static; display: flex; flex-wrap: wrap; gap: 8px; }
   .ff-notes li { position: static; opacity: 1; transform: none; transition: none; box-shadow: none; }
 }
+
+/* ── Option Wheel (capítulos do Trailer): roda vertical em 3D; o capítulo ativo fica ao centro ── */
+@media (min-width: 961px) and (prefers-reduced-motion: no-preference) {
+  .chapters.wheel { display: block; position: relative; height: 400px; perspective: 900px; perspective-origin: 0 50%; touch-action: pan-y; user-select: none; cursor: grab; mask-image: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent); }
+  .chapters.wheel:active { cursor: grabbing; }
+  .chapters.wheel .scrub-bar { display: none; }
+  .chapters.wheel li:not(.scrub-bar) {
+    position: absolute; left: 0; right: 0; top: 50%; margin-top: -42px;
+    transform-origin: 0 50%;
+    transform: translateY(calc(var(--d) * 86px)) rotateX(calc(var(--d) * -26deg)) translateZ(calc(var(--d) * var(--d) * -28px));
+    opacity: calc(1 - var(--d) * var(--d) * .22 - (var(--d) * var(--d) * var(--d) * var(--d)) * .02);
+    transition: transform .55s cubic-bezier(.3, .8, .2, 1), opacity .4s;
+  }
+  .chapters.wheel li[data-far] { opacity: 0; pointer-events: none; }
+  .chapters.wheel button { min-height: 84px; }
+}

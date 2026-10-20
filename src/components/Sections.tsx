@@ -237,6 +237,27 @@ export function TrailerSection() {
     if (v.paused) { userPaused.current = false; void v.play().catch(() => {}) } else { userPaused.current = true; v.pause() }
   }
 
+  // roda de capítulos: arraste na vertical ou use as setas (cima/baixo) para girar; cada passo troca o capítulo e o vídeo
+  const drag = useRef<{ y: number; i: number } | null>(null)
+  const wheel = {
+    onPointerDown: (e: React.PointerEvent) => { drag.current = { y: e.clientY, i: capRef.current } },
+    onPointerMove: (e: React.PointerEvent) => {
+      const d = drag.current
+      if (!d) return
+      const i = Math.max(0, Math.min(CAPITULOS.length - 1, d.i - Math.round((e.clientY - d.y) / 64)))
+      if (i !== capRef.current) goTo(i)
+    },
+    onPointerUp: () => { drag.current = null },
+    onPointerCancel: () => { drag.current = null },
+    onKeyDown: (e: React.KeyboardEvent) => {
+      const dir = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0
+      if (!dir) return
+      e.preventDefault()
+      const i = Math.max(0, Math.min(CAPITULOS.length - 1, capRef.current + dir))
+      if (i !== capRef.current) { goTo(i); (e.currentTarget.querySelectorAll('button')[i] as HTMLElement | undefined)?.focus() }
+    },
+  }
+
   return (
     <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
       <div className="wrap">
@@ -255,10 +276,10 @@ export function TrailerSection() {
             <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
             <button type="button" className="video-toggle" onClick={toggle}><Icon icon={paused ? PlayIcon : PauseIcon} size={16} strokeWidth={2} />{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
           </figure>
-          <ol className="chapters">
+          <ol className="chapters wheel" data-reveal {...wheel}>
             <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
             {CAPITULOS.map((c, i) => (
-              <li key={c.n} data-reveal>
+              <li key={c.n} style={{ '--d': i - cap } as React.CSSProperties} data-far={Math.abs(i - cap) > 2 || undefined}>
                 <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
                   <b>{String(i + 1).padStart(2, '0')}</b>
                   <span><strong>{c.n}</strong><small>{c.d}</small></span>
