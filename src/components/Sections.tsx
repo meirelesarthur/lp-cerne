@@ -675,11 +675,11 @@ const FAQ_GRUPOS = [
 const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
 
 /* ───────────────────────── Planos (comparativo sem preço) ───────────────────────── */
-// célula por plano [Pro, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
+// célula por plano [Professional, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
 type PlCel = 'i' | 'o' | 'n' | string
 type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
 const PLANOS = [
-  { k: 'pro', t: 'Pro', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
+  { k: 'pro', t: 'Professional', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
   { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['2 atividades', '5 usuários'] },
   { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['todas as atividades', '10 usuários'] },
 ]
