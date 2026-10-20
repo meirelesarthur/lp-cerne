@@ -459,7 +459,8 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-table .pl-title p { margin: 0; max-width: 34ch; font-size: 14px; line-height: 1.45; color: var(--muted); }
 .pl-table tfoot .pl-keyrow td { border-left: 0; border-top: 1px solid var(--border); padding-block: 14px; text-align: left; }
 .pl-keyrow .pl-legend { position: sticky; left: 18px; width: max-content; max-width: calc(100vw - 80px); margin: 0; }
-.planos { padding-top: clamp(64px, 9vh, 110px); }
+.planos { padding-top: clamp(64px, 9vh, 110px); padding-bottom: clamp(16px, 3vh, 32px); }
+.planos + .contact { padding-top: clamp(32px, 5vh, 64px); }
 
 /* CTA fixo menor no celular: não cobre o conteúdo */
 @media (max-width: 719px) { .sticky-cta { min-height: 40px; padding: 0 16px; font-size: 14px; right: 12px; bottom: 12px; } }

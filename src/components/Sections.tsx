@@ -548,14 +548,13 @@ const FAQ = [
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
 ]
 
-// perguntas agrupadas por tema (as respostas ficam em FAQ acima); as três primeiras abrem sozinhas
+// perguntas agrupadas por tema (as respostas ficam em FAQ acima); todas começam fechadas, para poupar espaço
 const FAQ_GRUPOS = [
   { t: 'Produto', qs: ['O Cerne já está disponível?', 'Serve para a minha operação?', 'Funciona no celular?', 'Quais relatórios já vêm prontos?', 'Mostra o custo e a margem de cada lote?'] },
   { t: 'Fiscal e financeiro', qs: ['O Cerne emite nota fiscal?', 'Meu contador usa o Domínio. Integra?', 'Concilia o extrato do banco?'] },
   { t: 'Operação da fazenda', qs: ['Controla compras e estoque?', 'Tem integração com balança?', 'Cobre reprodução e sanitário?', 'Dá para rastrear o produto até o comprador?', 'E frota, equipe e ordens de serviço?'] },
   { t: 'Controle e contratação', qs: ['Tenho mais de uma fazenda ou CNPJ. Funciona?', 'Consigo controlar quem faz o quê?', 'Consigo começar com os dados que já tenho?', 'Como funciona o teste?', 'Quanto custa?'] },
 ]
-const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
 
 /* ───────────────────────── Planos (comparativo sem preço) ───────────────────────── */
 // célula por plano [Professional, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
@@ -691,7 +690,7 @@ export function FaqSection() {
               {g.qs.map((q) => {
                 const f = FAQ.find((x) => x.q === q)!
                 return (
-                  <details key={f.q} data-reveal open={FAQ_ABERTAS.has(f.q) || undefined}>
+                  <details key={f.q} data-reveal>
                     <summary>{f.q}<Icon icon={PlusIcon} size={22} className="faq-plus" /></summary>
                     <p>{f.a} {f.tbd && <Tbd />}</p>
                   </details>
