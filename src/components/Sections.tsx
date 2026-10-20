@@ -6,25 +6,21 @@ import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
-  ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
+  BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
   SecurityLockIcon, Tick02Icon, WeightScale01Icon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
 const FazendaCerne = lazy(() => import('../figures/fazenda/FazendaCerne').then((m) => ({ default: m.FazendaCerne })))
 
-// WebGL dos anéis (~20 KB): só baixa quando a seção Problema está a ~2 telas de distância
-const MagicRings = lazy(() => import('./MagicRings'))
-
 const Tbd = ({ children = 'a validar' }: { children?: string }) => <span className="tbd">{children}</span>
 
-/* ───────────────────────── 03 · Problema → Cerne ───────────────────────── */
-// Palco fixo no desktop: (A) a dor, com planilha, caderno e conversa; o texto sobe e some, as três peças vão para o
-// centro, caem num funil e entram na tela do notebook; (B) a virada, com o produto inteiro (notebook e os dois apps).
-// No celular e com movimento reduzido as duas etapas ficam empilhadas e o funil não aparece.
+/* ───────────────────────── 03 · Problema → virada (scroll expand) ───────────────────────── */
+// Palco fixo no desktop: a dor (planilha, caderno e conversa) em volta de uma janelinha com o Cerne em funcionamento.
+// Conforme a rolagem, a janela cresce até a tela inteira (inspirado no ScrollExpand do React Bits), empurrando as três
+// peças para fora, e o Cerne ocupa tudo: o título da virada e as frentes entram por cima do sistema em movimento.
+// No celular e com movimento reduzido nada fica fixo: a dor, a janela do sistema e o texto da virada empilham.
 const PROBLEM_PIN = '(min-width: 961px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)'
-// ponto da tela do notebook (fração da figura) onde o sistema "nasce"; o pulso usa o mesmo ponto no CSS
-const SCREEN_AT = { x: 0.4, y: 0.42 }
 
 const PLANILHA = [
   ['Lote', 'Curral', 'Cab.', 'Peso (kg)', 'GMD'],
@@ -40,228 +36,137 @@ const CONVERSA = [
   { de: 'Marcos · trato', cor: '#c2410c', t: 'Ração acabou no silo 2. Alguém pediu?', h: '06:51' },
   { de: 'João Oliveira', cor: '#1f7aec', t: 'Manda foto da planilha 🙏', h: '06:52' },
 ]
+const FRENTES_VIRADA = [
+  { i: BarnsIcon, t: 'Rebanho e confinamento' },
+  { i: TractorIcon, t: 'Lavoura' },
+  { i: WarehouseIcon, t: 'Estoque e compras' },
+  { i: Invoice01Icon, t: 'Fiscal' },
+  { i: Chart01Icon, t: 'Financeiro e custo' },
+]
 
 export function ProblemSection() {
   const root = useRef<HTMLElement>(null)
+  const video = useRef<HTMLVideoElement>(null)
   const media = useAfterFirstScroll()
-  const [fx, setFx] = useState(false)
-  const near = useNear(root, '250% 0px')
-  useEffect(() => { if (near) void import('./MagicRings') }, [near])
+
+  // o vídeo do sistema toca só enquanto a seção está na tela (e nunca sozinho com movimento reduzido)
+  useEffect(() => {
+    const v = video.current
+    if (!v) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; if (!reduced) void v.play().catch(() => {}) } else v.pause()
+    }, { threshold: 0.25 })
+    io.observe(v)
+    return () => io.disconnect()
+  }, [])
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia()
     mm.add(PROBLEM_PIN, () => {
       const rootEl = root.current!
-      const q = <T extends Element>(sel: string) => rootEl.querySelector(sel) as T
-      // posição relativa à seção (que fica fixa), medida sem transformações: offsets do layout, não do que já está animado
-      const rel = (el: Element) => { const r = el.getBoundingClientRect(), b = rootEl.getBoundingClientRect(); return { x: r.left - b.left, y: r.top - b.top, w: r.width, h: r.height } }
-      const W = () => rootEl.clientWidth, H = () => rootEl.clientHeight
-      const target = () => { const f = rel(q('.product-fig')); return { x: f.x + f.w * SCREEN_AT.x, y: f.y + f.h * SCREEN_AT.y } }
-      const mouth = () => ({ x: W() / 2, y: H() * 0.17, w: Math.min(W() * 0.46, 620) })
-      // centro de cada peça no layout (o contêiner .layers não se move; só as peças)
-      const center = (el: Element) => { const L = rel(q('.layers')), e = el as HTMLElement; return { x: L.x + e.offsetLeft + e.offsetWidth / 2, y: L.y + e.offsetTop + e.offsetHeight / 2 } }
-      const cluster = () => { const L = rel(q('.layers')); return { x: L.x + L.w / 2, y: L.y + L.h / 2 } }
-      const toCenter = (axis: 'x' | 'y') => () => { const c = cluster(); return axis === 'x' ? W() / 2 - c.x : H() * 0.52 - c.y }
-      const toMouth = (axis: 'x' | 'y') => (i: number, el: Element) => {
-        const m = mouth(), c = center(el)
-        return axis === 'x' ? m.x + (i - 1) * m.w * 0.24 - c.x : m.y + 6 - c.y
-      }
-
-      // o funil liga a boca (sob as peças) ao ponto da tela do notebook: vidro verde em 3D, redesenhado a cada refresh
-      const drawFunnel = () => {
-        // anéis (MagicRings, React Bits): quadrado centrado no ponto de luz, grande o bastante para varrer a tela
-        const fx = q<HTMLElement>('.rings-fx'), S = Math.max(W(), H()) * 1.15, tp = target()
-        fx.style.cssText = `width:${S}px;height:${S}px;left:${tp.x - S / 2}px;top:${tp.y + 6 - S / 2}px`
-        const svg = q<SVGSVGElement>('.funnel'), m = mouth(), t = target(), d = t.y - m.y, a = m.w / 2, ry = Math.max(16, m.w * 0.07), neck = 15
-        svg.setAttribute('viewBox', `0 0 ${W()} ${H()}`)
-        const hw = (u: number) => neck + (a - neck) * Math.pow(1 - u, 2.15) // meia-largura do corpo em u (0 boca ... 1 bico)
-        const yAt = (u: number) => m.y + u * d
-        const N = 44, us = Array.from({ length: N + 1 }, (_, i) => i / N)
-        const left = us.map((u) => `${(m.x - hw(u)).toFixed(1)} ${yAt(u).toFixed(1)}`)
-        const rightRev = [...us].reverse().map((u) => `${(m.x + hw(u)).toFixed(1)} ${yAt(u).toFixed(1)}`)
-        const bodyD = `M ${left.join(' L ')} L ${rightRev.join(' L ')} Z`
-        const ring = (u: number, w: number, o: number) => {
-          const x = hw(u), y = yAt(u), r = Math.max(2.5, x * 0.2)
-          return `<path d="M ${m.x - x} ${y} A ${x} ${r} 0 0 0 ${m.x + x} ${y}" fill="none" stroke="#ecfdf5" stroke-opacity="${o}" stroke-width="${w}"/>` +
-                 `<path d="M ${m.x - x} ${y} A ${x} ${r} 0 0 1 ${m.x + x} ${y}" fill="none" stroke="#065f46" stroke-opacity="${o * 0.35}" stroke-width="${w * 0.8}"/>`
-        }
-        const streak = (k: number, w: number, o: number, u0 = 0.06, u1 = 0.74) => {
-          const pts = us.filter((u) => u >= u0 && u <= u1).map((u) => `${(m.x + k * hw(u) * 0.78).toFixed(1)} ${yAt(u).toFixed(1)}`)
-          return `<path d="M ${pts.join(' L ')}" fill="none" stroke="#fff" stroke-opacity="${o}" stroke-width="${w}" stroke-linecap="round"/>`
-        }
-        const rim = `<ellipse cx="${m.x}" cy="${m.y}" rx="${a}" ry="${ry}" fill="url(#fn-inside)"/>` +
-          `<ellipse cx="${m.x}" cy="${m.y}" rx="${a - 5}" ry="${ry - 3}" fill="none" stroke="#022c22" stroke-opacity=".5" stroke-width="2"/>`
-        const rimFront = `<path d="M ${m.x - a} ${m.y} A ${a} ${ry} 0 0 0 ${m.x + a} ${m.y}" fill="none" stroke="#a7f3d0" stroke-width="5" stroke-linecap="round"/>` +
-          `<path d="M ${m.x - a} ${m.y} A ${a} ${ry} 0 0 1 ${m.x + a} ${m.y}" fill="none" stroke="#34d399" stroke-opacity=".7" stroke-width="2.5"/>` +
-          `<path d="M ${m.x - a * 0.9} ${m.y + ry * 0.55} A ${a} ${ry} 0 0 0 ${m.x + a * 0.9} ${m.y + ry * 0.55}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"/>`
-        const tube = `<ellipse cx="${m.x}" cy="${t.y}" rx="${neck}" ry="4.5" fill="#064e3b" stroke="#6ee7b7" stroke-width="2"/>`
-        svg.querySelector('.funnel-shell')!.innerHTML =
-          `<path d="${bodyD}" fill="none" stroke="#34d399" stroke-width="10" stroke-opacity=".55" filter="url(#fn-glow)"/>` +
-          rim +
-          `<path d="${bodyD}" fill="url(#fn-body)"/><path d="${bodyD}" fill="url(#fn-shade)"/>` +
-          [0.1, 0.22, 0.36, 0.52, 0.68, 0.84].map((u, i) => ring(u, 1.2 + i * 0.08, 0.55 - i * 0.04)).join('') +
-          streak(-0.62, 7, 0.3) + streak(-0.58, 2.2, 0.75, 0.08, 0.6) + streak(0.7, 3.2, 0.2) +
-          `<path d="M ${left.join(' L ')}" fill="none" stroke="#6ee7b7" stroke-width="2"/>` +
-          `<path d="M ${us.map((u) => `${(m.x + hw(u)).toFixed(1)} ${yAt(u).toFixed(1)}`).join(' L ')}" fill="none" stroke="#047857" stroke-width="2"/>` +
-          tube + rimFront
-        for (const [cls, r] of [['.orb-halo', 30], ['.orb-core', 9], ['.orb-bloom', 44]] as const) {
-          const c = svg.querySelector(cls)!
-          c.setAttribute('cx', `${m.x}`); c.setAttribute('cy', `${t.y + 6}`); c.setAttribute('r', `${r}`)
-        }
-      }
-      drawFunnel()
-
+      const q = (sel: string) => rootEl.querySelector(sel)
+      gsap.set('.vira-art .layer-a', { rotate: -5 })
+      gsap.set('.vira-art .layer-b', { rotate: 4 })
+      gsap.set('.vira-art .layer-c', { rotate: -2, xPercent: -50 })
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=220%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true, onRefresh: drawFunnel, onToggle: (self) => setFx(self.isActive) },
+        scrollTrigger: { trigger: rootEl, start: 'top top', end: '+=300%', pin: true, scrub: 0.6, refreshPriority: 6, invalidateOnRefresh: true },
       })
+      void q
       // 0 → 1 = toda a duração
-      gsap.set('.orb-core, .orb-halo, .orb-bloom', { transformOrigin: '50% 50%', svgOrigin: undefined })
-      tl.fromTo('.layer-a', { x: -60, y: -30, rotate: -7 }, { x: 10, y: 14, rotate: -3, duration: 0.14 }, 0)
-        .fromTo('.layer-b', { x: 50, y: 6, rotate: 6 }, { x: -12, y: 0, rotate: 2, duration: 0.14 }, 0)
-        .fromTo('.layer-c', { x: -30, y: 50, rotate: -4 }, { x: 12, y: -30, rotate: -1.5, duration: 0.14 }, 0)
-        // o texto do ponto de partida sobe e some; as três peças ocupam o meio da tela
-        .to('.stage-a .problem-copy', { autoAlpha: 0, y: -140, ease: 'power2.in', duration: 0.14 }, 0.1)
-        .to('.layer', { x: toCenter('x'), y: toCenter('y'), scale: 1.06, duration: 0.16 }, 0.14)
-        // o mockup surge desfocado ao fundo e o funil se abre
-        .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.32)
-        .fromTo('.product-img', { autoAlpha: 0, scale: 0.86, y: 40, rotateX: 8, transformPerspective: 1200, filter: 'blur(16px)' }, { autoAlpha: 0.45, scale: 0.94, y: 12, rotateX: 3, filter: 'blur(8px)', ease: 'power2.out', duration: 0.18 }, 0.32)
-        .fromTo('.funnel', { autoAlpha: 0, y: -24 }, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.1 }, 0.34)
-        // as peças encolhem até a boca do funil e somem ali (não descem mais pelo funil)
-        .to('.layer', { x: toMouth('x'), y: toMouth('y'), rotate: (i: number) => (i - 1) * 8, scale: 0.34, stagger: 0.02, duration: 0.12 }, 0.4)
-        .to('.layer', { scale: 0.08, autoAlpha: 0, ease: 'power2.in', stagger: 0.02, duration: 0.07 }, 0.56)
-        // a esfera de luz nasce no bico, pulsa, cresce e "estoura" revelando o produto nítido; o funil se dissolve
-        .fromTo('.orb-core', { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, ease: 'back.out(2)', duration: 0.05 }, 0.58)
-        .fromTo('.orb-halo', { scale: 0.2, autoAlpha: 0 }, { scale: 1.6, autoAlpha: 0.9, ease: 'power2.out', duration: 0.08 }, 0.58)
-        .to('.orb-core', { scale: 1.9, duration: 0.05, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.63)
-        .to('.funnel-shell', { autoAlpha: 0, y: -10, duration: 0.09, ease: 'power2.in' }, 0.66)
-        .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 1 }, { scale: 52, autoAlpha: 0, ease: 'power3.out', duration: 0.26 }, 0.7)
-        // MagicRings entra com o clarão, pulsa em ondas verdes e se dissolve quando o produto está nítido
-        .fromTo('.rings-fx', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.05, ease: 'power1.out' }, 0.6)
-        .to('.rings-fx', { autoAlpha: 0, duration: 0.12, ease: 'power1.in' }, 0.84)
-        .to('.orb-core, .orb-halo', { scale: 8, autoAlpha: 0, duration: 0.1, ease: 'power2.out' }, 0.72)
-        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.73)
-        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.76)
+      tl.fromTo('.vira-frame', { clipPath: 'inset(43% 29% 7% 29% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0.1)
+        .fromTo('.vira-media', { scale: 1.3 }, { scale: 1, duration: 0.5 }, 0.1)
+        // a dor é empurrada para fora conforme a janela cresce
+        .to('.vira-copy', { autoAlpha: 0, y: -70, ease: 'power2.in', duration: 0.2 }, 0.1)
+        .to('.vira-art .layer-a', { x: () => -window.innerWidth * 0.5, y: -40, rotate: -22, autoAlpha: 0, ease: 'power2.in', duration: 0.36 }, 0.12)
+        .to('.vira-art .layer-b', { x: () => window.innerWidth * 0.5, y: -60, rotate: 20, autoAlpha: 0, ease: 'power2.in', duration: 0.36 }, 0.14)
+        .to('.vira-art .layer-c', { y: () => window.innerHeight * 0.55, rotate: 8, autoAlpha: 0, ease: 'power2.in', duration: 0.34 }, 0.16)
+        // o sistema ocupa a tela: véu escuro para o texto, título da virada e as frentes entrando uma a uma
+        .fromTo('.vira-scrim', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: 'none' }, 0.42)
+        .fromTo('.vira-final-head', { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.14, ease: 'power3.out' }, 0.56)
+        .fromTo('.vira-chips li', { autoAlpha: 0, y: 26, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.1, ease: 'back.out(1.6)', stagger: 0.04 }, 0.7)
         .set({}, {}, 1)
     })
     return () => mm.revert()
   }, [])
 
   return (
-    <section ref={root} className="sec sec-light problem" id="problema" aria-labelledby="problema-title">
-      <div className="problem-stage">
-        <div className="stage-a">
-          <div className="wrap problem-grid">
-            <div className="problem-copy">
-              <header className="sec-head">
-                <span className="eyebrow">O ponto de partida</span>
-                <h2 id="problema-title">Planilha aqui, caderno ali, WhatsApp no meio.</h2>
-                <p className="sec-lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
-              </header>
-              <ol className="pains">
-                <li><b>01</b> Número diferente em cada controle.</li>
-                <li><b>02</b> O que o campo anota demora a chegar ao escritório.</li>
-                <li><b>03</b> Resultado por lote ou curral só no fechamento, se der.</li>
-              </ol>
+    <section ref={root} className="sec sec-light problem vira" id="problema" aria-labelledby="problema-title">
+      <div className="vira-stage">
+        <header className="vira-copy sec-head center">
+          <span className="eyebrow">O ponto de partida</span>
+          <h2 id="problema-title">Planilha aqui, caderno ali, WhatsApp no meio.</h2>
+          <p className="sec-lead">Quando a informação está espalhada, a decisão chega atrasada e o custo aparece só no fim do mês.</p>
+          <ol className="pains">
+            <li><b>01</b> Número diferente em cada controle.</li>
+            <li><b>02</b> O que o campo anota demora a chegar ao escritório.</li>
+            <li><b>03</b> Resultado por lote ou curral só no fechamento, se der.</li>
+          </ol>
+        </header>
+
+        {/* a janela do Cerne: pequena no início e tela cheia no fim (clip-path animado) */}
+        <div className="vira-frame">
+          <video ref={video} className="vira-media" muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Cerne Web em funcionamento: painéis, rebanho, custos e financeiro">
+            <source src={asset('/video/system-loop.webm')} type="video/webm" />
+            <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
+          </video>
+          <div className="vira-scrim" aria-hidden="true" />
+        </div>
+
+        <div className="vira-art" aria-hidden="true">
+          <div className="layer layer-a">
+            <div className="xl-bar"><i className="xl-ico">X</i>controle_rebanho_v7_FINAL(2).xlsx</div>
+            <table className="sheet">
+              <thead><tr><th /><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead>
+              <tbody>
+                {PLANILHA.map((row, r) => (
+                  <tr key={r} className={r === 0 ? 'hd' : ''}>
+                    <th>{r + 1}</th>
+                    {row.map((c, k) => <td key={k} className={c === '#REF!' ? 'err' : c.endsWith('?') ? 'warn' : ''}>{c}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="xl-tabs"><span className="on">Rebanho</span><span>Trato</span><span>Cópia de Rebanho</span></div>
+          </div>
+          <div className="layer layer-b">
+            <div className="spiral">{Array.from({ length: 14 }, (_, i) => <i key={i} />)}</div>
+            <div className="notebook">
+              <p className="nb-date">Seg, 15/09 · trato</p>
+              <p>Curral 4: trato 6h30 <s>7h</s></p>
+              <p>Lote 12: pesar sexta</p>
+              <p>Ração: pedir 8 t (silo 2)</p>
+              <p>Vacina L-15: ver c/ João</p>
+              <p className="nb-note">84 ou 86 no C7??</p>
             </div>
-            <div className="layers" aria-hidden="true">
-              <div className="layer layer-a">
-                <div className="xl-bar"><i className="xl-ico">X</i>controle_rebanho_v7_FINAL(2).xlsx</div>
-                <table className="sheet">
-                  <thead><tr><th /><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead>
-                  <tbody>
-                    {PLANILHA.map((row, r) => (
-                      <tr key={r} className={r === 0 ? 'hd' : ''}>
-                        <th>{r + 1}</th>
-                        {row.map((c, k) => <td key={k} className={c === '#REF!' ? 'err' : c.endsWith('?') ? 'warn' : ''}>{c}</td>)}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="xl-tabs"><span className="on">Rebanho</span><span>Trato</span><span>Cópia de Rebanho</span></div>
-              </div>
-              <div className="layer layer-b">
-                <div className="spiral">{Array.from({ length: 14 }, (_, i) => <i key={i} />)}</div>
-                <div className="notebook">
-                  <p className="nb-date">Seg, 15/09 · trato</p>
-                  <p>Curral 4: trato 6h30 <s>7h</s></p>
-                  <p>Lote 12: pesar sexta</p>
-                  <p>Ração: pedir 8 t (silo 2)</p>
-                  <p>Vacina L-15: ver c/ João</p>
-                  <p className="nb-note">84 ou 86 no C7??</p>
-                </div>
-              </div>
-              <div className="layer layer-c">
-                <div className="wa-bar">
-                  <span className="wa-av">FS</span>
-                  <span className="wa-tt"><b>Fazenda São Pedro</b><small>João, Marcos, Silvio, você</small></span>
-                </div>
-                <div className="chat">
-                  {CONVERSA.map((m, i) => (
-                    <p key={i} className={m.de ? 'in' : 'out'}>
-                      {m.de && <b style={{ color: m.cor }}>{m.de}</b>}
-                      {m.t}<small>{m.h}{!m.de && <em> ✓✓</em>}</small>
-                    </p>
-                  ))}
-                </div>
-              </div>
+          </div>
+          <div className="layer layer-c">
+            <div className="wa-bar">
+              <span className="wa-av">FS</span>
+              <span className="wa-tt"><b>Fazenda São Pedro</b><small>João, Marcos, Silvio, você</small></span>
+            </div>
+            <div className="chat">
+              {CONVERSA.map((m, i) => (
+                <p key={i} className={m.de ? 'in' : 'out'}>
+                  {m.de && <b style={{ color: m.cor }}>{m.de}</b>}
+                  {m.t}<small>{m.h}{!m.de && <em> ✓✓</em>}</small>
+                </p>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="stage-b">
-          <div className="wrap product">
-            <header className="product-head">
-              <span className="eyebrow">A virada</span>
-              <h2>O Cerne junta tudo em um lugar.</h2>
-              <p className="sec-lead">Cada nota, pesagem e compra entra uma vez e já aparece no custo, no estoque e no DRE. No navegador hoje, com os apps de escritório e de campo a caminho.</p>
-            </header>
-            <figure className="product-fig">
-              <span className="product-pulse" aria-hidden="true" />
-              {/* o elemento existe desde o início (a animação precisa dele); só o arquivo espera o primeiro scroll */}
-              <img className="product-img" src={media ? asset('/mocks/cerne-produtos-recorte-1400.webp') : undefined} srcSet={media ? `${asset('/mocks/cerne-produtos-recorte-1400.webp')} 1400w, ${asset('/mocks/cerne-produtos-recorte-2400.webp')} 2400w` : undefined} sizes="(min-width: 1200px) 1100px, 92vw" width={2400} height={1461} alt="Cerne Web no notebook, com os apps Administração e Operação em dois celulares" decoding="async" />
-            </figure>
-          </div>
+        <div className="vira-final">
+          <header className="vira-final-head">
+            <span className="eyebrow">A virada</span>
+            <h2>O Cerne junta tudo em um lugar.</h2>
+            <p className="sec-lead">Cada nota, pesagem e compra entra uma vez e já aparece no custo, no estoque e no DRE. No navegador hoje, com os apps de escritório e de campo a caminho.</p>
+          </header>
+          <ul className="vira-chips">
+            {FRENTES_VIRADA.map((f) => <li key={f.t}><Icon icon={f.i} size={20} />{f.t}</li>)}
+          </ul>
         </div>
-
-        <div className="rings-fx" aria-hidden="true">
-          {fx && <Suspense fallback={null}><MagicRings color="#10b981" colorTwo="#6ee7b7" theme="light" ringCount={10} motion="ripple" speed={1.1} lineThickness={2.6} glow={1.05} baseRadius={0.1} radiusStep={0.07} expansion={0.3} clickBurst={false} followMouse={false} /></Suspense>}
-        </div>
-        <svg className="funnel" aria-hidden="true">
-          <defs>
-            <linearGradient id="fn-body" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#047857" stopOpacity=".62" />
-              <stop offset=".2" stopColor="#6ee7b7" stopOpacity=".5" />
-              <stop offset=".5" stopColor="#10b981" stopOpacity=".26" />
-              <stop offset=".8" stopColor="#059669" stopOpacity=".42" />
-              <stop offset="1" stopColor="#064e3b" stopOpacity=".66" />
-            </linearGradient>
-            <linearGradient id="fn-shade" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#fff" stopOpacity=".2" />
-              <stop offset=".55" stopColor="#047857" stopOpacity="0" />
-              <stop offset="1" stopColor="#022c22" stopOpacity=".38" />
-            </linearGradient>
-            <radialGradient id="fn-inside" cx=".5" cy=".4" r=".7">
-              <stop offset="0" stopColor="#022c22" stopOpacity=".92" />
-              <stop offset="1" stopColor="#065f46" stopOpacity=".7" />
-            </radialGradient>
-            <radialGradient id="fn-orb">
-              <stop offset="0" stopColor="#fff" />
-              <stop offset=".35" stopColor="#bbf7d0" />
-              <stop offset="1" stopColor="#10b981" stopOpacity="0" />
-            </radialGradient>
-            <radialGradient id="fn-bloom">
-              <stop offset="0" stopColor="#fff" stopOpacity=".95" />
-              <stop offset=".4" stopColor="#a7f3d0" stopOpacity=".6" />
-              <stop offset="1" stopColor="#10b981" stopOpacity="0" />
-            </radialGradient>
-            <filter id="fn-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" /></filter>
-          </defs>
-          <g className="funnel-shell" />
-          <circle className="orb-bloom" fill="url(#fn-bloom)" />
-          <circle className="orb-halo" fill="url(#fn-orb)" />
-          <circle className="orb-core" fill="#fff" stroke="#34d399" strokeWidth="3" />
-        </svg>
       </div>
     </section>
   )

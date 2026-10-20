@@ -110,17 +110,13 @@
 /* ===== letreiro ao vivo nas duas paredes de terra da frente (canto do estoque → quina da sede → ponta do confinamento) =====
    As paredes se encontram em (445, 412) no viewBox 760×430, inclinadas ±26,57° (isométrica 2:1):
    uma faixa reta com skewY na mesma inclinação parece pintada na terra. */
-.fz-wall { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; container-type: inline-size; }
+.fz-wall { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; container-type: inline-size; filter: drop-shadow(0 0 .8cqw rgba(5, 150, 105, .3)); }
 .fz-tk {
   position: absolute; height: calc(13 / 430 * 100%); transform-origin: 0 0; overflow: hidden;
   background: linear-gradient(180deg, rgba(8, 26, 18, .78), rgba(14, 42, 29, .7));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), inset 0 -1px 0 rgba(0, 0, 0, .3), 0 0 1.4cqw rgba(5, 150, 105, .25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), inset 0 -1px 0 rgba(0, 0, 0, .3);
   font-size: 1.05cqw; line-height: 1; color: #e2f0e8; white-space: nowrap;
 }
-/* esquerda: do canto do estoque (x 15) à quina da sede (x 445), descendo 2:1 */
-.fz-tk-l { left: calc(15 / 760 * 100%); width: calc(430 / 760 * 100%); top: calc(181 / 430 * 100%); transform: skewY(26.565deg); border-radius: .85cqw; }
-/* direita: da quina da sede (x 445, mesma altura em que a esquerda termina) à ponta do confinamento (x 745), subindo 2:1 */
-.fz-tk-r { left: calc(445 / 760 * 100%); width: calc(300 / 760 * 100%); top: calc(396 / 430 * 100%); transform: skewY(-26.565deg); border-radius: .85cqw; }
 .fz-tk-live {
   position: absolute; left: 0; top: 0; bottom: 0; z-index: 2; display: flex; align-items: center; gap: .5cqw; padding: 0 .9cqw 0 .8cqw;
   background: linear-gradient(90deg, #0b2418 80%, rgba(11, 36, 24, 0)); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .82cqw; color: #6ee7b7;
@@ -128,9 +124,6 @@
 .fz-tk-live::before { content: ''; width: .55cqw; height: .55cqw; border-radius: 50%; background: #34d399; box-shadow: 0 0 .6cqw #34d399; animation: fz-live 1.4s ease-in-out infinite; }
 @keyframes fz-live { 50% { opacity: .25; } }
 .fz-tk-track { position: absolute; inset: 0; }
-/* na quina da sede o texto some em 3cqw numa parede e reaparece na outra (cruzamento igual dos dois lados): a fita faz a curva em vez de levar um corte reto */
-.fz-tk-l .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 12%, #000 calc(100% - 3cqw), transparent); mask-image: linear-gradient(90deg, transparent 4%, #000 12%, #000 calc(100% - 3cqw), transparent); }
-.fz-tk-r .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent, #000 3cqw, #000 85%, transparent 99%); mask-image: linear-gradient(90deg, transparent, #000 3cqw, #000 85%, transparent 99%); }
 .fz-tk-item { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; gap: .45cqw; will-change: transform; }
 .fz-tk-item i { width: .5cqw; height: .5cqw; border-radius: 50%; background: #34d399; box-shadow: 0 0 .5cqw currentColor; color: #34d399; }
 .fz-tk-item[data-tile='lavoura'] i { background: #fbbf24; color: #fbbf24; }
@@ -151,3 +144,10 @@
 .fz-slot { display: contents; }
 .fz-pick { display: none; }
 @media (max-width: 719px) { .fz-slot { display: block; } .fz-pick { display: grid; } }
+
+/* fita contínua: só as pontas de fora são arredondadas, as faces se encontram sem corte */
+.fz-tk { border-radius: 0; }
+.fz-tk-first { border-radius: .85cqw 0 0 .85cqw; }
+.fz-tk-last { border-radius: 0 .85cqw .85cqw 0; }
+.fz-tk-first .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 12%); mask-image: linear-gradient(90deg, transparent 4%, #000 12%); }
+.fz-tk-last .fz-tk-track { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 99%); mask-image: linear-gradient(90deg, #000 85%, transparent 99%); }

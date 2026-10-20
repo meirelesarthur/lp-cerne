@@ -53,20 +53,29 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 /* degradê no fim da seção, por cima da foto: rola junto com ela e termina no fundo claro da próxima, sem emenda */
 .ground-fade { position: relative; z-index: 1; height: 32vh; background: linear-gradient(180deg, rgba(245, 248, 244, 0) 0%, rgba(245, 248, 244, .6) 50%, var(--canvas) 100%); }
 
-/* ===== 03 · Problema → Cerne (palco em duas etapas) ===== */
-.problem { padding: 0; }
-.problem-stage { position: relative; }
-.stage-a { padding: clamp(40px, 6vh, 72px) 0 clamp(56px, 8vh, 96px); }
-.stage-b { padding: 0 0 clamp(64px, 10vh, 110px); }
-.problem-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
-.pains { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 14px; }
-.pains li { display: flex; gap: 14px; align-items: baseline; font-size: 17px; line-height: 1.45; color: var(--text-soft); }
+/* ===== 03 · Problema → virada (scroll expand): a janela do Cerne cresce até a tela inteira ===== */
+.vira { padding: 0; }
+.vira-stage { position: relative; padding: clamp(56px, 9vh, 96px) 0 clamp(56px, 9vh, 96px); }
+.vira-copy { max-width: 820px; margin: 0 auto clamp(28px, 5vh, 48px); padding-inline: var(--gutter); text-align: center; }
+.vira-copy .sec-lead { margin-inline: auto; }
+.pains { list-style: none; margin: 24px auto 0; padding: 0; display: grid; gap: 10px; width: fit-content; text-align: left; }
+.pains li { display: flex; gap: 14px; align-items: baseline; font-size: 16px; line-height: 1.45; color: var(--text-soft); }
 .pains b { color: var(--accent-hover); font-size: 14px; letter-spacing: .06em; }
-.layers { position: relative; height: clamp(380px, 46vw, 560px); }
-.layer { position: absolute; width: 60%; border-radius: 12px; background: #fff; border: 1px solid var(--border); box-shadow: 0 18px 44px rgba(23, 40, 30, .14); overflow: hidden; will-change: transform; }
-.layer-a { left: 0; top: 2%; }
-.layer-b { right: 0; top: 24%; width: 50%; overflow: visible; background: #fffdf4; border-color: #eadfbf; }
-.layer-c { left: 10%; bottom: 0; width: 56%; }
+/* fora do palco fixo (celular, movimento reduzido): as peças da dor empilham, e a janela e o texto vêm depois */
+.vira-art { display: grid; gap: 14px; width: min(560px, calc(100% - 2 * var(--gutter))); margin: 0 auto 28px; }
+.layer { position: relative; width: 100%; border-radius: 12px; background: #fff; border: 1px solid var(--border); box-shadow: 0 18px 44px rgba(23, 40, 30, .14); overflow: hidden; }
+.layer-b { margin-top: 10px; overflow: visible; background: #fffdf4; border-color: #eadfbf; transform: rotate(.8deg); }
+.layer-c { transform: rotate(-.8deg); }
+.vira-frame { position: relative; order: 3; width: min(1100px, calc(100% - 2 * var(--gutter))); margin: 0 auto; aspect-ratio: 1740 / 1200; border-radius: 20px; overflow: hidden; background: #0b2016; box-shadow: 0 30px 80px rgba(8, 30, 16, .25); }
+.vira-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.vira-scrim { display: none; }
+.vira-final { width: min(820px, calc(100% - 2 * var(--gutter))); margin: 32px auto 0; text-align: center; }
+.vira-final .sec-lead { margin-inline: auto; }
+.vira-chips { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.vira-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--border); font-size: 14.5px; font-weight: 600; color: var(--text-soft); }
+.vira-chips svg { flex: none; color: var(--accent-hover); }
+.vira-stage { display: flex; flex-direction: column; }
+.vira-copy { order: 0; } .vira-art { order: 1; } .vira-final { order: 4; }
 /* planilha: janela do Excel, populada, com erro e número em dúvida */
 .xl-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #1d6f42; color: #fff; font-size: 11.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .xl-ico { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 3px; background: #fff; color: #1d6f42; font-style: normal; font-size: 10px; font-weight: 800; flex: none; }
@@ -104,29 +113,30 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .chat p small em { font-style: normal; color: #34b7f1; }
 .chat .in { justify-self: start; background: #fff; border-top-left-radius: 2px; }
 .chat .out { justify-self: end; background: #d9fdd3; border-top-right-radius: 2px; }
-/* funil: aparece só no palco fixo do desktop, entre o mockup (atrás) e as peças (na frente) */
-.funnel, .rings-fx { display: none; }
-/* etapa B: o produto inteiro, em grande; a imagem é recortada (fundo transparente) */
-.product { display: grid; justify-items: center; text-align: center; gap: 12px; }
-.product-head { max-width: 760px; }
-.product-head h2 { margin-bottom: 10px; }
-.product-head .sec-lead { margin-inline: auto; }
-.product-fig { margin: 0; display: grid; justify-items: center; gap: 6px; width: 100%; }
-.product-fig { position: relative; }
-.product-pulse { position: absolute; left: 40%; top: 42%; width: 80px; height: 80px; margin: -40px 0 0 -40px; border-radius: 50%; border: 2px solid var(--accent); background: radial-gradient(circle, rgba(5, 150, 105, .28), rgba(5, 150, 105, 0) 70%); opacity: 0; pointer-events: none; z-index: 2; }
-.product-img { display: block; width: min(100%, 1100px); height: auto; }
-@media (max-width: 960px), (prefers-reduced-motion: reduce) { .product-pulse { display: none; } }
 @media (min-width: 961px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
-  .problem-stage { height: 100vh; height: 100svh; overflow: hidden; }
-  .stage-a, .stage-b { position: absolute; inset: 0; padding: 84px 0 0; display: grid; align-items: center; }
-  .stage-a { z-index: 2; }
-  .rings-fx { display: block; position: absolute; z-index: 1; pointer-events: none; visibility: hidden; opacity: 0; }
-  .funnel { display: block; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; visibility: hidden; opacity: 0; overflow: visible; }
-  .stage-b { z-index: 1; visibility: hidden; opacity: 0; padding-bottom: 20px; }
-  .stage-b .product { gap: 6px; }
-  .product-head .sec-lead { display: none; }
-  .product-head h2 { font-size: clamp(28px, 3.2vw, 44px); margin-bottom: 0; }
-  .product-img { width: min(100%, 1100px, calc((100svh - 230px) * 1.64)); }
+  .vira-stage { display: block; height: 100vh; height: 100svh; overflow: hidden; padding: 0; background: var(--canvas) radial-gradient(rgba(23, 60, 40, .1) 1px, transparent 1.4px) 0 0 / 22px 22px; }
+  .vira-copy { position: absolute; left: 0; right: 0; top: clamp(84px, 10.5vh, 108px); max-width: none; margin: 0; z-index: 4; }
+  .vira-copy .eyebrow { margin-bottom: 8px; }
+  .vira-copy h2 { margin-bottom: 8px; font-size: clamp(28px, 3.3vw, 48px); }
+  .vira-copy .sec-lead { max-width: 74ch; font-size: clamp(15px, 1.1vw, 17px); }
+  .pains { display: flex; justify-content: center; gap: 12px 32px; width: auto; margin-top: 14px; }
+  .pains li { max-width: 27ch; font-size: 13.5px; line-height: 1.4; }
+  .vira-frame { position: absolute; inset: 0; z-index: 2; width: auto; margin: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; clip-path: inset(43% 29% 7% 29% round 22px); will-change: clip-path; }
+  .vira-media { will-change: transform; }
+  .vira-scrim { display: block; position: absolute; inset: 0; pointer-events: none; opacity: 0; visibility: hidden; background: radial-gradient(ellipse 85% 75% at 50% 50%, rgba(5, 16, 8, .66), rgba(5, 16, 8, .88)); }
+  .vira-art { position: absolute; inset: 0; z-index: 3; width: auto; margin: 0; display: block; pointer-events: none; }
+  .vira-art .layer { position: absolute; margin: 0; width: clamp(250px, 24vw, 360px); will-change: transform; }
+  .vira-art .layer-a { left: 6%; top: 52%; }
+  .vira-art .layer-b { right: 6%; top: 46%; width: clamp(210px, 19vw, 290px); transform: none; }
+  .vira-art .layer-c { left: 50%; bottom: 3%; width: clamp(240px, 22vw, 330px); transform: none; }
+  .vira-final { position: absolute; inset: 0; z-index: 5; width: auto; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 var(--gutter); color: #fff; }
+  .vira-final-head { max-width: 820px; visibility: hidden; opacity: 0; }
+  .vira-final .eyebrow { color: #86efac; }
+  .vira-final h2 { margin: 0 0 14px; font-size: clamp(36px, 5.2vw, 76px); line-height: 1.02; color: #fff; text-shadow: 0 2px 30px rgba(0, 0, 0, .45); }
+  .vira-final .sec-lead { color: rgba(255, 255, 255, .92); text-shadow: 0 1px 18px rgba(0, 0, 0, .5); }
+  .vira-chips { margin-top: 26px; gap: 12px; }
+  .vira-chips li { visibility: hidden; opacity: 0; padding: 12px 18px; font-size: 16px; color: #fff; background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .38); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
+  .vira-chips svg { color: #86efac; }
 }
 
 /* ===== 04 · Trailer ===== */
@@ -335,13 +345,8 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 /* ===== Responsivo ===== */
 @media (max-width: 960px) {
-  .layers { height: auto; display: grid; gap: 12px; }
-  .layer, .layer-b, .layer-c { position: static; width: 100%; }
-  .layer-b { margin-top: 10px; }
-  .layer-b { transform: rotate(.8deg); }
-  .layer-c { transform: rotate(-.8deg); }
   .frentes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .fatos, .problem-grid, .trailer-grid, .contact-grid, .faq-inner, .editions-grid { grid-template-columns: 1fr; }
+  .fatos, .trailer-grid, .contact-grid, .faq-inner, .editions-grid { grid-template-columns: 1fr; }
   .bento { grid-template-columns: 1fr; }
   .bento .cell { grid-column: auto; }
   .cell-f { flex-direction: column; gap: 20px; }
@@ -383,9 +388,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
   .system { background: linear-gradient(180deg, transparent 0, var(--canvas) 80px); }
 }
 
-/* funil: esfera de luz (transformações em torno do próprio centro) */
-.funnel .orb-core, .funnel .orb-halo, .funnel .orb-bloom { opacity: 0; }
-.product-pulse { display: none !important; }
 
 /* ===== GB Twin: foto de soja (drone + tablet à esquerda) e texto branco à direita, 50/50 ===== */
 .twin { position: relative; isolation: isolate; min-height: min(86svh, 820px); display: grid; align-items: center; color: #eafaf0; background: #062414; overflow: hidden; }
