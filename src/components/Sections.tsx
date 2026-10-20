@@ -60,7 +60,6 @@ export function ProblemSection() {
         const m = mouth(), c = center(el)
         return axis === 'x' ? m.x + (i - 1) * m.w * 0.24 - c.x : m.y + 6 - c.y
       }
-      const toSpout = (axis: 'x' | 'y') => (_i: number, el: Element) => { const t = target(), c = center(el); return axis === 'x' ? t.x - c.x : t.y - c.y }
 
       // o funil liga a boca (sob as peças) ao ponto da tela do notebook: vidro verde em 3D, redesenhado a cada refresh
       const drawFunnel = () => {
@@ -96,7 +95,7 @@ export function ProblemSection() {
           `<path d="M ${left.join(' L ')}" fill="none" stroke="#6ee7b7" stroke-width="2"/>` +
           `<path d="M ${us.map((u) => `${(m.x + hw(u)).toFixed(1)} ${yAt(u).toFixed(1)}`).join(' L ')}" fill="none" stroke="#047857" stroke-width="2"/>` +
           tube + rimFront
-        for (const [cls, r] of [['.orb-halo', 30], ['.orb-core', 9], ['.orb-bloom', 44]] as const) {
+        for (const [cls, r] of [['.orb-halo', 30], ['.orb-core', 9], ['.orb-bloom', 44], ['.orb-wave', 44]] as const) {
           const c = svg.querySelector(cls)!
           c.setAttribute('cx', `${m.x}`); c.setAttribute('cy', `${t.y + 6}`); c.setAttribute('r', `${r}`)
         }
@@ -119,19 +118,21 @@ export function ProblemSection() {
         .fromTo('.stage-b', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0.32)
         .fromTo('.product-img', { autoAlpha: 0, scale: 0.86, y: 40, rotateX: 8, transformPerspective: 1200, filter: 'blur(16px)' }, { autoAlpha: 0.45, scale: 0.94, y: 12, rotateX: 3, filter: 'blur(8px)', ease: 'power2.out', duration: 0.18 }, 0.32)
         .fromTo('.funnel', { autoAlpha: 0, y: -24 }, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.1 }, 0.34)
-        // as peças encolhem até a boca do funil e descem por ele até a tela do notebook
+        // as peças encolhem até a boca do funil e somem ali (não descem mais pelo funil)
         .to('.layer', { x: toMouth('x'), y: toMouth('y'), rotate: (i: number) => (i - 1) * 8, scale: 0.34, stagger: 0.02, duration: 0.12 }, 0.4)
-        .to('.layer', { x: toSpout('x'), y: toSpout('y'), rotate: 0, scale: 0.06, ease: 'power2.in', stagger: 0.03, duration: 0.12 }, 0.54)
-        .to('.layer', { autoAlpha: 0, stagger: 0.03, duration: 0.03, ease: 'none' }, 0.63)
+        .to('.layer', { scale: 0.08, autoAlpha: 0, ease: 'power2.in', stagger: 0.02, duration: 0.07 }, 0.56)
         // a esfera de luz nasce no bico, pulsa, cresce e "estoura" revelando o produto nítido; o funil se dissolve
-        .fromTo('.orb-core', { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, ease: 'back.out(2)', duration: 0.05 }, 0.62)
-        .fromTo('.orb-halo', { scale: 0.2, autoAlpha: 0 }, { scale: 1.6, autoAlpha: 0.9, ease: 'power2.out', duration: 0.08 }, 0.62)
-        .to('.orb-core', { scale: 1.9, duration: 0.05, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.67)
-        .to('.funnel-shell', { autoAlpha: 0, y: -10, duration: 0.09, ease: 'power2.in' }, 0.7)
-        .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 0.95 }, { scale: 26, autoAlpha: 0, ease: 'power3.out', duration: 0.2 }, 0.76)
-        .to('.orb-core, .orb-halo', { scale: 6, autoAlpha: 0, duration: 0.1, ease: 'power2.out' }, 0.76)
-        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.77)
-        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.8)
+        .fromTo('.orb-core', { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, ease: 'back.out(2)', duration: 0.05 }, 0.58)
+        .fromTo('.orb-halo', { scale: 0.2, autoAlpha: 0 }, { scale: 1.6, autoAlpha: 0.9, ease: 'power2.out', duration: 0.08 }, 0.58)
+        .to('.orb-core', { scale: 1.9, duration: 0.05, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.63)
+        .to('.funnel-shell', { autoAlpha: 0, y: -10, duration: 0.09, ease: 'power2.in' }, 0.66)
+        .fromTo('.orb-bloom', { scale: 0.05, autoAlpha: 1 }, { scale: 52, autoAlpha: 0, ease: 'power3.out', duration: 0.26 }, 0.72)
+        // onda de choque: um anel fino que sai do ponto e varre a tela atrás do clarão
+        .fromTo('.orb-wave', { scale: 0.05, autoAlpha: 0.95 }, { scale: 46, autoAlpha: 0, ease: 'power2.out', duration: 0.3 }, 0.73)
+        .to('.orb-core, .orb-halo', { scale: 8, autoAlpha: 0, duration: 0.1, ease: 'power2.out' }, 0.72)
+        .to('.product-img', { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, filter: 'blur(0px)', ease: 'power3.out', duration: 0.18 }, 0.73)
+        .fromTo('.product-head', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.12 }, 0.76)
+        .set({}, {}, 1)
     })
     return () => mm.revert()
   }, [])
@@ -245,6 +246,7 @@ export function ProblemSection() {
           </defs>
           <g className="funnel-shell" />
           <circle className="orb-bloom" fill="url(#fn-bloom)" />
+          <circle className="orb-wave" fill="none" stroke="#6ee7b7" strokeWidth="3" vectorEffect="non-scaling-stroke" />
           <circle className="orb-halo" fill="url(#fn-orb)" />
           <circle className="orb-core" fill="#fff" stroke="#34d399" strokeWidth="3" />
         </svg>

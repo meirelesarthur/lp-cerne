@@ -379,7 +379,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 }
 
 /* funil: esfera de luz (transformações em torno do próprio centro) */
-.funnel .orb-core, .funnel .orb-halo, .funnel .orb-bloom { opacity: 0; }
+.funnel .orb-core, .funnel .orb-halo, .funnel .orb-bloom, .funnel .orb-wave { opacity: 0; }
 .product-pulse { display: none !important; }
 
 /* ===== GB Twin: foto de soja (drone + tablet à esquerda) e texto branco à direita, 50/50 ===== */
