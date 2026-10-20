@@ -410,7 +410,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .pl-mod.is-open button { color: var(--accent-hover); }
 .pl-feat th { padding-left: 40px; font-size: 14px; color: var(--text-soft); }
 .pl-feat th, .pl-feat td { padding-block: 7px; border-bottom-color: transparent; }
-.pl-feat td { opacity: .55; }
+.pl-feat td > * { opacity: .55; }
 .pl-table tbody tr.pl-mod + tr.pl-feat th, .pl-table tbody tr.pl-feat + tr.pl-feat th { border-bottom-color: transparent; }
 .pl-table tbody tr:not(.pl-grp):hover > * { background: #e6f0e9; }
 .pl-yes { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #dcefe3; color: var(--accent-hover); vertical-align: middle; }
