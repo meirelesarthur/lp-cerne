@@ -12,7 +12,7 @@ import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
   BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
-  SecurityLockIcon, Tick02Icon, WeightScale01Icon,
+  SecurityLockIcon, ShoppingCart01Icon, Tick02Icon, WeightScale01Icon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
@@ -709,7 +709,7 @@ const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
 const ZEBRA = new Map(COMPARATIVO.flatMap((g) => g.mods).map((x, i) => [x.m, i % 2]))
 const CelPlano = ({ c }: { c: PlCel }) =>
   c === 'i' ? <span className="pl-yes"><Icon icon={Tick02Icon} size={14} strokeWidth={2.6} /><span className="sr-only">Incluído</span></span>
-  : c === 'o' ? <span className="pl-opt">Opcional</span>
+  : c === 'o' ? <span className="pl-opt"><Icon icon={ShoppingCart01Icon} size={14} strokeWidth={2.2} />Adicional</span>
   : c === 'n' ? <span className="pl-no" aria-label="Não incluso">—</span>
   : <span className="pl-txt">{c}</span>
 
