@@ -6,6 +6,7 @@ import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
 import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
+import ecoBg from '../assets/ecossistema-campo.jpg'
 import { FolderFloat } from './fx/FolderFloat'
 import { CardSwap, type SwapItem } from './fx/CardSwap'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
@@ -328,24 +329,56 @@ export function SystemSection() {
   )
 }
 
-/* ───────────────────────── 06 · Edições ───────────────────────── */
-const EDICOES: GalleryItem[] = [
-  { key: 'web', n: '01', tag: 'Disponível hoje', title: 'Cerne Web', desc: 'Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão Geral', cta: { label: 'Quero acesso antecipado', href: '#contato', interest: 'web', primary: true } },
-  { key: 'adm', n: '02', tag: 'Em teste', title: 'Cerne Administração', desc: 'Para gestores e escritório: resultado, rebanho e ordens de serviço.', src: '/screens/app-administracao.webp', alt: 'App Administração: visão geral de rebanho e confinamento', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-administracao' } },
-  { key: 'op', n: '03', tag: 'Em teste', title: 'Cerne Operação', desc: 'Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.', src: '/screens/app-operacao.webp', alt: 'App Operação: ordem de serviço de vacinação do Lote 12', phone: true, cta: { label: 'Entrar na lista de testes', href: '#contato', interest: 'app-operacao' } },
+/* ───────────────────────── 06 · Ecossistema (Web + app Administração + app Operação) ───────────────────────── */
+// vem junto com a contratação: o Cerne Web no escritório e os dois apps para separar as responsabilidades no dia a dia
+const ECO = [
+  { k: 'web', tag: 'Disponível hoje', who: 'No escritório', title: 'Cerne Web', d: 'O centro de comando da fazenda: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Custo e margem de cada lote na hora, sem planilha paralela.' },
+  { k: 'adm', tag: 'Em teste', who: 'Para quem decide', title: 'Cerne Administração', d: 'Resultado, rebanho e ordens de serviço na palma da mão. O gestor acompanha a fazenda inteira de onde estiver, sem ligar para ninguém.' },
+  { k: 'op', tag: 'Em teste', who: 'Para quem executa', title: 'Cerne Operação', d: 'Minhas ordens, trato, cocho, pesagem e sanitário registrados na hora, do curral ou da lavoura. O campo anota uma vez e o escritório já enxerga.' },
 ]
 
 export function EditionsSection() {
+  const root = useRef<HTMLElement>(null)
+  const near = useNear(root, '80% 0px')
   const media = useAfterFirstScroll()
+  const [focus, setFocus] = useState<string | null>(null)
+  const img = (name: string) => (media ? asset(`/screens/${name}.webp`) : undefined)
   return (
-    <section className="sec sec-light editions" id="edicoes" aria-labelledby="edicoes-title">
+    <section ref={root} className="eco" id="edicoes" aria-labelledby="edicoes-title" data-header-dark style={(near ? { '--eco-bg': `url(${ecoBg})` } : undefined) as unknown as React.CSSProperties}>
       <div className="wrap">
-        <header className="sec-head" data-reveal>
-          <span className="eyebrow">Como usar</span>
-          <h2 id="edicoes-title">Um sistema. Três formas de usar.</h2>
+        <header className="sec-head center on-photo" data-reveal>
+          <span className="eyebrow">Tudo isso vem com o Cerne</span>
+          <MaskedHeading id="edicoes-title" text="Você contrata um sistema e leva para casa um ecossistema inteiro." />
+          <p className="sec-lead">O Cerne Web para o escritório, o app Administração para quem decide e o app Operação para quem executa. Cada pessoa da fazenda com a ferramenta certa na mão, todo mundo no mesmo dado, e os problemas do dia a dia resolvidos de uma vez.</p>
         </header>
-        <div data-reveal>
-          <AccordionGallery large label="Edições do Cerne" items={EDICOES.map((e): GalleryItem => ({ ...e, src: media && e.src ? asset(e.src) : undefined }))} />
+
+        <div className="eco-stage" data-focus={focus ?? undefined} data-reveal>
+          <figure className="eco-dev eco-web">
+            <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
+            {media && <img src={img('visao-geral')} alt="Cerne Web: painel Visão geral da fazenda" width={1280} height={800} loading="lazy" decoding="async" />}
+          </figure>
+          <figure className="eco-dev eco-phone eco-adm">
+            {media && <img src={img('app-administracao')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}
+          </figure>
+          <figure className="eco-dev eco-phone eco-op">
+            {media && <img src={img('app-operacao')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}
+          </figure>
+        </div>
+
+        <ul className="eco-cards">
+          {ECO.map((e) => (
+            <li key={e.k} tabIndex={0} onPointerEnter={() => setFocus(e.k)} onPointerLeave={() => setFocus(null)} onFocus={() => setFocus(e.k)} onBlur={() => setFocus(null)} data-reveal>
+              <span className="eco-tag">{e.tag}</span>
+              <span className="eco-who">{e.who}</span>
+              <h3>{e.title}</h3>
+              <p>{e.d}</p>
+            </li>
+          ))}
+        </ul>
+
+        <div className="eco-cta" data-reveal>
+          <p><strong>Contratou o Cerne, levou os três.</strong> Os apps vêm junto com o sistema.</p>
+          <a className="btn btn-primary" href="#contato" data-interest="todos">Quero o ecossistema completo</a>
         </div>
         <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
       </div>
