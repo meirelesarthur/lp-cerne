@@ -1,0 +1,32 @@
+/* Efeitos de movimento (portados do React Bits para CSS puro). Tudo só com transform, opacity e clip-path. */
+
+/* ── Masked Heading: palavras sobem de dentro de uma máscara; brilho de malha passa pelas letras ── */
+.fx-mh { --fx-mh-a: currentColor; --fx-mh-b: #86efac; }
+.on-photo .fx-mh, .twin .fx-mh { --fx-mh-a: #fff; --fx-mh-b: #86efac; }
+.fx-mh-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+.fx-mh-w > span { display: inline-block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fx-mh.fx-armed .fx-mh-w > span { transform: translateY(110%); }
+  .fx-mh.fx-armed.is-in .fx-mh-w > span {
+    transform: none;
+    transition: transform .8s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 70ms);
+    /* depois de revelado, uma faixa de verde atravessa as letras uma vez */
+    background: linear-gradient(100deg, var(--fx-mh-a) 40%, var(--fx-mh-b) 50%, var(--fx-mh-a) 60%) 100% 0 / 250% 100% no-repeat;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    animation: fx-mh-sheen 1.6s ease-out calc(.5s + var(--i) * 70ms) forwards;
+  }
+}
+@keyframes fx-mh-sheen { to { background-position: 0 0; } }
+
+/* ── Stroke Text: contorno que se traça e depois preenche ── */
+.fx-st { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .fx-st.fx-armed { color: transparent; -webkit-text-stroke: 1.2px currentColor; clip-path: inset(-.1em 100% -.1em 0); }
+  .fx-st.fx-armed.is-in {
+    clip-path: inset(-.1em -.1em -.1em 0);
+    color: inherit;
+    transition: clip-path .9s cubic-bezier(.5, 0, .2, 1), color .6s ease .8s, -webkit-text-stroke-color .6s ease .8s;
+  }
+}

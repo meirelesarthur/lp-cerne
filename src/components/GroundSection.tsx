@@ -1,5 +1,6 @@
 import type { IconSvgElement } from '@hugeicons/react'
 import type { HeroGeometry } from './Hero'
+import { MaskedHeading } from './fx/MaskedHeading'
 import { Analytics01Icon, BarnsIcon, Building02Icon, Icon, Invoice01Icon, SmartPhone01Icon, TractorIcon, WarehouseIcon } from '../lib/icons'
 
 /**
@@ -42,7 +43,7 @@ export function GroundSection({ geo }: { geo: HeroGeometry | null }) {
       <div className="ground-content">
         <header className="sec-head on-photo" data-reveal>
           <span className="eyebrow">O que o Cerne cobre</span>
-          <h2 id="escopo-title">Uma fazenda, um cadastro, nenhuma planilha paralela.</h2>
+          <MaskedHeading id="escopo-title" text="Uma fazenda, um cadastro, nenhuma planilha paralela." />
           <p className="sec-lead">Do curral ao caixa e da lavoura à nota fiscal: o Cerne Web organiza a rotina de quem decide.</p>
         </header>
 

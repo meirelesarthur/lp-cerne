@@ -3,6 +3,8 @@ import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, ty
 import { maskPhone, submitLead, validators, type Status } from '../lib/form'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
+import { MaskedHeading } from './fx/MaskedHeading'
+import { StrokeText } from './fx/StrokeText'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
@@ -574,15 +576,15 @@ export function TwinSection() {
         <div className="twin-spacer" aria-hidden="true" />
         <div className="twin-copy">
           <span className="eyebrow">GB Twin</span>
-          <h2 id="twin-title">Cada pé da lavoura, contado do alto.</h2>
+          <MaskedHeading id="twin-title" text="Cada pé da lavoura, contado do alto." />
           <p className="twin-lead">O drone sobrevoa o pivô e o GB Twin conta os pés no ortomosaico, confere por amostra e emite o laudo. Você vê a falha onde ela está, não na média.</p>
           <ul className="twin-list">
             {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
           </ul>
           <dl className="twin-stats">
-            <div><dt>Copas</dt><dd>120.855</dd></div>
-            <div><dt>Estande</dt><dd>3.568<small>/ha</small></dd></div>
-            <div><dt>Aproveitamento</dt><dd>86%</dd></div>
+            <div><dt>Copas</dt><dd><StrokeText>120.855</StrokeText></dd></div>
+            <div><dt>Estande</dt><dd><StrokeText>3.568</StrokeText><small>/ha</small></dd></div>
+            <div><dt>Aproveitamento</dt><dd><StrokeText>86%</StrokeText></dd></div>
           </dl>
           <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
           <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
@@ -656,7 +658,7 @@ export function ContactSection() {
       <div className="wrap contact-grid">
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Acesso antecipado</span>
-          <h2 id="contato-title">Esteja entre os primeiros a usar o Cerne.</h2>
+          <MaskedHeading id="contato-title" text="Esteja entre os primeiros a usar o Cerne." />
           <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
           <button type="button" className="btn btn-ghost whats" disabled>Falar agora no WhatsApp <Tbd>número a definir</Tbd></button>
         </header>
