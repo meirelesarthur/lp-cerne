@@ -145,9 +145,28 @@
   .cs-stage { perspective: 1500px; perspective-origin: 40% 70%; }
 }
 
-/* ── Topography (fundo do Trailer): canvas atrás do conteúdo, sem capturar ponteiro ── */
-.trailer { position: relative; overflow: hidden; }
-.trailer > .wrap { position: relative; z-index: 1; }
-.fx-topo-slot { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* ── Topography (fundo do GB Twin): canvas atrás do conteúdo, sem capturar ponteiro ── */
 .fx-topo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; animation: fx-topo-in 1.4s ease .2s forwards; }
 @keyframes fx-topo-in { to { opacity: 1; } }
+
+/* ── GB Twin: hero escuro com relevo interativo ao fundo e o drone (sem fundo) à esquerda ── */
+.twin { position: relative; isolation: isolate; overflow: hidden; min-height: min(92svh, 860px); display: grid; align-items: center; padding: clamp(64px, 10vh, 110px) 0; color: #fff; background: radial-gradient(90% 80% at 28% 65%, #0b2a1c 0%, #05130c 62%, #030b07 100%); }
+/* fundo estático (celular, movimento reduzido, antes do WebGL): anéis de curva de nível */
+.twin::before { content: ''; position: absolute; inset: 0; z-index: 0; background: repeating-radial-gradient(ellipse 70% 55% at 30% 78%, rgba(74, 222, 128, .13) 0 1px, transparent 1px 30px); -webkit-mask-image: radial-gradient(70% 70% at 30% 72%, #000, transparent); mask-image: radial-gradient(70% 70% at 30% 72%, #000, transparent); }
+.twin-terrain { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.twin-terrain::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(3, 11, 7, 0) 30%, rgba(3, 11, 7, .62) 100%), linear-gradient(180deg, rgba(3, 11, 7, .5) 0%, rgba(3, 11, 7, 0) 22%); }
+.twin-grid { position: relative; z-index: 1; width: min(1320px, 100% - 2 * var(--gutter)); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(24px, 4vw, 72px); align-items: center; }
+.twin-figure { position: relative; margin: 0; }
+.twin-figure img { display: block; width: 100%; height: auto; filter: drop-shadow(0 40px 50px rgba(0, 0, 0, .55)); }
+.twin-glow { position: absolute; inset: 8% 4% -4%; z-index: -1; background: radial-gradient(closest-side, rgba(52, 211, 153, .3), transparent 72%); filter: blur(12px); }
+@media (prefers-reduced-motion: no-preference) {
+  .twin-figure img { animation: twin-float 7s ease-in-out infinite; }
+  @keyframes twin-float { 50% { transform: translateY(-12px) rotate(-.5deg); } }
+}
+.twin-cta { margin-top: 6px; }
+@media (max-width: 900px) {
+  .twin { display: block; min-height: 0; padding: 48px 0 64px; }
+  .twin-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .twin-figure { width: min(520px, 100%); margin-inline: auto; }
+  .twin-terrain::after { background: linear-gradient(180deg, rgba(3, 11, 7, .3), rgba(3, 11, 7, .5)); }
+}

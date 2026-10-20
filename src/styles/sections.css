@@ -340,13 +340,8 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 
 /* ===== GB Twin: foto de soja (drone + tablet à esquerda) e texto branco à direita, 50/50 ===== */
-.twin { position: relative; isolation: isolate; min-height: min(86svh, 820px); display: grid; align-items: center; color: #eafaf0; background: #062414; overflow: hidden; }
-.twin-bg { position: absolute; inset: 0; z-index: -1; }
-.twin-bg img { width: 100%; height: 100%; object-fit: cover; object-position: left center; display: block; }
-.twin-bg::after { content: ''; position: absolute; inset: 0; background:
   linear-gradient(90deg, rgba(4, 28, 14, 0) 0%, rgba(4, 28, 14, 0) 38%, rgba(4, 32, 16, .72) 58%, rgba(3, 26, 13, .9) 100%),
   linear-gradient(180deg, rgba(5, 25, 12, .35) 0%, rgba(5, 25, 12, 0) 22%, rgba(5, 25, 12, 0) 78%, rgba(5, 25, 12, .55) 100%); }
-.twin-grid { width: min(1320px, 100% - 2 * var(--gutter)); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 72px); padding: clamp(72px, 12vh, 140px) 0; }
 .twin-copy { display: grid; gap: 18px; align-content: center; max-width: 560px; }
 .twin .eyebrow { color: #86efac; margin: 0; }
 .twin h2 { margin: 0; font-size: clamp(32px, 3.9vw, 56px); line-height: 1.05; font-weight: 600; letter-spacing: -.022em; color: #fff; max-width: 14ch; }
@@ -363,12 +358,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 .btn-light { justify-self: start; background: #fff; color: #064e3b; border-color: #fff; }
 .btn-light:hover { background: #e8f8ee; }
 @media (max-width: 900px) {
-  .twin { display: block; min-height: 0; }
-  .twin-bg { position: relative; inset: auto; z-index: 0; height: clamp(280px, 78vw, 460px); }
-  .twin-bg img { object-position: 18% 58%; }
-  .twin-bg::after { background: linear-gradient(180deg, rgba(4, 28, 14, .35) 0%, rgba(4, 28, 14, 0) 24%, rgba(4, 28, 14, 0) 62%, #062414 100%); }
-  .twin-grid { display: block; width: auto; margin: 0; padding: 8px var(--gutter) 56px; position: relative; z-index: 1; }
-  .twin-spacer { display: none; }
   .twin-stats { gap: 18px; }
 }
 

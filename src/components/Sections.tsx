@@ -1,6 +1,6 @@
 import { asset } from '../lib/assets'
 import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { maskPhone, submitLead, validators, type Status } from '../lib/form'
+import { maskPhone, submitLead, validators, whatsappHref, type Status } from '../lib/form'
 import { gsap, shouldSkipScrub } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
 import { MaskedHeading } from './fx/MaskedHeading'
@@ -91,7 +91,8 @@ export function ProblemSection() {
         // a janela do Cerne cresce do centro até a tela inteira, e as peças são absorvidas por ela
         .fromTo('.vira-frame', { clipPath: 'inset(63% 50% 37% 50% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0.2)
         .fromTo('.vira-media', { scale: 1.35 }, { scale: 1, duration: 0.5 }, 0.2)
-        .to('.vira-art .layer', { scale: 0.42, autoAlpha: 0, ease: 'power2.in', stagger: 0.03, duration: 0.14 }, 0.42)
+        // as três peças saem logo que a janela nasce (não ficam por cima do que cresce ao fundo)
+        .to('.vira-art .layer', { scale: 0.5, autoAlpha: 0, ease: 'power1.out', stagger: 0.015, duration: 0.1 }, 0.2)
         // o sistema ocupa a tela: véu escuro para o texto, título da virada e as frentes entrando uma a uma
         .fromTo('.vira-scrim', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: 'none' }, 0.5)
         .fromTo('.vira-final-head', { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.14, ease: 'power3.out' }, 0.62)
@@ -193,14 +194,10 @@ const TELAS: SwapItem[] = [
 ]
 
 export function TrailerSection() {
-  const root = useRef<HTMLElement>(null)
   const media = useAfterFirstScroll()
-  const topoNear = useNear(root, '60% 0px')
-  const [topo] = useState(() => window.matchMedia(TOPO_MQ).matches && !shouldSkipScrub())
 
   return (
-    <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
-      <div className="fx-topo-slot" aria-hidden="true">{topo && topoNear && <Suspense fallback={null}><Topography /></Suspense>}</div>
+    <section className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
       <div className="wrap">
         <header className="sec-head center" data-reveal>
           <span className="eyebrow">O sistema em funcionamento</span>
@@ -487,13 +484,21 @@ export function ProfilesSection() {
 const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas']
 
 export function TwinSection() {
+  const root = useRef<HTMLElement>(null)
+  const near = useNear(root, '60% 0px')
+  // relevo em WebGL só em tela larga, com movimento permitido; senão fica o fundo estático de anéis
+  const [topo] = useState(() => window.matchMedia(TOPO_MQ).matches && !shouldSkipScrub())
+  const wa = whatsappHref('Olá! Quero conhecer o GB Twin.')
   return (
-    <section className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
-      <div className="twin-bg" aria-hidden="true">
-        <img src={asset('/frames/twin-bg.webp')} alt="" width={2200} height={1238} loading="lazy" decoding="async" />
+    <section ref={root} className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
+      <div className="twin-terrain" aria-hidden="true">
+        {topo && near && <Suspense fallback={null}><Topography /></Suspense>}
       </div>
       <div className="twin-grid">
-        <div className="twin-spacer" aria-hidden="true" />
+        <figure className="twin-figure" data-reveal>
+          <span className="twin-glow" aria-hidden="true" />
+          <img src={asset('/frames/twin-drone.webp')} alt="Drone sobrevoando a lavoura com o mapa de copas do GB Twin no tablet" width={1200} height={1007} loading="lazy" decoding="async" />
+        </figure>
         <div className="twin-copy">
           <span className="eyebrow">GB Twin</span>
           <MaskedHeading id="twin-title" text="Cada pé da lavoura, contado do alto." />
@@ -507,7 +512,9 @@ export function TwinSection() {
             <div><dt>Aproveitamento</dt><dd><StrokeText>86%</StrokeText></dd></div>
           </dl>
           <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
+          <div className="twin-cta">
+            <a className="btn btn-light" href={wa ?? '#contato'} data-interest="gb-twin" {...(wa ? { target: '_blank', rel: 'noreferrer' } : {})}>{wa ? 'Falar sobre o GB Twin no WhatsApp' : 'Quero conhecer o GB Twin'}</a>
+          </div>
         </div>
       </div>
     </section>
