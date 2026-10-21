@@ -1,6 +1,7 @@
 import { rmSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
+import { HERO } from './src/content/heroCopy.js'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -20,6 +21,9 @@ export default defineConfig(({ mode }) => {
       if (!site) out = out.replace(/\s*<[^>]*data-site[^>]*>/g, '')
       return out.replace(/ data-(asset|site)(?=[\s>/])/g, '')
     } } },
+    // casca estática do primeiro quadro no HTML: cabeçalho, poster e a proposta de valor (H1, lead e CTA) aparecem sem esperar o JS.
+    // O React troca esta casca pelo mesmo conteúdo quando monta (copy vem de src/content/heroCopy.ts, a mesma do Hero.tsx).
+    { name: 'hero-static-shell', transformIndexHtml: { order: 'pre' as const, handler: (html: string) => html.replace('<!--HERO_STATIC-->', `<header class="header"><a href="/" aria-label="Cerne, página inicial"><img class="logo-on-glass" src="/logo.svg" alt="Cerne" height="28"><img class="logo-on-scene" src="/logo-white.svg" alt="" aria-hidden="true" height="28"></a><button type="button" class="btn btn-primary">${HERO.cta}</button></header><main id="main"><section class="hero" aria-label="Cerne: ERP para o agro"><div class="hero-pin"><picture><source media="(max-width: 820px) and (orientation: portrait)" srcset="${base}/frames/hero/mobile/poster-first.webp"><img class="poster" src="${base}/frames/hero/desktop/poster-first.webp" alt="" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="hero-intro"><div class="hero-intro-copy"><span class="hero-eyebrow">${HERO.eyebrow}</span><h1>${HERO.h1Pre} <em>${HERO.h1Em}</em></h1><p class="lead">${HERO.lead}</p><button type="button" class="btn btn-primary">${HERO.cta}</button><p class="hero-intro-proof">${HERO.proof}</p></div></div></div></section></main>`) } },
     // robots.txt e sitemap.xml no build (o sitemap precisa da URL absoluta do site)
     { name: 'seo-files', apply: 'build' as const, generateBundle(this: { emitFile: (f: { type: 'asset'; fileName: string; source: string }) => void }) {
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: `User-agent: *

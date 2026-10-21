@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
 import { coverBox, finalZoom, prefersHd, supportsAvif, type Box, type Manifest, type Zoom } from '../lib/stage'
 import { ArrowDown01Icon, Icon, Mouse01Icon } from '../lib/icons'
+import { HERO } from '../content/heroCopy'
 import { LeadForm } from './LeadForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
@@ -240,11 +241,11 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
         {!isStatic && (
           <div className="hero-intro">
             <div className="hero-intro-copy">
-              <span className="hero-eyebrow">ERP para pecuária e lavoura</span>
-              <h1>O Cerne da sua <em>operação.</em></h1>
-              <p className="lead">O Cerne reúne rebanho, lavoura, estoque, fiscal e financeiro num só lugar: o centro de tudo o que acontece na sua fazenda, com o custo e a margem de cada lote sem esperar o fechamento do mês.</p>
-              <button type="button" className="btn btn-primary" onClick={focusHeroForm}>Quero acesso antecipado</button>
-              <p className="hero-intro-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
+              <span className="hero-eyebrow">{HERO.eyebrow}</span>
+              <h1>{HERO.h1Pre} <em>{HERO.h1Em}</em></h1>
+              <p className="lead">{HERO.lead}</p>
+              <button type="button" className="btn btn-primary" onClick={focusHeroForm}>{HERO.cta}</button>
+              <p className="hero-intro-proof">{HERO.proof}</p>
             </div>
           </div>
         )}

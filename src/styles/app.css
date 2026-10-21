@@ -144,3 +144,12 @@ a.btn { text-decoration: none; }
     linear-gradient(180deg, rgba(var(--veil), .9) 0%, rgba(var(--veil), .6) 22%, rgba(var(--veil), 0) 32%); }
 }
 @media (prefers-reduced-motion: reduce) { .hero-hint svg, .hero-mouse > svg path:nth-child(2), .hero-chevs svg { animation: none; } }
+
+/* celular (barra do navegador que some ao rolar): o palco do Hero usa a altura MAIOR (lvh) para a foto cobrir a tela inteira e
+   não sobrar uma faixa em branco embaixo do vídeo; o conteúdo (texto, form, indicadores) continua na altura segura (svh) */
+@media (max-width: 820px) and (orientation: portrait) {
+  .hero:not(.static) .hero-pin { height: 100lvh; }
+  .hero:not(.static) .hero-content, .hero:not(.static) .hero-intro { bottom: auto; height: 100svh; }
+  .hero:not(.static) .hero-mouse { bottom: calc(100lvh - 100svh + 20px); }
+  .hero:not(.static) .hero-hint { top: 50svh; }
+}
