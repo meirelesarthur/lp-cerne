@@ -15,9 +15,9 @@ export const maskPhone = (v: string) => {
 
 export const validators = {
   name: (v: string) => (v.trim().length >= 2 ? '' : 'Informe seu nome.'),
-  email: (v: string) => (EMAIL_RE.test(v.trim()) ? '' : 'Informe um e-mail válido.'),
+  // e-mail é opcional: vazio vale, preenchido precisa ser válido
+  email: (v: string) => (!v.trim() || EMAIL_RE.test(v.trim()) ? '' : 'Confira o e-mail ou deixe em branco.'),
   whatsapp: (v: string) => (v.replace(/\D/g, '').length >= 10 ? '' : 'Informe o WhatsApp com DDD.'),
-  consent: (v: boolean) => (v ? '' : 'Aceite para receber nosso contato.'),
 }
 
 /** Origem da visita (UTM e referrer), anexada a todo lead para medir canal. */

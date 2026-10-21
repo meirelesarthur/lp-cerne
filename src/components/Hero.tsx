@@ -8,7 +8,7 @@ import { HERO } from '../content/heroCopy'
 import { LeadForm } from './LeadForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
-const EMAIL_ID = 'hero-email'
+const FIRST_FIELD_ID = 'hero-name'
 /** Quadros verticais só em tela retrato estreita; janelas deitadas usam o plano 16:9. */
 /** Altura do header fixo (logo + CTA). */
 const HEADER_H = 84
@@ -47,12 +47,12 @@ let heroTrigger: ScrollTrigger | null = null
 
 /** CTA do header: leva ao estado final do Hero e foca o e-mail. */
 export function focusHeroForm() {
-  const focus = () => document.getElementById(EMAIL_ID)?.focus({ preventScroll: true })
+  const focus = () => document.getElementById(FIRST_FIELD_ID)?.focus({ preventScroll: true })
   if (heroTrigger) {
     scrollToY(heroTrigger.end)
     window.setTimeout(focus, 1500)
   } else {
-    document.getElementById(EMAIL_ID)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document.getElementById(FIRST_FIELD_ID)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     window.setTimeout(focus, 400)
   }
 }
@@ -257,7 +257,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">
-            <LeadForm variant="hero" emailId={EMAIL_ID} />
+            <LeadForm variant="hero" focusId={FIRST_FIELD_ID} />
           </div>
         </div>
 

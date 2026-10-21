@@ -127,7 +127,6 @@
 .hero .form .field label { margin-bottom: 3px; }
 .hero .form .field input, .hero .form .field select { min-height: 38px; font-size: 15px; }
 .hero .form .row2 { gap: 0 10px; }
-.hero .form .consent { margin: 2px 0 10px; }
 .hero .form .btn { min-height: 42px; }
 @media (max-width: 820px) {
   /* celular: o parágrafo do Hero cede espaço para o formulário completo caber na primeira tela */
