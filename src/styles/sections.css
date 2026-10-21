@@ -33,7 +33,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 /* ===== 02 · Escopo: fazenda fixa que se esmaece até o fundo claro ===== */
 .ground { position: relative; background: var(--canvas); display: flex; flex-direction: column; }
-.ground-bg { position: sticky; top: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; overflow: hidden; z-index: 0; }
+.ground-bg { background: linear-gradient(180deg, #3d5a2a 0%, var(--lavoura) 100%); position: sticky; top: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; overflow: hidden; z-index: 0; }
 .ground-bg img { position: absolute; max-width: none; display: block; }
 /* sombra leve no centro para o título branco */
 .ground-shade { position: absolute; inset: 0; background: radial-gradient(70% 55% at 50% 42%, rgba(12, 28, 10, .38), rgba(12, 28, 10, 0) 70%); }

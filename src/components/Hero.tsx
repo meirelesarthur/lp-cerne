@@ -113,6 +113,20 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
     return () => { alive = false }
   }, [dir, variant])
 
+  // a foto do chão (continuação do Hero) começa a baixar em baixa prioridade logo depois da carga, para já estar no cache quando
+  // a rolagem chegar ao fim do Hero; sem isso, em rede lenta o fim do Hero mostrava um vão em branco até a imagem chegar
+  useEffect(() => {
+    const src = m?.ground?.src
+    if (!src || isStatic) return
+    const t = window.setTimeout(() => {
+      const img = new Image()
+      img.fetchPriority = 'low'
+      img.decoding = 'async'
+      img.src = src
+    }, 2500)
+    return () => window.clearTimeout(t)
+  }, [m, isStatic])
+
   // geometria do quadro (cover) e do zoom final, refeita a cada resize
   useLayoutEffect(() => {
     if (!m?.final || !pin.current) return
