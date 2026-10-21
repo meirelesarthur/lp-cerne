@@ -61,7 +61,6 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
   const root = useRef<HTMLElement>(null)
   const pin = useRef<HTMLDivElement>(null)
   const frameBox = useRef<HTMLDivElement>(null)
-  const appImg = useRef<HTMLImageElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const scrub = useRef<ScrubHandle>(null)
   const [mobile, setMobile] = useState(() => window.matchMedia(MOBILE_MQ).matches)
@@ -189,7 +188,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
         tl.fromTo('.final-layer', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.012 }, P.seqEnd - 0.012)
           .fromTo('.frame-box', { x: 0, y: 0, scale: 1 }, { x: zoom.tx, y: zoom.ty, scale: zoom.s, duration: P.zoomEnd - P.seqEnd, ease: 'power2.inOut' }, P.seqEnd)
           .to('.tablet-screen', { autoAlpha: 1, duration: 0.03 }, P.seqEnd)
-          .to('.tablet-video', { autoAlpha: 1, duration: 0.05 }, P.seqEnd + 0.06)
+          .to('.tablet-video', { autoAlpha: 1, duration: 0.03 }, P.seqEnd) // o pôster do vídeo (Visão geral) já ocupa a tela do tablet
           .to('.hero-shade', { opacity: 1, duration: 0.08 }, P.zoomEnd - 0.06)
           // autoAlpha: fora da fase o bloco fica com visibility:hidden (não recebe foco nem é lido)
           .fromTo('.hero-copy', { autoAlpha: 0, y: 32 }, { autoAlpha: 1, y: 0, duration: 0.09, ease: 'power2.out' }, P.zoomEnd - 0.04)
@@ -225,7 +224,6 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             >
               <img className="final-still" src={m.final.src} alt="" decoding="async" />
               <div className="tablet-screen" style={{ left: `${t.x * 100}%`, top: `${t.y * 100}%`, width: `${t.w * 100}%`, height: `${t.h * 100}%` }}>
-                <img ref={appImg} className="tablet-app" src={asset('/app/visao-geral-full.webp')} alt="" decoding="async" />
                 <video ref={video} className="tablet-video" muted loop playsInline preload="none" poster={asset('/video/system-loop-poster.webp')} aria-hidden="true">
                   <source src={asset('/video/system-loop.webm')} type="video/webm" />
                   <source src={asset('/video/system-loop.mp4')} type="video/mp4" />

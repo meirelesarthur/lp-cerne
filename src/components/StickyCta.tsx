@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Icon, WhatsappIcon } from '../lib/icons'
 
-/** CTA fixo depois do Hero (o header só leva de volta ao topo); some quando o formulário completo ou a maquete da fazenda estão na tela. */
+/** CTA fixo depois do Hero (o header só leva de volta ao topo); some quando o Hero, o formulário completo ou a maquete da fazenda estão na tela. */
 export function StickyCta() {
   const [hide, setHide] = useState(true)
   useEffect(() => {
@@ -12,7 +12,10 @@ export function StickyCta() {
       // some também sobre a maquete da fazenda: ali o cartão do setor usa o canto inferior
       const m = document.getElementById('sistema')?.getBoundingClientRect()
       const onFarm = Boolean(m && m.top < window.innerHeight * 0.5 && m.bottom > window.innerHeight * 0.5)
-      setHide(!done || onForm || onFarm)
+      // e enquanto o Hero está na tela: o cartão do formulário do Hero usa o mesmo canto inferior
+      const h = document.querySelector('.hero-pin')?.getBoundingClientRect()
+      const onHero = Boolean(h && h.bottom > window.innerHeight * 0.6)
+      setHide(!done || onForm || onFarm || onHero)
     }
     sync()
     window.addEventListener('scroll', sync, { passive: true })

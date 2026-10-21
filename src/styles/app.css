@@ -111,7 +111,7 @@ a.btn { text-decoration: none; }
 .hero.static .hero-pin { height: auto; min-height: 100svh; }
 .hero.static .hero-copy, .hero.static .hero-form-wrap, .hero.static .hero-shade { opacity: 1; visibility: visible; }
 .hero.static .hero-hint, .hero.static .hero-mouse, .hero.static .hero-progress { display: none; }
-.hero.static .tablet-screen { visibility: visible; opacity: 1; }
+.hero.static .tablet-screen, .hero.static .tablet-video { visibility: visible; opacity: 1; }
 .hero.static .hero-content { position: relative; min-height: 100svh; }
 
 /* ===== Mobile: tablet gigante no meio, texto acima, form abaixo ===== */
