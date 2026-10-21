@@ -28,8 +28,8 @@ export default function Below() {
       <TwinSection />
       <EditionsSection />
       <PlansSection />
-      <FaqSection />
       <ContactSection />
+      <FaqSection />
     </>
   )
 }

@@ -1,13 +1,18 @@
 import { asset } from '../lib/assets'
-import { Suspense, lazy, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
-import { maskPhone, submitLead, validators, type Status } from '../lib/form'
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { whatsappHref } from '../lib/form'
+import { LeadForm } from './LeadForm'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
+import { MaskedHeading } from './fx/MaskedHeading'
+import { AccordionGallery, type GalleryItem } from './fx/AccordionGallery'
+import { FolderFloat } from './fx/FolderFloat'
+import { CardSwap, type SwapItem } from './fx/CardSwap'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
-  BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PauseIcon, PlayIcon, PlusIcon, QrCodeIcon,
-  SecurityLockIcon, Tick02Icon, WeightScale01Icon,
+  BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
+  SecurityLockIcon, ShoppingCart01Icon, Tick02Icon, WeightScale01Icon, WhatsappIcon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
@@ -82,7 +87,8 @@ export function ProblemSection() {
         // a janela do Cerne cresce do centro até a tela inteira, e as peças são absorvidas por ela
         .fromTo('.vira-frame', { clipPath: 'inset(63% 50% 37% 50% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 0.5 }, 0.2)
         .fromTo('.vira-media', { scale: 1.35 }, { scale: 1, duration: 0.5 }, 0.2)
-        .to('.vira-art .layer', { scale: 0.42, autoAlpha: 0, ease: 'power2.in', stagger: 0.03, duration: 0.14 }, 0.42)
+        // as três peças saem logo que a janela nasce (não ficam por cima do que cresce ao fundo)
+        .to('.vira-art .layer', { scale: 0.5, autoAlpha: 0, ease: 'power1.out', stagger: 0.015, duration: 0.1 }, 0.2)
         // o sistema ocupa a tela: véu escuro para o texto, título da virada e as frentes entrando uma a uma
         .fromTo('.vira-scrim', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: 'none' }, 0.5)
         .fromTo('.vira-final-head', { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.14, ease: 'power3.out' }, 0.62)
@@ -174,113 +180,50 @@ export function ProblemSection() {
 }
 
 /* ───────────────────────── 04 · Trailer ───────────────────────── */
-const CAPITULOS = [
-  { t: 0, n: 'Visão geral', d: 'Indicadores da fazenda num painel só.' },
-  { t: 3.6, n: 'Pecuária de corte', d: 'Rebanho, composição e manejos do período.' },
-  { t: 6.4, n: 'Lotação de currais', d: 'Quem está onde e o que precisa de atenção.' },
-  { t: 9.2, n: 'Custos do confinamento', d: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.' },
-  { t: 12.0, n: 'Financeiro', d: 'Receitas, despesas, atrasados e orçado × realizado.' },
+// as cinco telas que passam na pilha (a cada 3 s); imagens já usadas no resto da página
+const TELAS: SwapItem[] = [
+  { key: 'geral', title: 'Visão geral', desc: 'Indicadores da fazenda num painel só.', src: '/screens/visao-geral.webp', alt: 'Cerne Web: painel Visão geral' },
+  { key: 'pecuaria', title: 'Pecuária de corte', desc: 'Rebanho, composição e manejos do período.', src: '/screens/pecuaria.webp', alt: 'Cerne Web: painel Pecuária de corte' },
+  { key: 'lotacao', title: 'Lotação de currais', desc: 'Quem está onde e o que precisa de atenção.', src: '/screens/lotacao-currais.webp', alt: 'Cerne Web: lotação de currais' },
+  { key: 'custos', title: 'Custos do confinamento', desc: 'Custo por arroba, por animal/dia e COE, sem esperar o fechamento.', src: '/screens/custos-confinamento.webp', alt: 'Cerne Web: custos do confinamento' },
+  { key: 'financeiro', title: 'Financeiro', desc: 'Receitas, despesas, atrasados e orçado × realizado.', src: '/screens/financeiros.webp', alt: 'Cerne Web: financeiro' },
 ]
 
 export function TrailerSection() {
-  const root = useRef<HTMLElement>(null)
-  const video = useRef<HTMLVideoElement>(null)
-  const bar = useRef<HTMLElement>(null)
-  const capRef = useRef(0)
-  const userPaused = useRef(false)
   const media = useAfterFirstScroll()
-  const [cap, setCap] = useState(0)
-  const [paused, setPaused] = useState(true)
-  const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-
-  useEffect(() => {
-    const v = video.current
-    if (!v) return
-    // movimento reduzido: o vídeo só toca se a pessoa pedir; senão toca ao entrar na tela e pausa ao sair
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        if (v.preload === 'none') v.preload = 'auto'
-        if (!reduced && !userPaused.current) void v.play().catch(() => {})
-      } else v.pause()
-    }, { threshold: 0.35 })
-    io.observe(v)
-    const onTime = () => {
-      const t = v.currentTime % 15
-      let i = 0
-      CAPITULOS.forEach((c, k) => { if (t >= c.t) i = k })
-      if (i !== capRef.current) { capRef.current = i; setCap(i) }
-      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(1, v.currentTime / (v.duration || 15))})`
-    }
-    const onState = () => setPaused(v.paused)
-    v.addEventListener('timeupdate', onTime)
-    v.addEventListener('play', onState)
-    v.addEventListener('pause', onState)
-    return () => { io.disconnect(); v.removeEventListener('timeupdate', onTime); v.removeEventListener('play', onState); v.removeEventListener('pause', onState) }
-  }, [reduced])
-
-  const goTo = (i: number) => {
-    const v = video.current
-    capRef.current = i
-    setCap(i)
-    if (!v) return
-    v.currentTime = CAPITULOS[i].t + 0.05
-    userPaused.current = false
-    void v.play().catch(() => {})
-  }
-  const toggle = () => {
-    const v = video.current
-    if (!v) return
-    if (v.paused) { userPaused.current = false; void v.play().catch(() => {}) } else { userPaused.current = true; v.pause() }
-  }
 
   return (
-    <section ref={root} className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
+    <section className="sec sec-deep trailer" id="trailer" aria-labelledby="trailer-title" data-header-dark>
       <div className="wrap">
         <header className="sec-head center" data-reveal>
           <span className="eyebrow">O sistema em funcionamento</span>
           <h2 id="trailer-title">Veja o Cerne por dentro.</h2>
           <p className="sec-lead">Telas reais do Cerne Web, com dados de demonstração.</p>
         </header>
-        <div className="trailer-grid">
-          <figure className="browser" data-reveal>
-            <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>app.cerne.agr.br</span></div>
-            <video ref={video} muted loop playsInline preload="none" poster={media ? asset('/video/system-loop-poster.webp') : undefined} aria-label="Demonstração das telas do Cerne Web" aria-describedby="trailer-desc">
-              <source src={asset('/video/system-loop.webm')} type="video/webm" />
-              <source src={asset('/video/system-loop.mp4')} type="video/mp4" />
-            </video>
-            <p id="trailer-desc" className="sr-only">O vídeo percorre cinco telas do Cerne Web, nesta ordem: {CAPITULOS.map((c) => `${c.n}: ${c.d}`).join(' ')}</p>
-            <button type="button" className="video-toggle" onClick={toggle}><Icon icon={paused ? PlayIcon : PauseIcon} size={16} strokeWidth={2} />{paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}</button>
-          </figure>
-          <ol className="chapters">
-            <li className="scrub-bar" aria-hidden="true"><i ref={bar as React.RefObject<HTMLElement>} /></li>
-            {CAPITULOS.map((c, i) => (
-              <li key={c.n} data-reveal>
-                <button type="button" className={i === cap ? 'on' : ''} onClick={() => goTo(i)} aria-pressed={i === cap}>
-                  <b>{String(i + 1).padStart(2, '0')}</b>
-                  <span><strong>{c.n}</strong><small>{c.d}</small></span>
-                </button>
-              </li>
-            ))}
-          </ol>
+        <div data-reveal>
+          <CardSwap label="Telas do Cerne Web" interval={3000} items={TELAS.map((t) => ({ ...t, src: media && t.src ? asset(t.src) : undefined }))} />
         </div>
       </div>
     </section>
   )
 }
 
-/* ───────────────────────── 05 · Sistema (bento) ───────────────────────── */
-// grade de 12 colunas: telas reais em moldura de proporção fixa; frentes sem tela mostram os subitens em chips
+/* ───────────────────────── 05 · Sistema (módulos) ───────────────────────── */
+// frentes com tela real entram na galeria de painéis; as sem tela viram pastas que soltam os subitens
 type Modulo = { k: string; n: string; tag: string; t: string; d: string; feats?: string[]; img?: string; chips?: string[]; note?: string }
 const MODULOS: Modulo[] = [
   { k: 'a', n: '01', tag: 'Operação', t: 'Pecuária e confinamento', d: 'Do nascimento à venda: reprodução, pesagens, sanitário, nutrição e o mapa de confinamento com currais, dietas e batidas.', feats: ['Mapa de confinamento', 'Reprodução: IATF, FIV e monta', 'Pesagem e GMD', 'Relatórios SISBOV'], img: 'lotacao-currais' },
-  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões no mapa, planejamento de safra, apontamentos, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Balança rodoviária'], img: 'talhoes' },
+  { k: 'b', n: '02', tag: 'Operação', t: 'Agricultura', d: 'Talhões no mapa, planejamento de safra, apontamentos, romaneios e rastreabilidade.', feats: ['Safras', 'Romaneios', 'Balança rodoviária'], img: 'visao-geral' },
   { k: 'c', n: '03', tag: 'Administrativo', t: 'Suprimentos e estoque', d: 'Solicitação, cotação, aprovação, compra e recebimento, com SLA e fábrica de ração.', feats: ['Cotação via link', 'Aprovação de compras', 'Fábrica de ração'], img: 'suprimentos' },
   { k: 'd', n: '04', tag: 'Administrativo', t: 'Financeiro e ativos', d: 'Contas a pagar e receber, conciliação OFX, DRE e depreciação.', feats: ['Conciliação bancária', 'DRE', 'Orçado × realizado'], img: 'financeiros' },
-  { k: 'e', n: '05', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
-  { k: 'g', n: '06', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
-  { k: 'h', n: '07', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
-  { k: 'f', n: '08', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
+  { k: 'f', n: '05', tag: 'Gestão', t: 'Dashboards e relatórios', d: '115 relatórios em PDF e Excel e 10 painéis prontos, sem montar planilha.', feats: ['Visão geral', 'Custos do confinamento', 'Pecuária de corte', 'Financeiro', 'Pluviometria'], img: 'custos-confinamento' },
+  { k: 'e', n: '06', tag: 'Base', t: 'Cadastros', d: 'A base única que todas as frentes usam.', chips: ['Fazendas', 'Safras', 'Produtos', 'Pessoas', 'Perfis de acesso'], note: 'Cada frente lê o mesmo cadastro: um produto, uma pessoa, uma fazenda, um só lugar.' },
+  { k: 'g', n: '07', tag: 'Fiscal', t: 'Fiscal do produtor', d: 'Notas e livros emitidos de dentro da operação, prontos para o contador.', chips: ['NF-e', 'CT-e', 'MDF-e', 'DF-e e manifestação', 'LCDPR', 'Exportação Domínio'], note: 'A pesagem da balança já pode virar NF-e, sem redigitar.' },
+  { k: 'h', n: '08', tag: 'Gestão', t: 'Frota e pessoal', d: 'Máquinas, equipes e ordens de serviço no mesmo cadastro da fazenda.', chips: ['Manutenção preventiva', 'Abastecimentos', 'Ordens de serviço', 'Faltas e adiantamentos', 'Apuração mensal'], note: 'O custo da máquina e da mão de obra cai no centro de custo certo.' },
 ]
+
+const GALERIA = MODULOS.filter((m) => m.img)
+const PASTAS = MODULOS.filter((m) => !m.img)
 
 // ícones das conquistas (Hugeicons, herdam a cor do medalhão)
 const ICONES = {
@@ -340,25 +283,14 @@ export function SystemSection() {
   const farmRef = useRef<HTMLElement>(null)
   const farmNear = useNear(farmRef, '150% 0px')
   const media = useAfterFirstScroll()
-  // leve parallax das telas dentro das molduras (transform só, sem layout)
-  useLayoutEffect(() => {
-    if (!media || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('.shot img').forEach((img) => {
-        gsap.fromTo(img, { yPercent: 0 }, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } })
-      })
-    }, root)
-    return () => ctx.revert()
-  }, [media])
-
   return (
     <>
       <section ref={farmRef} className="sec sec-light farm" id="sistema" aria-labelledby="sistema-title" style={(farmNear ? { '--farm-bg': `url(${asset('/frames/sistema-bg.webp')})`, '--farm-bg-m': `url(${asset('/frames/sistema-bg-mobile.webp')})` } : undefined) as unknown as React.CSSProperties}>
         <div className="wrap farm-head">
           <header className="sec-head" data-reveal>
-            <span className="eyebrow">O sistema</span>
-            <h2 id="sistema-title">A fazenda inteira, num só cadastro.</h2>
-            <p className="sec-lead">Cada operação do campo vira um registro, e o escritório acompanha tudo no mesmo lugar. Clique em um setor para ver o que o Cerne faz ali.</p>
+            <span className="eyebrow">O Cerne da sua fazenda</span>
+            <h2 id="sistema-title">A fazenda inteira em um só lugar: o Cerne.</h2>
+            <p className="sec-lead">Tudo o que acontece da porteira ao escritório vira um registro no Cerne, e o escritório acompanha cada setor no mesmo lugar. Clique em um setor e veja o que o Cerne faz ali.</p>
           </header>
         </div>
         {farmNear ? (
@@ -368,27 +300,21 @@ export function SystemSection() {
     <section ref={root} className="sec sec-light system" id="modulos" aria-labelledby="modulos-title">
       <div className="wrap">
         <header className="sec-head" data-reveal>
-          <span className="eyebrow">Os módulos</span>
-          <h2 id="modulos-title">Oito frentes. Um só cadastro.</h2>
+          <span className="eyebrow">Os módulos do Cerne</span>
+          <h2 id="modulos-title">Oito frentes. Um só cadastro: o Cerne.</h2>
           <p className="sec-lead">Os módulos que já estão no menu do Cerne Web, da porteira ao contador.</p>
         </header>
-        <div className="bento">
-          {MODULOS.map((m) => (
-            <article key={m.k} className={`cell cell-${m.k}`} data-reveal>
-              <div className="cell-text">
-                <div className="cell-top"><span className="cell-n">{m.n}</span><span className="cell-tag">{m.tag}</span></div>
-                <h3>{m.t}</h3>
-                <p>{m.d}</p>
-                {m.feats && <ul className="feats">{m.feats.map((f) => <li key={f}>{f}</li>)}</ul>}
-              </div>
-              {m.img ? (
-                <div className="shot">{media && <img src={asset(`/screens/${m.img}.webp`)} alt="" width={m.img === 'talhoes' ? 960 : 1280} height={m.img === 'talhoes' ? 720 : 800} loading="lazy" decoding="async" />}</div>
-              ) : (
-                <div className="base">
-                  <ul className="chips">{m.chips!.map((c) => <li key={c}>{c}</li>)}</ul>
-                  {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
-                </div>
-              )}
+        <div data-reveal>
+          <AccordionGallery label="Módulos com tela" items={GALERIA.map((m): GalleryItem => ({ key: m.k, n: m.n, tag: m.tag, title: m.t, desc: m.d, feats: m.feats, src: media ? asset(`/screens/${m.img}.webp`) : undefined }))} />
+        </div>
+        <div className="folders">
+          {PASTAS.map((m) => (
+            <article key={m.k} className="cell folder" data-reveal>
+              <div className="cell-top"><span className="cell-n">{m.n}</span><span className="cell-tag">{m.tag}</span></div>
+              <h3>{m.t}</h3>
+              <p>{m.d}</p>
+              <FolderFloat items={m.chips!} />
+              {m.note && <p className="base-note"><i aria-hidden="true" />{m.note}</p>}
             </article>
           ))}
         </div>
@@ -402,37 +328,38 @@ export function SystemSection() {
   )
 }
 
-/* ───────────────────────── 06 · Edições ───────────────────────── */
+/* ───────────────────────── 06 · Edições (Web + app Administração + app Operação) ───────────────────────── */
+// vem junto com a contratação: o Cerne Web no escritório e os dois apps para separar as responsabilidades no dia a dia
 export function EditionsSection() {
   const media = useAfterFirstScroll()
   return (
     <section className="sec sec-light editions" id="edicoes" aria-labelledby="edicoes-title">
       <div className="wrap">
         <header className="sec-head" data-reveal>
-          <span className="eyebrow">Como usar</span>
-          <h2 id="edicoes-title">Um sistema. Três formas de usar.</h2>
+          <span className="eyebrow">Tudo isso vem com o Cerne</span>
+          <h2 id="edicoes-title">Você contrata um sistema e leva para casa um ecossistema inteiro.</h2>
+          <p className="sec-lead">O Cerne Web para o escritório, o app Administração para quem decide e o app Operação para quem executa. Cada pessoa da fazenda com a ferramenta certa na mão, todo mundo no mesmo dado, e os problemas do dia a dia resolvidos de uma vez.</p>
         </header>
         <div className="editions-grid">
           <article className="edition web" data-reveal>
+            <span className="who">No escritório</span>
             <h3>Cerne Web</h3>
-            <p>Disponível hoje no navegador: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Instalável como app.</p>
+            <p>O centro de comando da fazenda: 11 módulos, 115 relatórios, fiscal e financeiro integrados. Custo e margem de cada lote na hora, sem planilha paralela.</p>
             {media && <img src={asset('/screens/visao-geral.webp')} alt="Cerne Web: painel Visão Geral" width={1280} height={800} loading="lazy" decoding="async" />}
-            <a className="btn btn-primary" href="#contato" data-interest="demonstracao">Agendar demonstração</a>
           </article>
           <article className="edition app" data-reveal>
+            <span className="who">Para quem decide</span>
             <h3>Cerne Administração</h3>
-            <p>Para gestores e escritório: resultado, rebanho e ordens de serviço.</p>
+            <p>Resultado, rebanho e ordens de serviço na palma da mão. O gestor acompanha a fazenda inteira de onde estiver, sem ligar para ninguém.</p>
             <div className="phone">{media && <img src={asset('/screens/app-administracao.webp')} alt="App Administração: visão geral de rebanho e confinamento" width={585} height={1266} loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-administracao">Entrar na lista de testes</a>
           </article>
           <article className="edition app" data-reveal>
+            <span className="who">Para quem executa</span>
             <h3>Cerne Operação</h3>
-            <p>Para o campo: minhas ordens, trato, cocho, pesagem e sanitário.</p>
+            <p>Minhas ordens, trato, cocho, pesagem e sanitário registrados na hora, do curral ou da lavoura. O campo anota uma vez e o escritório já enxerga.</p>
             <div className="phone">{media && <img src={asset('/screens/app-operacao.webp')} alt="App Operação: ordem de serviço de vacinação do Lote 12" width={585} height={1266} loading="lazy" decoding="async" />}</div>
-            <a className="btn btn-ghost" href="#contato" data-interest="app-operacao">Entrar na lista de testes</a>
           </article>
         </div>
-        <p className="fineprint" data-reveal>Os apps estão em desenvolvimento; funcionalidades e prazos podem mudar. <Tbd>texto a validar</Tbd></p>
       </div>
     </section>
   )
@@ -565,6 +492,7 @@ export function ProfilesSection() {
 const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas']
 
 export function TwinSection() {
+  const wa = whatsappHref('Olá! Quero conhecer o GB Twin.')
   return (
     <section className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
       <div className="twin-bg" aria-hidden="true">
@@ -574,18 +502,12 @@ export function TwinSection() {
         <div className="twin-spacer" aria-hidden="true" />
         <div className="twin-copy">
           <span className="eyebrow">GB Twin</span>
-          <h2 id="twin-title">Cada pé da lavoura, contado do alto.</h2>
+          <MaskedHeading id="twin-title" text="Cada pé da lavoura, contado do alto." />
           <p className="twin-lead">O drone sobrevoa o pivô e o GB Twin conta os pés no ortomosaico, confere por amostra e emite o laudo. Você vê a falha onde ela está, não na média.</p>
           <ul className="twin-list">
             {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
           </ul>
-          <dl className="twin-stats">
-            <div><dt>Copas</dt><dd>120.855</dd></div>
-            <div><dt>Estande</dt><dd>3.568<small>/ha</small></dd></div>
-            <div><dt>Aproveitamento</dt><dd>86%</dd></div>
-          </dl>
-          <p className="twin-note">Pivô 02, dados de demonstração. <Tbd>disponibilidade a validar</Tbd></p>
-          <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
+          <a className="btn btn-light" href={wa} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar sobre o GB Twin</a>
         </div>
       </div>
     </section>
@@ -600,115 +522,17 @@ const CONFIANCA: Conquista[] = [
   { t: 'Seu contador conectado', d: 'Exportação para o Domínio: bancário, folha, pagar e receber.', i: 'contador' },
 ]
 /* ───────────────────────── 09 · Form completo ───────────────────────── */
-type CErr = Partial<Record<'name' | 'email' | 'whatsapp' | 'consent', string>>
-
 export function ContactSection() {
-  const uid = useId()
-  const [v, setV] = useState({ name: '', email: '', whatsapp: '', size: '', interest: '', consent: false })
-  const [errors, setErrors] = useState<CErr>({})
-  const [status, setStatus] = useState<Status>('idle')
-
-  // os CTAs "Agendar demonstração" / "Quero testar" pré-selecionam o interesse
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement).closest('[data-interest]') as HTMLElement | null
-      if (a) setV((s) => ({ ...s, interest: a.dataset.interest ?? '' }))
-    }
-    document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
-  }, [])
-
-  const check = (k: keyof CErr) => {
-    const msg = k === 'consent' ? validators.consent(v.consent) : validators[k](v[k])
-    setErrors((e) => ({ ...e, [k]: msg }))
-    return !msg
-  }
-  const set = (k: keyof typeof v, val: string | boolean) => setV((s) => ({ ...s, [k]: val }))
-
-  const onSubmit = async (ev: FormEvent, intent: 'lista' | 'demonstracao') => {
-    ev.preventDefault()
-    const results = [check('name'), check('email'), check('whatsapp'), check('consent')]
-    if (!results.every(Boolean)) {
-      document.getElementById([`${uid}-name`, `${uid}-email`, `${uid}-whatsapp`, `${uid}-consent`][results.indexOf(false)])?.focus()
-      return
-    }
-    setStatus('loading')
-    try {
-      await submitLead({ origem: 'form-completo', intencao: intent, nome: v.name.trim(), email: v.email.trim(), whatsapp: v.whatsapp, tamanho: v.size, interesse: v.interest, consent: v.consent })
-      setStatus('success')
-    } catch {
-      setStatus('error')
-    }
-  }
-
-  const field = (k: 'name' | 'email' | 'whatsapp', label: string, props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="field" data-invalid={Boolean(errors[k])}>
-      <label htmlFor={`${uid}-${k}`}>{label}</label>
-      <input id={`${uid}-${k}`} {...props} value={v[k]} onBlur={() => check(k)}
-        onChange={(e) => set(k, k === 'whatsapp' ? maskPhone(e.target.value) : e.target.value)}
-        aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `${uid}-${k}-e` : undefined} />
-      {errors[k] && <span className="err" id={`${uid}-${k}-e`}>{errors[k]}</span>}
-    </div>
-  )
-
   return (
     <section className="sec sec-light contact" id="contato" aria-labelledby="contato-title">
       <div className="wrap contact-grid">
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Acesso antecipado</span>
-          <h2 id="contato-title">Esteja entre os primeiros a usar o Cerne.</h2>
-          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e agende uma demonstração com a nossa equipe.</p>
-          <button type="button" className="btn btn-ghost whats" disabled>Falar agora no WhatsApp <Tbd>número a definir</Tbd></button>
+          <MaskedHeading id="contato-title" text="Esteja entre os primeiros a usar o Cerne." />
+          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e fale com a nossa equipe.</p>
+          <a className="btn btn-ghost whats" href={whatsappHref('Olá! Quero saber mais sobre o Cerne.')} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar agora no WhatsApp</a>
         </header>
-
-        {status === 'success' ? (
-          <div className="form big" role="status" data-reveal>
-            <h3>Pronto, seu acesso está reservado.</h3>
-            <p className="sub show">Você será avisado na primeira hora do lançamento, pelo e-mail ou WhatsApp informado.</p>
-          </div>
-        ) : (
-          <form className="form big" noValidate onSubmit={(e) => onSubmit(e, 'lista')} data-reveal>
-            {field('name', 'Nome', { autoComplete: 'name', placeholder: 'Seu nome' })}
-            <div className="row2">
-              {field('email', 'E-mail', { type: 'email', autoComplete: 'email', inputMode: 'email', placeholder: 'voce@suafazenda.com.br' })}
-              {field('whatsapp', 'WhatsApp', { type: 'tel', autoComplete: 'tel-national', inputMode: 'tel', placeholder: '(00) 00000-0000' })}
-            </div>
-            <div className="row2">
-              <div className="field">
-                <label htmlFor={`${uid}-size`}>Tamanho da operação</label>
-                <select id={`${uid}-size`} value={v.size} onChange={(e) => set('size', e.target.value)}>
-                  <option value="">Selecione</option>
-                  <option value="ate-1000">Até 1.000 cabeças</option>
-                  <option value="1000-5000">1.000 a 5.000 cabeças</option>
-                  <option value="acima-5000">Acima de 5.000 cabeças</option>
-                  <option value="agricultura-outro">Agricultura / outro</option>
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor={`${uid}-interest`}>Interesse</label>
-                <select id={`${uid}-interest`} value={v.interest} onChange={(e) => set('interest', e.target.value)}>
-                  <option value="">Selecione</option>
-                  <option value="web">Cerne Web</option>
-                  <option value="app-administracao">App Administração</option>
-                  <option value="app-operacao">App Operação</option>
-                  <option value="demonstracao">Demonstração</option>
-                  <option value="gb-twin">GB Twin</option>
-                  <option value="todos">Todos</option>
-                </select>
-              </div>
-            </div>
-            <label className="consent">
-              <input id={`${uid}-consent`} type="checkbox" checked={v.consent} onChange={(e) => { set('consent', e.target.checked); setErrors((x) => ({ ...x, consent: validators.consent(e.target.checked) })) }} aria-invalid={Boolean(errors.consent)} aria-describedby={errors.consent ? `${uid}-consent-e` : undefined} />
-              <span>Concordo em receber contato da GB Agritech, conforme a Política de Privacidade (LGPD).</span>
-            </label>
-            {errors.consent && <span className="err err-consent" id={`${uid}-consent-e`}>{errors.consent}</span>}
-            <div className="actions">
-              <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : 'Quero acesso antecipado'}</button>
-              <button className="btn btn-ghost" type="button" disabled={status === 'loading'} onClick={(e) => onSubmit(e, 'demonstracao')}>Agendar demonstração</button>
-            </div>
-            {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
-          </form>
-        )}
+        <div data-reveal><LeadForm variant="page" /></div>
       </div>
     </section>
   )
@@ -732,34 +556,33 @@ const FAQ = [
   { q: 'E frota, equipe e ordens de serviço?', a: 'Estão no mesmo cadastro: manutenção preventiva, abastecimento e transferência de máquinas; faltas, adiantamentos e apuração mensal da equipe; e ordens de serviço com monitoramento e avaliação.' },
   { q: 'Consigo começar com os dados que já tenho?', a: 'Sim. Dá para lançar saldos iniciais e importar extratos OFX e planilhas, como orçamento e correção de estoque.' },
   { q: 'Funciona no celular?', a: 'O Cerne Web roda no navegador e pode ser instalado como app. Os apps de campo e de gestão estão em teste.' },
-  { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado ou agende uma demonstração com a nossa equipe.', tbd: true },
+  { q: 'Como funciona o teste?', a: 'Garanta o acesso antecipado e a nossa equipe entra em contato.', tbd: true },
   { q: 'Quanto custa?', a: 'Os valores dependem do tamanho da operação. Fale com a nossa equipe.', tbd: true },
 ]
 
-// perguntas agrupadas por tema (as respostas ficam em FAQ acima); as três primeiras abrem sozinhas
+// perguntas agrupadas por tema (as respostas ficam em FAQ acima); todas começam fechadas, para poupar espaço
 const FAQ_GRUPOS = [
   { t: 'Produto', qs: ['O Cerne já está disponível?', 'Serve para a minha operação?', 'Funciona no celular?', 'Quais relatórios já vêm prontos?', 'Mostra o custo e a margem de cada lote?'] },
   { t: 'Fiscal e financeiro', qs: ['O Cerne emite nota fiscal?', 'Meu contador usa o Domínio. Integra?', 'Concilia o extrato do banco?'] },
   { t: 'Operação da fazenda', qs: ['Controla compras e estoque?', 'Tem integração com balança?', 'Cobre reprodução e sanitário?', 'Dá para rastrear o produto até o comprador?', 'E frota, equipe e ordens de serviço?'] },
   { t: 'Controle e contratação', qs: ['Tenho mais de uma fazenda ou CNPJ. Funciona?', 'Consigo controlar quem faz o quê?', 'Consigo começar com os dados que já tenho?', 'Como funciona o teste?', 'Quanto custa?'] },
 ]
-const FAQ_ABERTAS = new Set(['O Cerne já está disponível?', 'Serve para a minha operação?', 'O Cerne emite nota fiscal?'])
 
 /* ───────────────────────── Planos (comparativo sem preço) ───────────────────────── */
-// célula por plano [Pro, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
+// célula por plano [Professional, Deluxe, Enterprise]: 'i' incluído · 'o' opcional (contratado à parte) · 'n' não incluso · texto
 type PlCel = 'i' | 'o' | 'n' | string
 type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
 const PLANOS = [
-  { k: 'pro', t: 'Pro', d: 'Gestão essencial', u: ['1 atividade', '3 usuários'] },
-  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['2 atividades', '5 usuários'] },
-  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['todas as atividades', '10 usuários'] },
+  { k: 'pro', t: 'Professional', d: 'Gestão essencial', u: ['Uma escolha', '3 usuários'] },
+  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['Duas escolhas', '5 usuários'] },
+  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['Todas', '10 usuários'] },
 ]
 const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
   { g: 'Base de todos os planos', mods: [
     { m: 'Financeiro e fiscal', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber, caixa e bancos', 'Emissão de NF-e, XML e LCDPR', 'Regras fiscais e acesso do contador'] },
     { m: 'Estoque, frota e bens', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e, baixas e transferências', 'Saldo por armazém', 'Manutenções, abastecimentos e inventário de bens'] },
     { m: 'Cadastros, relatórios e painéis', p: ['i', 'i', 'i'], f: ['Fazendas, safras, produtos e pessoas', 'Relatórios em PDF e Excel', 'Painéis de acompanhamento e pluviometria'] },
-    { m: 'Atividades', p: ['1 à escolha', '2 à escolha', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
+    { m: 'Atividades', p: ['Uma escolha', 'Duas escolhas', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
   ] },
   { g: 'Gestão e custos', mods: [
     { m: 'Gestão gerencial e contabilidade', p: ['n', 'i', 'i'], f: ['DRE e previsto × realizado', 'Centro de custo, rateios e contratos', 'Depreciação, partida dobrada e plano de contas'] },
@@ -780,7 +603,7 @@ const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
 const ZEBRA = new Map(COMPARATIVO.flatMap((g) => g.mods).map((x, i) => [x.m, i % 2]))
 const CelPlano = ({ c }: { c: PlCel }) =>
   c === 'i' ? <span className="pl-yes"><Icon icon={Tick02Icon} size={14} strokeWidth={2.6} /><span className="sr-only">Incluído</span></span>
-  : c === 'o' ? <span className="pl-opt">Opcional</span>
+  : c === 'o' ? <span className="pl-opt"><Icon icon={ShoppingCart01Icon} size={14} strokeWidth={2.2} />Adicional</span>
   : c === 'n' ? <span className="pl-no" aria-label="Não incluso">—</span>
   : <span className="pl-txt">{c}</span>
 
@@ -846,10 +669,6 @@ export function PlansSection() {
                 <th className="pl-fix" scope="row">Módulos incluídos<small>os demais são contratados à parte ou vêm no plano de cima</small></th>
                 {inclusos.map((n, k) => <td key={k}><span className="pl-txt">{n} de {total}</span></td>)}
               </tr>
-              <tr className="pl-cta">
-                <th className="pl-fix" scope="row" />
-                {PLANOS.map((p) => <td key={p.k}><a className="btn btn-ghost" href="#contato" data-interest="demonstracao">Falar sobre o {p.t}</a></td>)}
-              </tr>
               <tr className="pl-keyrow">
                 <td colSpan={4}>
                   <div className="pl-legend">
@@ -883,7 +702,7 @@ export function FaqSection() {
               {g.qs.map((q) => {
                 const f = FAQ.find((x) => x.q === q)!
                 return (
-                  <details key={f.q} data-reveal open={FAQ_ABERTAS.has(f.q) || undefined}>
+                  <details key={f.q} data-reveal>
                     <summary>{f.q}<Icon icon={PlusIcon} size={22} className="faq-plus" /></summary>
                     <p>{f.a} {f.tbd && <Tbd />}</p>
                   </details>
@@ -911,7 +730,6 @@ export function Footer() {
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
-          <a href="#contato">Política de Privacidade <Tbd>link</Tbd></a>
         </div>
       </div>
     </footer>

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, scrollToY, shouldSkipScrub, startSmoothScroll } from '../lib/scroll'
 import { coverBox, finalZoom, prefersHd, supportsAvif, type Box, type Manifest, type Zoom } from '../lib/stage'
 import { ArrowDown01Icon, Icon, Mouse01Icon } from '../lib/icons'
-import { HeroForm } from './HeroForm'
+import { LeadForm } from './LeadForm'
 import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 
 const EMAIL_ID = 'hero-email'
@@ -212,8 +212,8 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
           <div className="hero-intro">
             <div className="hero-intro-copy">
               <span className="hero-eyebrow">ERP para pecuária e lavoura</span>
-              <h1>Sua fazenda, do campo ao financeiro, <em>num só sistema.</em></h1>
-              <p className="lead">Rebanho, lavoura, estoque, fiscal e financeiro no mesmo lugar. Veja o custo e a margem de cada lote sem esperar o fechamento do mês.</p>
+              <h1>O Cerne da sua <em>operação.</em></h1>
+              <p className="lead">O Cerne reúne rebanho, lavoura, estoque, fiscal e financeiro num só lugar: o centro de tudo o que acontece na sua fazenda, com o custo e a margem de cada lote sem esperar o fechamento do mês.</p>
               <button type="button" className="btn btn-primary" onClick={focusHeroForm}>Quero acesso antecipado</button>
               <p className="hero-intro-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
             </div>
@@ -227,7 +227,7 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
             <p className="hero-proof">115 relatórios · 10 painéis · NF-e, MDF-e e LCDPR</p>
           </div>
           <div className="hero-form-wrap">
-            <HeroForm emailId={EMAIL_ID} />
+            <LeadForm variant="hero" emailId={EMAIL_ID} />
           </div>
         </div>
 
