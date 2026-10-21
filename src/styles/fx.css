@@ -78,11 +78,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .acg-p, .acg-cap, .acg-shot img, .acg-strip { transition: none; }
-  /* sem animação: as notas ficam sempre à mostra, numa lista comum */
+  /* sem animação: as notas ficam sempre à mostra, numa lista comum. Os seletores repetem .is-open e :hover para
+     vencer as regras de abertura (senão, com a pasta "aberta", as notas ficavam deslocadas e sobre o título) */
   .ff { height: auto; }
-  .ff-folder { display: none; }
-  .ff-notes { position: static; display: flex; flex-wrap: wrap; gap: 8px; }
-  .ff-notes li { position: static; opacity: 1; transform: none; transition: none; box-shadow: none; }
+  .ff .ff-folder { display: none; }
+  .ff .ff-notes { position: static; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ff .ff-notes li, .ff.is-open .ff-notes li, .ff:hover .ff-notes li { position: static; opacity: 1; transform: none; transition: none; box-shadow: none; }
 }
 
 /* ── Card Swap (Trailer): telas empilhadas em 3D, centralizadas, trocando a cada 3 s ── */

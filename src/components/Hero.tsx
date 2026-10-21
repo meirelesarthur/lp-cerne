@@ -84,6 +84,21 @@ export function Hero({ onGeometry }: { onGeometry?: (g: HeroGeometry) => void })
     return () => mq.removeEventListener('change', on)
   }, [])
 
+  // modo estático (movimento reduzido, economia de dados): não há timeline que marque o fim do Hero, então o atributo que
+  // liga o vidro do cabeçalho e o CTA fixo é ligado aqui, quando o Hero já saiu da tela
+  useEffect(() => {
+    if (!isStatic) return
+    const html = document.documentElement
+    const sync = () => {
+      const r = root.current?.getBoundingClientRect()
+      html.toggleAttribute('data-hero-done', Boolean(r && r.bottom < HEADER_H))
+    }
+    sync()
+    window.addEventListener('scroll', sync, { passive: true })
+    window.addEventListener('resize', sync)
+    return () => { window.removeEventListener('scroll', sync); window.removeEventListener('resize', sync); html.removeAttribute('data-hero-done') }
+  }, [isStatic])
+
   useEffect(() => {
     if (stageReady) return
     return onFirstInteraction(() => setStageReady(true), 9000)
