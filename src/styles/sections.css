@@ -489,3 +489,13 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 
 /* cabeçalhos dos planos com o bloco de texto centralizado na vertical (antes ficava rente à base) */
 .pl-table thead th.pl-head { vertical-align: middle; padding-block: 22px; }
+
+/* ===== Política de Privacidade (rota /privacidade) ===== */
+.privacy { min-height: calc(100svh - 170px); width: min(720px, calc(100% - 2 * var(--gutter))); margin: 0 auto; padding: clamp(104px, 14vh, 140px) 0 clamp(56px, 9vh, 96px); }
+.privacy h1 { margin: 0 0 6px; font-size: clamp(30px, 5vw, 44px); line-height: 1.08; font-weight: 600; letter-spacing: -.022em; }
+.privacy-upd { margin: 0 0 28px; font-size: 14px; color: var(--muted); }
+.privacy h2 { margin: 30px 0 6px; font-size: 19px; font-weight: 600; }
+.privacy p, .privacy li { margin: 0 0 10px; font-size: 16px; line-height: 1.6; color: var(--text-soft); }
+.privacy ul { margin: 0 0 10px; padding-left: 22px; }
+.privacy a { color: var(--accent-hover); }
+.privacy-back { display: inline-block; margin-top: 30px; font-weight: 600; }

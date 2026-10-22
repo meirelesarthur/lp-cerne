@@ -5,8 +5,8 @@ type Errors = Partial<Record<'name' | 'email' | 'whatsapp', string>>
 type Values = { name: string; email: string; whatsapp: string; interest: string }
 
 const CTA = 'Quero acesso antecipado'
-/** Página da Política de Privacidade (public/privacidade.html). VITE_PRIVACY_URL troca o endereço, se preciso. */
-const PRIVACY_URL = (import.meta.env.VITE_PRIVACY_URL as string | undefined) || '/privacidade.html'
+/** Página da Política de Privacidade (página PrivacyApp, rota /privacidade). VITE_PRIVACY_URL troca o endereço, se preciso. */
+const PRIVACY_URL = (import.meta.env.VITE_PRIVACY_URL as string | undefined) || '/privacidade'
 /** Texto de ciência exibido sob o botão: é registrado junto do lead (prova do que a pessoa viu ao clicar). */
 const CONSENT_TEXT = `Ao clicar em "${CTA}", declaro que li e concordo com a Política de Privacidade e autorizo a GB Agritech a entrar em contato por WhatsApp (e por e-mail, se informado) sobre o Cerne.`
 

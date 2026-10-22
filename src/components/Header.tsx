@@ -1,15 +1,17 @@
 import { focusHeroForm } from './Hero'
 
-export function Header() {
+export function Header({ home = false }: { home?: boolean }) {
   return (
     <header className="header">
       <a href="/" aria-label="Cerne, página inicial">
         <img className="logo-on-glass" src="/logo.svg" alt="Cerne" height={28} />
         <img className="logo-on-scene" src="/logo-white.svg" alt="" aria-hidden="true" height={28} />
       </a>
-      <button type="button" className="btn btn-primary" onClick={focusHeroForm}>
+      {home
+        ? <a className="btn btn-primary" href="/#contato">Quero acesso antecipado</a>
+        : <button type="button" className="btn btn-primary" onClick={focusHeroForm}>
         Quero acesso antecipado
-      </button>
+      </button>}
     </header>
   )
 }

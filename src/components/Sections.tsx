@@ -717,7 +717,8 @@ export function FaqSection() {
 }
 
 /* ───────────────────────── Rodapé ───────────────────────── */
-export function Footer() {
+/** `base` = "/" fora da home (as âncoras viram /#sistema etc.). */
+export function Footer({ base = '' }: { base?: string }) {
   return (
     <footer className="footer" data-header-dark>
       <div className="wrap footer-inner">
@@ -726,11 +727,11 @@ export function Footer() {
           <p>uma solução GB Agritech</p>
         </div>
         <nav aria-label="Rodapé">
-          <a href="#sistema">Sistema</a><a href="#edicoes">Edições</a><a href="#perfis">Perfis</a><a href="#planos">Planos</a><a href="#duvidas">Dúvidas</a><a href="#contato">Contato</a>
+          <a href={`${base}#sistema`}>Sistema</a><a href={`${base}#edicoes`}>Edições</a><a href={`${base}#perfis`}>Perfis</a><a href={`${base}#planos`}>Planos</a><a href={`${base}#duvidas`}>Dúvidas</a><a href={`${base}#contato`}>Contato</a>
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
-          <a href="/privacidade.html">Política de Privacidade</a>
+          <a href="/privacidade">Política de Privacidade</a>
         </div>
       </div>
     </footer>
