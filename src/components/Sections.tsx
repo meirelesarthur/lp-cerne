@@ -1,6 +1,5 @@
 import { asset } from '../lib/assets'
 import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { whatsappHref } from '../lib/form'
 import { LeadForm } from './LeadForm'
 import { gsap } from '../lib/scroll'
 import { useAfterFirstScroll, useNear } from '../lib/defer'
@@ -12,7 +11,7 @@ import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
   BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
-  SecurityLockIcon, ShoppingCart01Icon, SmartPhone01Icon, GlobeIcon, Tick02Icon, WeightScale01Icon, WhatsappIcon,
+  SecurityLockIcon, ShoppingCart01Icon, SmartPhone01Icon, ComputerIcon, Tick02Icon, WeightScale01Icon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
@@ -493,7 +492,6 @@ export function ProfilesSection() {
 const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas', 'Reconstrução 3D da plantação', 'Pronto para realidade virtual', 'Previsibilidade de safra', 'Até 98,5% de confiabilidade']
 
 export function TwinSection() {
-  const wa = whatsappHref('Olá! Quero conhecer o GB Twin.')
   return (
     <section className="twin" id="twin" aria-labelledby="twin-title" data-header-dark>
       <div className="twin-bg" aria-hidden="true">
@@ -508,7 +506,7 @@ export function TwinSection() {
           <ul className="twin-list">
             {TWIN_ITENS.map((t) => <li key={t}>{t}</li>)}
           </ul>
-          <a className="btn btn-light" href={wa} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar sobre o GB Twin</a>
+          <a className="btn btn-light" href="#contato" data-interest="gb-twin">Quero conhecer o GB Twin</a>
         </div>
       </div>
     </section>
@@ -530,8 +528,7 @@ export function ContactSection() {
         <header className="sec-head" data-reveal>
           <span className="eyebrow">Acesso antecipado</span>
           <MaskedHeading id="contato-title" text="Esteja entre os primeiros a usar o Cerne." />
-          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e fale com a nossa equipe.</p>
-          <a className="btn btn-ghost whats" href={whatsappHref('Olá! Quero saber mais sobre o Cerne.')} target="_blank" rel="noreferrer"><Icon icon={WhatsappIcon} size={20} strokeWidth={1.8} />Falar agora no WhatsApp</a>
+          <p className="sec-lead">Receba acesso na primeira hora do lançamento, acompanhe os apps e a nossa equipe entra em contato.</p>
         </header>
         <div data-reveal><LeadForm variant="page" /></div>
       </div>
@@ -638,7 +635,7 @@ export function PlansSection() {
                 {PLANOS.map((p) => (
                   <th key={p.k} className={`pl-head ${p.k}`} scope="col">
                     <b>{p.t}</b><span>{p.d}</span>
-                    <em className="pl-plat" aria-label="Inclui Cerne Web e dois apps"><Icon icon={GlobeIcon} size={14} strokeWidth={2} />Web<Icon icon={PlusIcon} size={12} strokeWidth={2.6} /><Icon icon={SmartPhone01Icon} size={14} strokeWidth={2} />2 apps</em>
+                    <em className="pl-plat" aria-label="Inclui Cerne Web e dois apps"><Icon icon={ComputerIcon} size={14} strokeWidth={2} />Web<Icon icon={PlusIcon} size={12} strokeWidth={2.6} /><Icon icon={SmartPhone01Icon} size={14} strokeWidth={2} />2 apps</em>
                   </th>
                 ))}
               </tr>

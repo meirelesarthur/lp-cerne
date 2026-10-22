@@ -45,10 +45,3 @@ export async function submitLead(payload: Record<string, unknown>) {
   await new Promise((r) => setTimeout(r, 900))
   console.info('[Cerne LP] lead (mock, não enviado):', body)
 }
-
-/** WhatsApp comercial (DDI+DDD+número, só dígitos). VITE_WHATSAPP sobrescreve, se preciso trocar sem mexer no código. */
-export const WHATSAPP = String(import.meta.env.VITE_WHATSAPP || '5527999745731').replace(/\D/g, '')
-
-export function whatsappHref(text: string) {
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`
-}
