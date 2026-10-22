@@ -486,3 +486,6 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
 /* "Web + 2 apps" no topo de cada plano: todos os planos levam o Cerne Web e os dois apps */
 .pl-head em.pl-plat { display: inline-flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
 .pl-head em.pl-plat svg { flex: none; }
+
+/* cabeçalhos dos planos com o bloco de texto centralizado na vertical (antes ficava rente à base) */
+.pl-table thead th.pl-head { vertical-align: middle; padding-block: 22px; }
