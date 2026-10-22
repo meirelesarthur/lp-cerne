@@ -12,7 +12,7 @@ import { ScrubCanvas, type ScrubHandle } from './ScrubCanvas'
 import { prefersHd, supportsAvif } from '../lib/stage'
 import {
   BarnsIcon, Invoice01Icon, TractorIcon, WarehouseIcon, ArrowRight01Icon, Building02Icon, Calculator01Icon, Chart01Icon, Chat01Icon, HistoryIcon, Icon, PlusIcon, QrCodeIcon,
-  SecurityLockIcon, ShoppingCart01Icon, Tick02Icon, WeightScale01Icon, WhatsappIcon,
+  SecurityLockIcon, ShoppingCart01Icon, SmartPhone01Icon, GlobeIcon, Tick02Icon, WeightScale01Icon, WhatsappIcon,
 } from '../lib/icons'
 
 // a maquete (arte de ~450 KB) só baixa quando a seção chega perto da tela
@@ -574,23 +574,25 @@ const FAQ_GRUPOS = [
 type PlCel = 'i' | 'o' | 'n' | string
 type PlModulo = { m: string; p: [PlCel, PlCel, PlCel]; f: string[] }
 const PLANOS = [
-  { k: 'pro', t: 'Professional', d: 'Gestão essencial', u: ['Uma escolha', '3 usuários'] },
-  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos', u: ['Duas escolhas', '5 usuários'] },
-  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa', u: ['Todas', '10 usuários'] },
+  { k: 'pro', t: 'Professional', d: 'Gestão essencial' },
+  { k: 'dlx', t: 'Deluxe', d: 'Gestão gerencial e de custos' },
+  { k: 'ent', t: 'Enterprise', d: 'Operação corporativa' },
 ]
 const COMPARATIVO: { g: string; mods: PlModulo[] }[] = [
   { g: 'Base de todos os planos', mods: [
-    { m: 'Financeiro e fiscal', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber, caixa e bancos', 'Emissão de NF-e, XML e LCDPR', 'Regras fiscais e acesso do contador'] },
+    { m: 'Cerne Web e os dois apps', p: ['i', 'i', 'i'], f: ['Cerne Web no navegador, instalável como app', 'App Administração: gestor e escritório', 'App Operação: campo'] },
+    { m: 'Fiscal completo', p: ['i', 'i', 'i'], f: ['Emissão de NF-e, CT-e e MDF-e', 'Consulta e manifestação de DF-e e NFS-e recebidas', 'XML, LCDPR, regras fiscais e acesso do contador'] },
+    { m: 'Financeiro', p: ['i', 'i', 'i'], f: ['Contas a pagar e a receber', 'Caixa e bancos', 'Fluxo bancário'] },
     { m: 'Estoque, frota e bens', p: ['i', 'i', 'i'], f: ['Entrada por NF-e e DF-e, baixas e transferências', 'Saldo por armazém', 'Manutenções, abastecimentos e inventário de bens'] },
     { m: 'Cadastros, relatórios e painéis', p: ['i', 'i', 'i'], f: ['Fazendas, safras, produtos e pessoas', 'Relatórios em PDF e Excel', 'Painéis de acompanhamento e pluviometria'] },
-    { m: 'Atividades', p: ['Uma escolha', 'Duas escolhas', 'Todas'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: apontamentos e romaneios', 'Fruticultura: pomar'] },
+    { m: 'Pecuária e agricultura', p: ['i', 'i', 'i'], f: ['Pecuária: rebanho, manejo e movimentações', 'Agricultura: safras, apontamentos e romaneios'] },
   ] },
   { g: 'Gestão e custos', mods: [
     { m: 'Gestão gerencial e contabilidade', p: ['n', 'i', 'i'], f: ['DRE e previsto × realizado', 'Centro de custo, rateios e contratos', 'Depreciação, partida dobrada e plano de contas'] },
-    { m: 'Conciliação, CT-e/MDF-e e Domínio', p: ['o', 'i', 'i'], f: ['Importação de OFX e conciliação por mês', 'Emissão e manifestação de CT-e, emissão de MDF-e', 'Exportação para o Domínio, NFS-e e CSV'] },
+    { m: 'Conciliação bancária e Domínio', p: ['o', 'i', 'i'], f: ['Importação de OFX e conciliação por mês', 'Exportação para o Domínio, NFS-e e CSV'] },
     { m: 'Planejamento e orçamento', p: ['o', 'i', 'i'], f: ['Planejamento agrícola e pecuário', 'Previsão orçamentária'] },
     { m: 'Pecuária avançada', p: ['o', 'i', 'i'], f: ['Reprodução: estação de monta, protocolos, genealogia', 'Confinamento: dietas, batidas, pátios e currais', 'Fábrica de ração: formulação e custo'] },
-    { m: 'Balança, grãos e frutas', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária, descontos e classificação', 'Contratos de venda de grãos', 'Carregamento de frutas e fechamento semanal'] },
+    { m: 'Balança e contratos de grãos', p: ['o', 'i', 'i'], f: ['Pesagem rodoviária, descontos e classificação', 'Contratos de venda de grãos', 'Carregamento e fechamento semanal'] },
   ] },
   { g: 'Operação corporativa', mods: [
     { m: 'Compras', p: ['o', 'o', 'i'], f: ['Solicitação e cotação com fornecedores', 'Autorização por alçada', 'Compra, recebimento, SLA e savings'] },
@@ -630,13 +632,13 @@ export function PlansSection() {
             <thead>
               <tr>
                 <th className="pl-fix pl-title" scope="col">
-                  <h2 id="planos-title">Compare os planos, módulo a módulo</h2>
-                  <p>Comece pelo essencial e some módulos quando a operação pedir.</p>
+                  <h2 id="planos-title">Conheça o que vem em cada plano</h2>
+                  <p>Todos os planos levam o Cerne Web e os dois apps. O que muda é o conjunto de funcionalidades.</p>
                 </th>
                 {PLANOS.map((p) => (
                   <th key={p.k} className={`pl-head ${p.k}`} scope="col">
                     <b>{p.t}</b><span>{p.d}</span>
-                    <em>{p.u.map((x) => <i key={x}>{x}</i>)}</em>
+                    <em className="pl-plat" aria-label="Inclui Cerne Web e dois apps"><Icon icon={GlobeIcon} size={14} strokeWidth={2} />Web<Icon icon={PlusIcon} size={12} strokeWidth={2.6} /><Icon icon={SmartPhone01Icon} size={14} strokeWidth={2} />2 apps</em>
                   </th>
                 ))}
               </tr>
@@ -682,7 +684,7 @@ export function PlansSection() {
             </tfoot>
           </table>
         </div>
-        <p className="fineprint" data-reveal>Valores sob consulta, de acordo com o porte da fazenda (cabeças ou hectares) e o número de usuários.</p>
+        <p className="fineprint" data-reveal>Valores sob consulta, de acordo com o porte da fazenda (cabeças ou hectares).</p>
       </div>
     </section>
   )

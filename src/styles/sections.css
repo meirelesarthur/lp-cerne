@@ -482,3 +482,7 @@ html.reveal-on [data-reveal] { opacity: 0; transform: translateY(24px); }
    as duas; a seção sobe 2px por cima do fim do Hero e a foto desce os mesmos 2px, então a continuidade da imagem não muda */
 .ground { margin-top: -2px; }
 .ground-bg img { transform: translateY(2px); }
+
+/* "Web + 2 apps" no topo de cada plano: todos os planos levam o Cerne Web e os dois apps */
+.pl-head em.pl-plat { display: inline-flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+.pl-head em.pl-plat svg { flex: none; }
