@@ -489,7 +489,8 @@ export function ProfilesSection() {
 }
 
 /* ───────────────────────── GB Twin ───────────────────────── */
-const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas']
+// duas colunas de 4: a primeira desce com o censo e o controle de falhas, a segunda com 3D, realidade virtual, safra e confiabilidade
+const TWIN_ITENS = ['Censo de copas por pivô', 'Mapa do censo em células de 20 m', 'Calibração por amostra de campo', 'Busca e controle de falhas', 'Reconstrução 3D da plantação', 'Pronto para realidade virtual', 'Previsibilidade de safra', 'Até 98,5% de confiabilidade']
 
 export function TwinSection() {
   const wa = whatsappHref('Olá! Quero conhecer o GB Twin.')

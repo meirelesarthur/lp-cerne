@@ -5,7 +5,8 @@ export type SwapItem = { key: string; title: string; desc: string; src?: string;
 /**
  * Card Swap (inspirado no React Bits): telas empilhadas em 3D, centralizadas; a da frente vai para o fundo a cada
  * `interval` ms. Clicar numa tela de trás (ou numa pílula) traz aquela para a frente; clicar na da frente passa
- * para a próxima. O avanço automático para com o mouse em cima, fora da tela e com movimento reduzido.
+ * para a próxima. O avanço automático só para fora da tela, com movimento reduzido ou quando a pessoa aperta "Pausar"
+ * (WCAG 2.2.2). Passar o mouse por cima NÃO pausa: com o cursor parado no meio da tela durante a rolagem, a rotação não andava.
  * Pilha 3D só em tela larga e sem movimento reduzido; fora disso aparece só a tela ativa. Só transform e opacity (CSS).
  */
 export function CardSwap({ items, interval = 3000, label }: { items: SwapItem[]; interval?: number; label: string }) {
@@ -13,7 +14,7 @@ export function CardSwap({ items, interval = 3000, label }: { items: SwapItem[];
   const root = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
   const [inView, setInView] = useState(false)
-  const [paused, setPaused] = useState(false)
+  const [paused, setPaused] = useState(false) // pausa pedida pela pessoa (botão)
   const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   // `tick` reinicia o intervalo (e a barra de progresso) a cada troca, inclusive as feitas por clique
   const [tick, setTick] = useState(0)
@@ -36,7 +37,7 @@ export function CardSwap({ items, interval = 3000, label }: { items: SwapItem[];
 
   const cur = items[active]
   return (
-    <div ref={root} className="cs" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
+    <div ref={root} className="cs">
       <ul className="cs-stage" aria-label={label}>
         {items.map((m, i) => {
           const p = (i - active + n) % n
@@ -53,6 +54,7 @@ export function CardSwap({ items, interval = 3000, label }: { items: SwapItem[];
         <strong>{cur.title}</strong>
         <span>{cur.desc}</span>
       </div>
+      {!reduced && <button type="button" className="cs-pause" aria-pressed={paused} onClick={() => setPaused((p) => !p)}>{paused ? 'Retomar rotação' : 'Pausar rotação'}</button>}
       <div className="cs-pills" role="group" aria-label="Telas do Cerne">
         {items.map((m, i) => (
           <button key={m.key} type="button" className={`cs-pill${i === active ? ' on' : ''}${running ? ' run' : ''}`} aria-pressed={i === active} onClick={() => go(i)} style={{ '--ms': `${interval}ms` } as React.CSSProperties}>

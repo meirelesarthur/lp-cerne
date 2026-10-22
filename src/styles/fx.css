@@ -139,3 +139,7 @@
   .fatos .gc-ico-sm { width: 46px; height: 46px; margin: 0 0 14px; border-radius: 13px; }
   .fatos h3 { margin: 0 0 8px; font-size: 18px; }
 }
+
+/* controle de pausa da rotação automática (WCAG 2.2.2): discreto, abaixo da legenda */
+.cs-pause { display: block; margin: 10px auto 0; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(226, 240, 232, .28); background: transparent; color: #a9c7b6; font: inherit; font-size: 12.5px; cursor: pointer; }
+.cs-pause:hover { color: #e2f0e8; border-color: rgba(226, 240, 232, .5); }
