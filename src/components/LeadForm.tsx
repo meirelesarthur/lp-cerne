@@ -5,8 +5,8 @@ type Errors = Partial<Record<'name' | 'email' | 'whatsapp', string>>
 type Values = { name: string; email: string; whatsapp: string; interest: string }
 
 const CTA = 'Quero acesso antecipado'
-/** Link da Política de Privacidade (VITE_PRIVACY_URL). Sem ele, o texto aparece sem link até a página existir. */
-const PRIVACY_URL = import.meta.env.VITE_PRIVACY_URL as string | undefined
+/** Página da Política de Privacidade (public/privacidade.html). VITE_PRIVACY_URL troca o endereço, se preciso. */
+const PRIVACY_URL = (import.meta.env.VITE_PRIVACY_URL as string | undefined) || '/privacidade.html'
 /** Texto de ciência exibido sob o botão: é registrado junto do lead (prova do que a pessoa viu ao clicar). */
 const CONSENT_TEXT = `Ao clicar em "${CTA}", declaro que li e concordo com a Política de Privacidade e autorizo a GB Agritech a entrar em contato por WhatsApp (e por e-mail, se informado) sobre o Cerne.`
 
@@ -95,7 +95,7 @@ export function LeadForm({ variant, focusId }: { variant: 'hero' | 'page'; focus
 
       <button className="btn btn-primary" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Enviando…' : CTA}</button>
       <p className="legal-note">
-        Ao clicar em “{CTA}”, declaro que li e concordo com a {PRIVACY_URL ? <a href={PRIVACY_URL} target="_blank" rel="noreferrer">Política de Privacidade</a> : <b>Política de Privacidade</b>} e autorizo a GB Agritech a entrar em contato por WhatsApp (e por e-mail, se informado) sobre o Cerne.
+        Ao clicar em “{CTA}”, declaro que li e concordo com a <a href={PRIVACY_URL} target="_blank" rel="noreferrer">Política de Privacidade</a> e autorizo a GB Agritech a entrar em contato por WhatsApp (e por e-mail, se informado) sobre o Cerne.
       </p>
       {status === 'error' && <p className="form-msg bad" role="alert">Não foi possível enviar agora. Tente novamente em instantes.</p>}
     </form>

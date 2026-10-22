@@ -730,6 +730,7 @@ export function Footer() {
         </nav>
         <div className="legal">
           <a href="https://gbagritech.com.br" target="_blank" rel="noreferrer">gbagritech.com.br</a>
+          <a href="/privacidade.html">Política de Privacidade</a>
         </div>
       </div>
     </footer>
